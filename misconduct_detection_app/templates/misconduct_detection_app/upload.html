@@ -1,0 +1,108 @@
+{% extends 'misconduct_detection_app/layout.html' %}
+
+{% block sideButton %}
+    <a href="\examine\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" onclick="submitAllFiles()" title="You have not uploaded any file yet" id="nextButton" disabled>Next</button></a>
+    <br><br>
+    <a href="\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
+    <br><br>
+    <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal" data-target="#cancelButton">Cancel</button>
+    <br><hr>
+
+    <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ request.build_absolute_uri }}uploadFile/" id="uploadFile_Form">
+        {% csrf_token %}
+        <input type="file" name="file" onchange="uploadFile();" id="uploadFile_Input"> 
+        <label for="uploadFile_Input" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="uploadFile_Label">
+            Upload File
+        </label>
+    </form>
+
+    <br>
+
+    <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ request.build_absolute_uri }}uploadFolder/" id="uploadFolder_Form" value="value">
+        {% csrf_token %}
+        <input type="file" name="file" onchange="uploadFolder();" id="uploadFolder_Input" directory multiple webkitdirectory mozdirectory> 
+        <label for="uploadFolder_Input" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="uploadFolder_Label">
+            Upload Folder
+        </label>
+    </form>
+
+    <br>
+
+{% endblock %}
+
+{% block content %}
+    <p id="upload_Content">
+        At this page, you need to upload the file to be checked and the folder which contains files to be compared. <br> <br> <br>
+        When the files are uploaded, please click "Next" to continue. <br>
+        If you wish to cancel your current job and go to last page, click "Back" to cancel your operations and return to last page.<br>
+        If you wish to cancel your current job and go to the first page, click "Cancel" to cancel all your operations and return to first page.<br>
+    </p>
+{% endblock %}
+
+{% block javaScriptOnPage %}
+    <script>
+        pageName = "Uploading";
+        uploadFileFinish = false;
+        uploadFolderFinish = false;
+
+        function uploadFile() {
+            uploadFileFinish = true;
+            openNextButton();
+            document.getElementById("uploadFile_Label").classList.remove("btn-outline-primary");
+            document.getElementById("uploadFile_Label").classList.add("btn-outline-secondary");
+            document.getElementById("uploadFile_Label").classList.add("disabled");
+            singleFile = new FormData($('#uploadFile_Form')[0]);
+            $.ajax({
+                url: "{{ request.build_absolute_uri }}uploadFile/",
+                type: 'POST',
+                cache: false,
+                data: singleFile,
+                processData: false,
+                contentType: false,
+                dataType:"json",
+                beforeSend: function(){
+                    uploading = true;
+                },
+                success : function(data) {
+                    uploading = false;
+                }
+            });
+        }
+
+        function uploadFolder() {
+            uploadFolderFinish = true;
+            openNextButton();
+            document.getElementById("uploadFolder_Label").classList.remove("btn-outline-primary");
+            document.getElementById("uploadFolder_Label").classList.add("btn-outline-secondary");
+            document.getElementById("uploadFolder_Label").classList.add("disabled");
+            var folderFileList = $('#uploadFolder_Form')[0];
+
+            folderFile = new FormData(folderFileList);
+
+
+            $.ajax({
+                url: "{{ request.build_absolute_uri }}uploadFolder/",
+                type: 'POST',
+                cache: false,
+                data: folderFile,
+                processData: false,
+                contentType: false,
+                dataType:"json",
+                beforeSend: function(){
+                    uploading = true;
+                },
+                success : function(data) {
+                    uploading = false;
+                }
+            });
+        }
+
+        function openNextButton() {
+            if (uploadFileFinish == true && uploadFolderFinish == true)
+            {
+                document.getElementById("nextButton").removeAttribute("disabled");
+                document.getElementById("nextButton").removeAttribute("title");
+            }
+        }
+    </script>
+{% endblock %}

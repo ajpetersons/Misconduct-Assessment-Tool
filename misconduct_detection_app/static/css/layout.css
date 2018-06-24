@@ -1,0 +1,13 @@
+#layoutHeader {
+    font-size: 35px;
+    font-family:'Segoe UI',Arial,sans-serif;
+}
+
+.btn-custom-size {
+    width: 100px;
+}
+
+p, ul {
+    font-size: 22px;
+    line-height: 50px;
+}

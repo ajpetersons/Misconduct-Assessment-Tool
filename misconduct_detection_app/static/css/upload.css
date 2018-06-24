@@ -1,0 +1,11 @@
+input[type="file"] {
+    display: none;
+}
+
+.btn-custom-size-for-upload {
+    width: 145px;
+}
+
+.label-for-upload {
+    margin: 0 auto;
+}

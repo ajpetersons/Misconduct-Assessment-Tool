@@ -1,0 +1,59 @@
+{% extends 'misconduct_detection_app/layout.html' %}
+
+{% block sideButton %}
+    <a href="\select\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Next</button></a>
+    <br><br>
+    <a href="\upload\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
+    <br><br>
+    <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal" data-target="#cancelButton">Cancel</button>
+    <br><hr>
+
+    <div class="nav flex-column nav-pills" id="fileFolderSwitchTab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link nav-item" id="fileFolderSwitchTab_File" data-toggle="pill" href="#fileFolderSwitchContent_File" role="tab" aria-controls="fileFolderSwitchContent_File" aria-selected="true">Uploaded File</a>
+        <a class="nav-link nav-item" id="fileFolderSwitchTab_Folder" data-toggle="pill" href="#fileFolderSwitchContent_Folder" role="tab" aria-controls="fileFolderSwitchContent_Folder" aria-selected="false">Uploaded Folder</a>
+    </div>
+
+{% endblock %}
+
+{% block content %}
+    <p id="examine_Content">
+        At this page, you will have a chance to examine the files you have just uploaded. <br> <br>
+        Please select one item at the left to begin.<br>
+        When you are ready, please click 'Next' to continue.
+    </p>
+    <div class="tab-content" id="fileFolderSwitchContent">
+        <div class="tab-pane fade" id="fileFolderSwitchContent_File" role="tabpanel" aria-labelledby="fileFolderSwitchTab_File">
+            {% for local_file in local_files %}
+            <a href="singlefiles/{{ local_file }}" target="_blank">{{ local_file }}</a>
+            <br>
+            {% endfor %}
+        </div>
+        <div class="tab-pane fade" id="fileFolderSwitchContent_Folder" role="tabpanel" aria-labelledby="fileFolderSwitchTab_Folder">
+            {% for local_folder in local_folders %}
+            <a href="folders/{{ local_folder }}" onclick="operateFolderView(this.id)" id="folders/{{ local_folder }}">{{ local_folder }}</a>
+            <br>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javaScriptOnPage %}
+    <script>
+        pageName = "Examination";
+        document.getElementById("fileFolderSwitchTab_File").addEventListener("click", selectOneItem);
+        document.getElementById("fileFolderSwitchTab_Folder").addEventListener("click", selectOneItem);
+
+        function selectOneItem() {
+            examine_Content = document.getElementById("examine_Content").innerHTML = "";
+        }
+
+        function operateFolderView(id) {
+            var data;
+            $.get( id, function( data ) {
+                alert( "Data Loaded: " + data );
+            });
+
+            
+        }
+    </script>
+{% endblock %}

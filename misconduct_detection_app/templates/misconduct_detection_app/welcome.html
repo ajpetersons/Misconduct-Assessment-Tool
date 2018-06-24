@@ -1,0 +1,30 @@
+{% extends 'misconduct_detection_app/layout.html' %}
+
+{% block sideButton %}
+    <a href="upload"><button class="btn btn-outline-secondary btn-lg btn-custom-size">Next</button></a>
+    <br>
+{% endblock %}
+
+{% block content %}
+    <p>
+        Welcome to use this misconduct detection assistant tool. This tool is designed to assist
+        code misconduct detection. Here is a brief introduction: 
+    </p>
+
+    <ul>
+        <li>First, you will be asked to upload a file to check and a folder which contains the files to be compared as base</li>
+        <li>Then, you will have a chance to review the files you uploaded and edit them.</li>
+        <li>Next, you can select code segments from the file you uploaded, which will be compared with the base files</li>
+        <li>Finally, you can view the results and generate report.</li>
+    </ul>
+
+    <p>
+        Please click "Next" to begin.
+    </p>
+{% endblock %}
+
+{% block javaScriptOnPage %}
+    <script>
+        pageName = "Welcome";
+    </script>
+{% endblock %}
