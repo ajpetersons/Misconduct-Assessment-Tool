@@ -3,6 +3,8 @@
 *.s
 *.pyc
 .idea/
+misconduct_detection_app/uploads
+
 
 # Created by https://www.gitignore.io
 
