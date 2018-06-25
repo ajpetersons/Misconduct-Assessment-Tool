@@ -4,6 +4,7 @@
 *.pyc
 .idea/
 misconduct_detection_app/uploads
+misconduct_detection_app/results
 
 
 # Created by https://www.gitignore.io

@@ -1,7 +1,7 @@
 {% extends 'misconduct_detection_app/layout.html' %}
 
 {% block sideButton %}
-    <a href="\results\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" disabled id="nextButton">Next</button></a>
+    <a href="runningWaitingPage\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" disabled id="nextButton">Next</button></a>
     <br><br>
     <a href="\examine\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
     <br><br>
@@ -54,7 +54,7 @@
             });
         }
 
-        document.getElementById("selectCode_Input").onclick = function() {
+        document.getElementById("selectCode_Label").onclick = function() {
             document.getElementById("nextButton").removeAttribute("disabled");
         }
 

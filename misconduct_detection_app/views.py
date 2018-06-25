@@ -1,3 +1,5 @@
+import shutil
+
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, MemoryFileUploadHandler, TemporaryFileUploadHandler
 from django.shortcuts import render
@@ -184,28 +186,6 @@ def handle_upload_folder(file, file_name, file_extension, original_path):
             destination.write(chunk)
 
 
-# ------------------------------------Run the Jplag jar------------------------------------
-
-
-def run_jar(request):
-    """Run the .jar type detection plugin
-
-    TODO: NOT FINISHED YET!!
-    
-    :param request: request
-    :type request: HttpRequest
-    :return: HttpResponse
-    :rtype: HttpResponse
-    """
-    return HttpResponse("Running Finished")
-
-    detection_plugin_path = "%cd%\\detetion_libs\\jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"
-    results_path = "%cd%\\results\\"
-    upload_file_path = "%cd%\\uploads\\folders"
-    os.system("java -jar {0} -m 999 -l c/c++ -r {1} {2}".format(detection_plugin_path, results_path, upload_file_path))
-    return HttpResponse("Running Finished")
-
-
 # ------------------------------------Examination Page------------------------------------
 
 
@@ -244,3 +224,42 @@ def select_code(request):
         return HttpResponse('Selection Succeeded')
     else:
         return HttpResponse('Selection Failed') 
+
+
+# ------------------------------------Run the Jplag jar------------------------------------
+
+
+def run_jar(request):
+    """Run the .jar type detection plugin
+
+    TODO: NOT FINISHED YET!!
+    
+    :param request: request
+    :type request: HttpRequest
+    :return: HttpResponse
+    :rtype: HttpResponse
+    """
+
+    detection_plugin_path = "%cd%\\detetion_libs\\jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"
+    results_path = "%cd%\\results\\"
+    upload_file_path = "%cd%\\uploads\\folders"
+    os.system("java -jar {0} -m 999 -l c/c++ -r {1} {2}".format(detection_plugin_path, results_path, upload_file_path))
+    return HttpResponse("Running Finished")
+
+
+def run_detection(request):
+    return render(request, 'misconduct_detection_app/running.html')
+
+
+def run_detection_core(request):
+    # path_folder = "misconduct_detection_app/uploads/folders/"
+    # des_folder = "misconduct_detection_app/uploads/temp/"
+    # local_folders = os.listdir(path_folder)
+    # for file_name in local_folders:
+    #     shutil.copytree(path_folder + file_name, des_folder + file_name)
+
+    detection_plugin_path = "%cd%\\misconduct_detection_app\\detection_libs\\jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"
+    results_path = "%cd%\\misconduct_detection_app\\results\\"
+    upload_file_path = "%cd%\\misconduct_detection_app\\uploads\\temp"
+    os.system("java -jar {0} -m 999 -l c/c++ -s -r {1} {2}".format(detection_plugin_path, results_path, upload_file_path))
+    return HttpResponse("Running Finished")

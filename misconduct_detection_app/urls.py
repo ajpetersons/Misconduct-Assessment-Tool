@@ -28,5 +28,7 @@ urlpatterns = [
     path('examine/singlefiles/<str:name>', views.examine_file, name='examine_file'),
     path('examine/folders/<str:name>', views.examine_folder, name='examine_folder'),
     path('select/selectCode/', views.select_code, name='select_code'),
+    path('select/runningWaitingPage/', views.run_detection, name='run_detection'),
+    path('select/running/', views.run_detection_core, name='run_detection'),
     path('runjar/', views.run_jar, name='run_jar'),
 ]
