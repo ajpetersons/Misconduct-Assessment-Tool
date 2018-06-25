@@ -27,5 +27,6 @@ urlpatterns = [
     path('upload/uploadFolder/', views.upload_folder, name='upload_folder'),
     path('examine/singlefiles/<str:name>', views.examine_file, name='examine_file'),
     path('examine/folders/<str:name>', views.examine_folder, name='examine_folder'),
+    path('select/selectCode/', views.select_code, name='select_code'),
     path('runjar/', views.run_jar, name='run_jar'),
 ]

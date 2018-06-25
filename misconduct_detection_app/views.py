@@ -83,9 +83,12 @@ def select_index(request):
     path_file = "misconduct_detection_app/uploads/singlefiles/"
     local_files = os.listdir(path_file)
 
-    f = open(path_file + local_files, 'r')
+    f = open(path_file + local_files[0], 'r')
     file_content = f.read()
     f.close()
+    context = {
+        "file_content": file_content,
+    }
 
     return render(request, 'misconduct_detection_app/select.html', context)
 
@@ -176,7 +179,7 @@ def handle_upload_folder(file, file_name, file_extension, original_path):
     path = 'misconduct_detection_app/uploads/folders/' + original_path
     if not os.path.exists(path):
         os.makedirs(path)
-    with open(path + file_name + file_extension, 'wb+')as destination:
+    with open(path + file_name + file_extension, 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
 
@@ -225,3 +228,19 @@ def examine_folder_files(request, name):
     file_content = f.read()
     f.close()
     return HttpResponse(file_content, content_type="text/plain")
+
+
+# ------------------------------------Select Code------------------------------------
+
+
+def select_code(request):
+    path = "misconduct_detection_app/uploads/temp/"
+
+    if request.method == 'POST':
+        if not os.path.exists(path):
+            os.makedirs(path)
+        with open(path + 'target' + '.c', 'w+') as f:
+            f.write(request.POST['inputCode'])
+        return HttpResponse('Selection Succeeded')
+    else:
+        return HttpResponse('Selection Failed') 

@@ -1,24 +1,29 @@
 {% extends 'misconduct_detection_app/layout.html' %}
 
 {% block sideButton %}
-    <a href="\results\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Next</button></a>
+    <a href="\results\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" disabled id="nextButton">Next</button></a>
     <br><br>
     <a href="\examine\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
     <br><br>
     <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal" data-target="#cancelButton">Cancel</button>
     <br><hr>
+
+    <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ request.build_absolute_uri }}uploadFile/" id="selectCode_Form">
+        {% csrf_token %}
+        <label for="selectCode_Input" onclick="selectCodeContinue()" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="selectCode_Label">
+            Continue
+        </label>
+    </form>
 {% endblock %}
 
 {% block content %}
     <div class="container-fluid">
         <div class="row flex-xl-nowrap">
             <div class="input-group col-12 col-md-6 col-lg-6 border-right">
-                <div class="input-group-prepend">
-                </div>
-                <textarea class="form-control" id="codeDisplayText">#Code Here</textarea>
+                <textarea class="form-control" id="codeDisplayText" rows="30" readonly>#Code Here</textarea>
             </div>
             <div class="input-group col-12 col-md-6 col-lg-6">
-                <textarea class="form-control" id="inputText">#Input Here</textarea>
+                <textarea class="form-control" id="inputText" rows="30" name="inputCode" form="selectCode_Form">You have not added any code segment yet.</textarea>
             </div>
         </div>
     </div>
@@ -27,7 +32,34 @@
 {% block javaScriptOnPage %}
     <script>
         pageName = "Selection";
+        const code = `{{ file_content }}`;
+        document.getElementById("codeDisplayText").innerHTML = code;
 
-        
+        function selectCodeContinue() {
+            selectedCode = new FormData($('#selectCode_Form')[0]);
+            $.ajax({
+                url: "{{ request.build_absolute_uri }}selectCode/",
+                type: 'POST',
+                cache: false,
+                data: selectedCode,
+                processData: false,
+                contentType: false,
+                dataType:"json",
+                beforeSend: function() {
+                    uploading = true;
+                },
+                success : function(data) {
+                    uploading = false;
+                }
+            });
+        }
+
+        document.getElementById("selectCode_Input").onclick = function() {
+            document.getElementById("nextButton").removeAttribute("disabled");
+        }
+
+        document.getElementById("inputText").onclick = function() {
+            document.getElementById("nextButton").setAttribute("disabled", "disabled");
+        }
     </script>
 {% endblock %}

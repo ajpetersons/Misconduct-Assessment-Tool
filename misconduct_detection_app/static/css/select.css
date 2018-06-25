@@ -5,3 +5,7 @@
 #inputText {
     font-size: 20px;
 }
+
+input[type="text"] {
+    display: none;
+}
