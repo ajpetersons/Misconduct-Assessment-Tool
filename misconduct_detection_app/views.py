@@ -80,7 +80,14 @@ def examine_index(request):
 
 
 def select_index(request):
-    return render(request, 'misconduct_detection_app/select.html')
+    path_file = "misconduct_detection_app/uploads/singlefiles/"
+    local_files = os.listdir(path_file)
+
+    f = open(path_file + local_files, 'r')
+    file_content = f.read()
+    f.close()
+
+    return render(request, 'misconduct_detection_app/select.html', context)
 
 
 def results_index(request):

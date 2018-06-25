@@ -10,11 +10,24 @@
 {% endblock %}
 
 {% block content %}
-
+    <div class="container-fluid">
+        <div class="row flex-xl-nowrap">
+            <div class="input-group col-12 col-md-6 col-lg-6 border-right">
+                <div class="input-group-prepend">
+                </div>
+                <textarea class="form-control" id="codeDisplayText">#Code Here</textarea>
+            </div>
+            <div class="input-group col-12 col-md-6 col-lg-6">
+                <textarea class="form-control" id="inputText">#Input Here</textarea>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block javaScriptOnPage %}
     <script>
         pageName = "Selection";
+
+        
     </script>
 {% endblock %}
