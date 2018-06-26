@@ -252,14 +252,25 @@ def run_detection(request):
 
 
 def run_detection_core(request):
-    # path_folder = "misconduct_detection_app/uploads/folders/"
-    # des_folder = "misconduct_detection_app/uploads/temp/"
-    # local_folders = os.listdir(path_folder)
-    # for file_name in local_folders:
-    #     shutil.copytree(path_folder + file_name, des_folder + file_name)
+    path_folder = "misconduct_detection_app/uploads/folders/"
+    des_folder = "misconduct_detection_app/uploads/temp/"
+    local_folders = os.listdir(path_folder)
+    # Temp used for debuging
+    # local_folders = os.listdir(path_folder + local_folders[0])
+    for file_name in local_folders:
+        if not os.path.exists(des_folder + file_name):
+            shutil.copytree(path_folder + file_name, des_folder + file_name)
 
     detection_plugin_path = "%cd%\\misconduct_detection_app\\detection_libs\\jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"
     results_path = "%cd%\\misconduct_detection_app\\results\\"
     upload_file_path = "%cd%\\misconduct_detection_app\\uploads\\temp"
     os.system("java -jar {0} -m 999 -l c/c++ -s -r {1} {2}".format(detection_plugin_path, results_path, upload_file_path))
-    return HttpResponse("Running Finished")
+
+    path_res = "misconduct_detection_app/results/"
+    file_content = os.listdir(path_res)
+
+    context = {
+        'file_content': file_content
+    }
+
+    return render(request, 'misconduct_detection_app/results.html', context)

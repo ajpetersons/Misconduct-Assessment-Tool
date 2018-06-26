@@ -1,13 +1,15 @@
 {% extends 'misconduct_detection_app/layout.html' %}
 
 {% block sideButton %}
-    <a href="upload"><button class="btn btn-outline-secondary btn-lg btn-custom-size">Next</button></a>
+    <div class="offset-md-3">
+        <a href="upload"><button class="btn btn-outline-secondary btn-lg btn-custom-size">Next</button></a>
+    </div>
     <br>
 {% endblock %}
 
 {% block content %}
     <p>
-        Welcome to use this misconduct detection assistant tool. This tool is designed to assist
+        Welcome to use the misconduct detection assistant (MDA) tool. This tool is designed to assist
         code misconduct detection. Here is a brief introduction: 
     </p>
 
@@ -19,7 +21,7 @@
     </ul>
 
     <p>
-        Please click "Next" to begin.
+        Click "Next" to begin.
     </p>
 {% endblock %}
 

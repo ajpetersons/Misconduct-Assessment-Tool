@@ -1,16 +1,23 @@
 {% extends 'misconduct_detection_app/layout.html' %}
 
 {% block sideButton %}
-    <a href="#"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size disabled">Next</button></a>
-    <br><br>
-    <a href="\select\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
-    <br><br>
-    <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal" data-target="#cancelButton">Cancel</button>
-    <br><hr>
+    <div class="offset-md-3">
+        <a href="#"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size disabled">Next</button></a>
+        <br><br>
+        <a href="\select\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
+        <br><br>
+        <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal" data-target="#cancelButton">Cancel</button>
+        <br>
+    </div>
+    
+    <hr>
 {% endblock %}
 
 {% block content %}
-
+    {% for file in file_content %}
+        <a href="results/{{ file }}" target="_blank">{{ file }}</a>
+        <br>
+    {% endfor %}
 {% endblock %}
 
 {% block javaScriptOnPage %}
