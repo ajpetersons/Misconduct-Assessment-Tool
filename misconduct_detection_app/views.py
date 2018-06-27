@@ -13,20 +13,32 @@ import os
 # ------------------------------------Custom File Handler------------------------------------
 
 
-class CustomInMemoryUploadedFile(InMemoryUploadedFile):
+class MDP_CustomInMemoryUploadedFile(InMemoryUploadedFile):
+    """The custom InMemoryUploadedFile data type
+    
+    In our MDP project, we need to know the original file path to show the details when
+    user asks. Therefore, we added the support of original file path to the file type.
+    """
+
     def __init__(self, file, field_name, name, content_type, size, charset, content_type_extra=None):
         super().__init__(file, field_name, name, content_type, size, charset, content_type_extra)
         self.original_path = name[:name.rfind('/')] + "/"
 
 
-class CustomMemoryFileUploadHandler(MemoryFileUploadHandler):
+class MDP_CustomMemoryFileUploadHandler(MemoryFileUploadHandler):
+    """The custom file upload handler 
+    
+    This file handler uses MDP_CustomInMemoryUploadedFile we defined above to support 
+    save the original file path on the server.
+    """
+
     def file_complete(self, file_size):
         """Return a file object if this handler is activated."""
         if not self.activated:
             return
 
         self.file.seek(0)
-        return CustomInMemoryUploadedFile(
+        return MDP_CustomInMemoryUploadedFile(
             file=self.file,
             field_name=self.field_name,
             name=self.file_name,
@@ -37,16 +49,16 @@ class CustomMemoryFileUploadHandler(MemoryFileUploadHandler):
         )
 
 
-class CustomTemporaryUploadedFile(TemporaryUploadedFile):
+class MDP_CustomTemporaryUploadedFile(TemporaryUploadedFile):
     def __init__(self, name, content_type, size, charset, content_type_extra=None):
         super().__init__(name, content_type, size, charset, content_type_extra)
         self.original_path = name[:name.rfind('/')] + "/"
 
 
-class CustomTemporaryFileUploadHandler(TemporaryFileUploadHandler):
+class MDP_CustomTemporaryFileUploadHandler(TemporaryFileUploadHandler):
     def new_file(self, *args, **kwargs):
         super().new_file(*args, **kwargs)
-        self.file = CustomTemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset,
+        self.file = MDP_CustomTemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset,
                                                 self.content_type_extra)
 
 
