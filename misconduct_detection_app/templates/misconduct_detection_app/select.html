@@ -23,13 +23,36 @@
 {% block content %}
     <div class="container-fluid">
         <div class="row flex-xl-nowrap">
-            <div class="input-group col-12 col-md-6 col-lg-6 border-right">
+            <div class="input-group col-12 col-md-12 col-lg-12">
                 <textarea class="form-control" id="codeDisplayText" rows="30" readonly>#Code Here</textarea>
-            </div>
-            <div class="input-group col-12 col-md-6 col-lg-6">
-                <textarea class="form-control" id="inputText" rows="30" name="inputCode" form="selectCode_Form">You have not added any code segment yet.</textarea>
+
+                <div class="flex-xl-nowrap">
+                    <br><br>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="addSegment"><i class="material-icons">keyboard_arrow_right</i></button>
+                    <div class="row"><br></div>
+                    <div class="row"><br></div>
+                    <div class="row"><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="delSegment"><i class="material-icons">clear</i></button>
+                    
+                    <div class="row"><br></div>
+                </div>
+
+                <!-- <textarea class="form-control" id="inputText" rows="30" name="inputCode" form="selectCode_Form" readonly style="text-align: center">
+                    You have not added any code segment yet.
+                </textarea> -->
+                <div class="card border-secondary" style="max-width: 48rem;">
+                    <div class="card-header">Header</div>
+                    <div class="card-body text-secondary">
+                        <h5 class="card-title">Secondary card title</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
+
+    <div style="display: none" id="hoverMenu">
+        <p>Test here</p>
     </div>
 {% endblock %}
 
@@ -62,6 +85,41 @@
 
         document.getElementById("inputText").onclick = function() {
             document.getElementById("nextButton").setAttribute("disabled", "disabled");
+        }
+
+        document.onmouseup = document.getElementById("codeDisplayText").ondbclick= function(){
+            /*
+            TODO: Support multiple browser here
+            */
+
+            // var txt;
+            // if(document.selection){
+            //     txt = document.selection.createRange().text
+            // }else{
+            //     txt = window.getSelection()+'';
+            // }
+            // if(txt){alert(txt)}
+
+            // TODO: Deselect example here.
+            // if (window.getSelection) {
+            //     if (window.getSelection().empty) {  // Chrome
+            //         window.getSelection().empty();
+            //     } else if (window.getSelection().removeAllRanges) {  // Firefox
+            //         window.getSelection().removeAllRanges();
+            //     }
+            //     } else if (document.selection) {  // IE?
+            //     document.selection.empty();
+            // }
+
+            // var selObj = window.getSelection(); 
+            // if(selObj != ""){alert(selObj);}
+            // var selRange = selObj.getRangeAt(0);
+            // do stuff with the range
+        }
+
+        document.getElementById("addSegment").onclick = function() {
+            var selObj = window.getSelection(); 
+            if(selObj != ""){alert(selObj);}
         }
     </script>
 {% endblock %}
