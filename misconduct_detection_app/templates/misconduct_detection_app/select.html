@@ -33,18 +33,12 @@
                     <div class="row"><br></div>
                     <div class="row"><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>
                     <button type="button" class="btn btn-outline-secondary btn-sm" id="delSegment"><i class="material-icons">clear</i></button>
-                    
                     <div class="row"><br></div>
                 </div>
 
-                <!-- <textarea class="form-control" id="inputText" rows="30" name="inputCode" form="selectCode_Form" readonly style="text-align: center">
-                    You have not added any code segment yet.
-                </textarea> -->
-                <div class="card border-secondary" style="max-width: 48rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body text-secondary">
-                        <h5 class="card-title">Secondary card title</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <div class="card border-secondary" style="width: 48rem;" id="segmentDisplayBox">
+                    <div class="card-body text-secondary text-center">
+                        <h5 class="card-title">You have not added any code segment yet.</h5>
                     </div>
                 </div>
             </div>
@@ -61,6 +55,8 @@
         pageName = "Selection";
         const code = `{{ file_content }}`;
         document.getElementById("codeDisplayText").innerHTML = code;
+        var segmentNumber = 0;
+        var firstCall = true;
 
         document.getElementById("selectCode_Label").onclick = function() {
             selectedCode = new FormData($('#selectCode_Form')[0]);
@@ -83,9 +79,6 @@
             document.getElementById("nextButton").removeAttribute("disabled");
         }
 
-        document.getElementById("inputText").onclick = function() {
-            document.getElementById("nextButton").setAttribute("disabled", "disabled");
-        }
 
         document.onmouseup = document.getElementById("codeDisplayText").ondbclick= function(){
             /*
@@ -116,10 +109,36 @@
             // var selRange = selObj.getRangeAt(0);
             // do stuff with the range
         }
-
+        
         document.getElementById("addSegment").onclick = function() {
-            var selObj = window.getSelection(); 
-            if(selObj != ""){alert(selObj);}
+            if (firstCall) {
+                document.getElementById("segmentDisplayBox").innerHTML = "";
+                firstCall = false;
+            }
+            var selectText = window.getSelection(); 
+            if(selectText != ""){
+                segmentNumber++;
+                var codeSegmentHeader = document.createElement("div");
+                codeSegmentHeader.setAttribute("class", "card-header")
+                codeSegmentHeader.innerHTML = "Segment " + segmentNumber;
+                
+                var codeSegmentDiv = document.createElement("div");
+                codeSegmentDiv.setAttribute("class", "card-body text-secondary");
+
+                var codeSegment = document.createElement("p");
+                codeSegment.setAttribute("class", "card-text");
+
+                var codeSegmentCodePart = document.createElement("pre");
+                codeSegmentCodePart.setAttribute("style", "line-height: 28px;");
+                codeSegmentCodePart.innerHTML = selectText;
+
+                codeSegment.appendChild(codeSegmentCodePart);
+                codeSegmentDiv.appendChild(codeSegment);
+                document.getElementById("segmentDisplayBox").appendChild(codeSegmentHeader);
+                document.getElementById("segmentDisplayBox").appendChild(codeSegmentDiv);
+
+            }
         }
+
     </script>
 {% endblock %}
