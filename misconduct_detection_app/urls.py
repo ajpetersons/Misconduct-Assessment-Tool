@@ -30,5 +30,4 @@ urlpatterns = [
     path('select/selectCode/', views.select_code, name='select_code'),
     path('select/runningWaitingPage/', views.run_detection, name='run_detection'),
     path('select/running/', views.run_detection_core, name='run_detection'),
-    path('runjar/', views.run_jar, name='run_jar'),
 ]

@@ -1,5 +1,6 @@
 import os
 
+
 class DetectionLib:
     def __init__(self, name, lib_path, results_path):
         self.name = name
@@ -43,8 +44,8 @@ class Jplag(DetectionLib):
     def run_detection(self, upload_file_path):
         os.system(
             "java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
-                                                            self.file_language,
                                                             self.number_of_matches,
+                                                            self.file_language,
                                                             self.results_path,
                                                             upload_file_path))
 

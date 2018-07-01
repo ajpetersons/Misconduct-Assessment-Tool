@@ -1,11 +1,13 @@
 import shutil
 
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
-from django.core.files.uploadhandler import FileUploadHandler, MemoryFileUploadHandler, TemporaryFileUploadHandler
+from django.core.files.uploadhandler import MemoryFileUploadHandler, TemporaryFileUploadHandler
 from django.shortcuts import render
 from django.http import HttpResponse
-from .detection_lib_manager import Jplag
+
 import os
+
+from .env_settings import *
 
 
 # Create your views here.
@@ -239,25 +241,8 @@ def select_code(request):
     else:
         return HttpResponse('Selection Failed')
 
-    # ------------------------------------Run the Jplag jar------------------------------------
 
-
-def run_jar(request):
-    """Run the .jar type detection plugin
-
-    TODO: NOT FINISHED YET!!
-    
-    :param request: request
-    :type request: HttpRequest
-    :return: HttpResponse
-    :rtype: HttpResponse
-    """
-
-    detection_plugin_path = "%cd%\\detetion_libs\\jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"
-    results_path = "%cd%\\results\\"
-    upload_file_path = "%cd%\\uploads\\folders"
-    os.system("java -jar {0} -m 999 -l c/c++ -r {1} {2}".format(detection_plugin_path, results_path, upload_file_path))
-    return HttpResponse("Running Finished")
+# ------------------------------------Run the Jplag jar------------------------------------
 
 
 def run_detection(request):
@@ -265,22 +250,21 @@ def run_detection(request):
 
 
 def run_detection_core(request):
-    path_folder = "misconduct_detection_app/uploads/folders/"
-    des_folder = "misconduct_detection_app/uploads/temp/"
-    path_res = "misconduct_detection_app/results/"
+    path_folder = os.path.join("misconduct_detection_app", "uploads", "folders")
+    des_folder = os.path.join("misconduct_detection_app", "uploads", "temp")
+    path_res = os.path.join("misconduct_detection_app", "results")
 
-    local_folders = os.listdir(path_folder)
-    for file_name in local_folders:
-        if not os.path.exists(des_folder + file_name):
-            shutil.copytree(path_folder + file_name, des_folder + file_name)
+    file_relation = {}
 
-    detector = Jplag(name="Jplag",
-                     lib_path="%cd%\\misconduct_detection_app\\detection_libs\\jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar",
-                     results_path="%cd%\\misconduct_detection_app\\results\\",
-                     file_language="c/c++",
-                     number_of_matches="999")
+    counter = 0
+    for (dir_path, dir_names, file_names) in os.walk(path_folder):
+        for file_name in file_names:
+            if not os.path.exists(des_folder + file_name):
+                file_relation[str(counter) + "_" + file_name] = os.path.join(dir_path, file_name)
+                shutil.copy(file_relation[str(counter) + "_" + file_name], des_folder + "/" + str(counter) + "_" + file_name)
+                counter += 1
 
-    detector.run_detection(upload_file_path="%cd%\\misconduct_detection_app\\uploads\\temp")
+    Jplag_detector.run_detection(upload_file_path="%cd%\\misconduct_detection_app\\uploads\\temp")
 
     file_content = os.listdir(path_res)
 
