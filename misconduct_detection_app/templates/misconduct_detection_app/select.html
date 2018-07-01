@@ -109,7 +109,7 @@
             // var selRange = selObj.getRangeAt(0);
             // do stuff with the range
         }
-        
+
         document.getElementById("addSegment").onclick = function() {
             if (firstCall) {
                 document.getElementById("segmentDisplayBox").innerHTML = "";
@@ -125,14 +125,15 @@
                 var codeSegmentDiv = document.createElement("div");
                 codeSegmentDiv.setAttribute("class", "card-body text-secondary");
 
-                var codeSegment = document.createElement("p");
-                codeSegment.setAttribute("class", "card-text");
+                var codeSegment = document.createElement("textarea");
+                codeSegment.setAttribute("class", "form-control");
+                codeSegment.setAttribute("id", "inputText");
+                codeSegment.setAttribute("rows", "10");
+                codeSegment.setAttribute("name", "Segment " + segmentNumber);
+                codeSegment.setAttribute("form", "selectCode_Form");
+                codeSegment.setAttribute("readonly", "readonly");
+                codeSegment.innerHTML = selectText;
 
-                var codeSegmentCodePart = document.createElement("pre");
-                codeSegmentCodePart.setAttribute("style", "line-height: 28px;");
-                codeSegmentCodePart.innerHTML = selectText;
-
-                codeSegment.appendChild(codeSegmentCodePart);
                 codeSegmentDiv.appendChild(codeSegment);
                 document.getElementById("segmentDisplayBox").appendChild(codeSegmentHeader);
                 document.getElementById("segmentDisplayBox").appendChild(codeSegmentDiv);

@@ -231,8 +231,10 @@ def select_code(request):
     if request.method == 'POST':
         if not os.path.exists(path):
             os.makedirs(path)
-        with open(path + 'target' + '.c', 'w+') as f:
-            f.write(request.POST['inputCode'])
+        for code_segment in request.POST.keys():
+            if code_segment != "csrfmiddlewaretoken":
+                with open(path + code_segment + '.c', 'w+') as f:
+                    f.write(request.POST[code_segment])
         return HttpResponse('Selection Succeeded')
     else:
         return HttpResponse('Selection Failed') 
