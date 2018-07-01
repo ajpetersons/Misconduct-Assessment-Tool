@@ -135,8 +135,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 FILE_UPLOAD_HANDLERS = [
-    'misconduct_detection_app.views.MDP_CustomMemoryFileUploadHandler',
-    'misconduct_detection_app.views.MDP_CustomTemporaryFileUploadHandler',
+    'misconduct_detection_app.views.MDPCustomMemoryFileUploadHandler',
+    'misconduct_detection_app.views.MDPCustomTemporaryFileUploadHandler',
     # 'django.core.files.uploadhandler.MemoryFileUploadHandler',
     # 'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]

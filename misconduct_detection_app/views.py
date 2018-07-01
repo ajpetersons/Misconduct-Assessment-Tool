@@ -4,8 +4,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUpload
 from django.core.files.uploadhandler import FileUploadHandler, MemoryFileUploadHandler, TemporaryFileUploadHandler
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from .detection_lib_manager import Jplag
 import os
 
 
@@ -13,7 +12,7 @@ import os
 # ------------------------------------Custom File Handler------------------------------------
 
 
-class MDP_CustomInMemoryUploadedFile(InMemoryUploadedFile):
+class MDPCustomInMemoryUploadedFile(InMemoryUploadedFile):
     """The custom InMemoryUploadedFile data type
     
     In our MDP project, we need to know the original file path to show the details when
@@ -25,7 +24,7 @@ class MDP_CustomInMemoryUploadedFile(InMemoryUploadedFile):
         self.original_path = name[:name.rfind('/')] + "/"
 
 
-class MDP_CustomMemoryFileUploadHandler(MemoryFileUploadHandler):
+class MDPCustomMemoryFileUploadHandler(MemoryFileUploadHandler):
     """The custom file upload handler 
     
     This file handler uses MDP_CustomInMemoryUploadedFile we defined above to support 
@@ -38,7 +37,7 @@ class MDP_CustomMemoryFileUploadHandler(MemoryFileUploadHandler):
             return
 
         self.file.seek(0)
-        return MDP_CustomInMemoryUploadedFile(
+        return MDPCustomInMemoryUploadedFile(
             file=self.file,
             field_name=self.field_name,
             name=self.file_name,
@@ -49,17 +48,17 @@ class MDP_CustomMemoryFileUploadHandler(MemoryFileUploadHandler):
         )
 
 
-class MDP_CustomTemporaryUploadedFile(TemporaryUploadedFile):
+class MDPCustomTemporaryUploadedFile(TemporaryUploadedFile):
     def __init__(self, name, content_type, size, charset, content_type_extra=None):
         super().__init__(name, content_type, size, charset, content_type_extra)
         self.original_path = name[:name.rfind('/')] + "/"
 
 
-class MDP_CustomTemporaryFileUploadHandler(TemporaryFileUploadHandler):
+class MDPCustomTemporaryFileUploadHandler(TemporaryFileUploadHandler):
     def new_file(self, *args, **kwargs):
         super().new_file(*args, **kwargs)
-        self.file = MDP_CustomTemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset,
-                                                self.content_type_extra)
+        self.file = MDPCustomTemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset,
+                                                   self.content_type_extra)
 
 
 # ------------------------------------Index------------------------------------
@@ -214,6 +213,7 @@ def examine_folder(request, name):
     local_folders = os.listdir(path_folder)
     return render(request, 'misconduct_detection_app/examine.html', {"local_folders": local_folders})
 
+
 def examine_folder_files(request, name):
     path_file = "misconduct_detection_app/uploads/folders/"
     f = open(path_file + name, 'r')
@@ -237,10 +237,9 @@ def select_code(request):
                     f.write(request.POST[code_segment])
         return HttpResponse('Selection Succeeded')
     else:
-        return HttpResponse('Selection Failed') 
+        return HttpResponse('Selection Failed')
 
-
-# ------------------------------------Run the Jplag jar------------------------------------
+    # ------------------------------------Run the Jplag jar------------------------------------
 
 
 def run_jar(request):
@@ -268,19 +267,21 @@ def run_detection(request):
 def run_detection_core(request):
     path_folder = "misconduct_detection_app/uploads/folders/"
     des_folder = "misconduct_detection_app/uploads/temp/"
+    path_res = "misconduct_detection_app/results/"
+
     local_folders = os.listdir(path_folder)
-    # Temp used for debuging
-    # local_folders = os.listdir(path_folder + local_folders[0])
     for file_name in local_folders:
         if not os.path.exists(des_folder + file_name):
             shutil.copytree(path_folder + file_name, des_folder + file_name)
 
-    detection_plugin_path = "%cd%\\misconduct_detection_app\\detection_libs\\jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"
-    results_path = "%cd%\\misconduct_detection_app\\results\\"
-    upload_file_path = "%cd%\\misconduct_detection_app\\uploads\\temp"
-    os.system("java -jar {0} -m 999 -l c/c++ -s -r {1} {2}".format(detection_plugin_path, results_path, upload_file_path))
+    detector = Jplag(name="Jplag",
+                     lib_path="%cd%\\misconduct_detection_app\\detection_libs\\jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar",
+                     results_path="%cd%\\misconduct_detection_app\\results\\",
+                     file_language="c/c++",
+                     number_of_matches="999")
 
-    path_res = "misconduct_detection_app/results/"
+    detector.run_detection(upload_file_path="%cd%\\misconduct_detection_app\\uploads\\temp")
+
     file_content = os.listdir(path_res)
 
     context = {
