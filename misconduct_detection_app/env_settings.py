@@ -13,7 +13,6 @@ detection_libs_path = {
     "Jplag": os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar")
 }
 
-
 jplag_detector = Jplag(name="Jplag",
                        lib_path=detection_libs_path["Jplag"],
                        results_path=RESULTS_PATH,
@@ -21,4 +20,4 @@ jplag_detector = Jplag(name="Jplag",
                        folder_to_compare_path=FOLDER_PATH,
                        file_language="c/c++",
                        number_of_matches="1%",
-)
+                       )

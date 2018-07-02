@@ -1,5 +1,6 @@
 import os
 import shutil
+from bs4 import BeautifulSoup
 
 
 class DetectionLib:
@@ -60,6 +61,8 @@ class DetectionLib:
 
     @file_to_compare_path.setter
     def file_to_compare_path(self, file_to_compare_path):
+        if not os.path.exists(file_to_compare_path):
+            os.makedirs(file_to_compare_path)
         self.__file_to_compare_path = file_to_compare_path
 
     @property
@@ -92,15 +95,18 @@ class Jplag(DetectionLib):
     def run_detection(self, temp_working_path):
         counter = 0
 
-        for (dir_path, dir_names, file_names) in os.walk(self.file_to_compare_path):
-            for file_name in file_names:
-                shutil.copy(os.path.join(dir_path, file_name), os.path.join(temp_working_path, file_name))
+        if not os.path.exists(temp_working_path):
+            os.makedirs(temp_working_path)
+
+        for file_name in os.listdir(self.file_to_compare_path):
+            shutil.copy(os.path.join(self.file_to_compare_path, file_name), os.path.join(temp_working_path, file_name))
 
         for (dir_path, dir_names, file_names) in os.walk(self.folder_to_compare_path):
             for file_name in file_names:
                 if not os.path.exists(temp_working_path + file_name):
                     self.file_relation[str(counter)] = os.path.join(dir_path, file_name)
-                    shutil.copy(self.file_relation[str(counter)], temp_working_path + "/" + str(counter) + "_" + file_name)
+                    shutil.copy(self.file_relation[str(counter)],
+                                temp_working_path + "/" + str(counter) + "_" + file_name)
                     counter += 1
 
         os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
@@ -110,7 +116,30 @@ class Jplag(DetectionLib):
                                                                   temp_working_path))
 
     def results_interpretation(self):
-        return 0
+        with open(os.path.join(self.results_path, "index.html")) as fp:
+            soup = BeautifulSoup(fp, 'html.parser')
+
+        search_files = os.listdir(self.file_to_compare_path)
+
+        results = {}
+
+        for search_file in search_files:
+            temp_similarities_for_searching_file = {}
+            for tag in soup.find_all('h4'):
+                if 'Matches sorted by maximum similarity (' in tag.contents:
+                    for tr_tag in tag.parent.find_all('tr'):
+                        if search_file in tr_tag.contents[0].contents:
+                            only_similarities = tr_tag.contents[2:]
+                            for one_similarity in only_similarities:
+                                original_file_name = one_similarity.contents[0].contents[0]
+                                original_result_link = one_similarity.contents[0].get("href")
+                                similarity = one_similarity.contents[2].contents[0]
+                                temp_similarities_for_searching_file[
+                                    self.file_relation[original_file_name[:original_file_name.find("_")]]] = [
+                                    similarity, original_result_link]
+            results[search_file] = temp_similarities_for_searching_file
+
+        return results
 
     def clean_working_envs(self, temp_working_path):
         shutil.rmtree(temp_working_path)
