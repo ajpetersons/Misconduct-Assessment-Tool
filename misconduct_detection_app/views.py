@@ -228,14 +228,12 @@ def examine_folder_files(request, name):
 
 
 def select_code(request):
-    path = "misconduct_detection_app/uploads/temp/"
-
     if request.method == 'POST':
-        if not os.path.exists(path):
-            os.makedirs(path)
+        if not os.path.exists(SEGMENTS_PATH):
+            os.makedirs(SEGMENTS_PATH)
         for code_segment in request.POST.keys():
             if code_segment != "csrfmiddlewaretoken":
-                with open(path + code_segment + '.c', 'w+') as f:
+                with open(SEGMENTS_PATH + "/" + code_segment + '.c', 'w+') as f:
                     f.write(request.POST[code_segment])
         return HttpResponse('Selection Succeeded')
     else:
@@ -250,14 +248,6 @@ def run_detection(request):
 
 
 def run_detection_core(request):
-    path_folder = os.path.join("misconduct_detection_app", "uploads", "folders")
-    des_folder = os.path.join("misconduct_detection_app", "uploads", "temp")
-    path_res = os.path.join("misconduct_detection_app", "results")
-
-    file_relation = {}
-
-    counter = 0
-
     # for (dir_path, dir_names, file_names) in os.walk(path_folder):
     #     for file_name in file_names:
     #         if not os.path.exists(des_folder + file_name):
@@ -283,16 +273,9 @@ def run_detection_core(request):
     #     Jplag_detector.results_path = path_res + "/" + str(count) + "/"
     #     Jplag_detector.run_detection(upload_file_path="%cd%\\misconduct_detection_app\\uploads\\temp" + "\\" + str(count))
 
-    for (dir_path, dir_names, file_names) in os.walk(path_folder):
-        for file_name in file_names:
-            if not os.path.exists(des_folder + file_name):
-                file_relation[str(counter)] = os.path.join(dir_path, file_name)
-                shutil.copy(file_relation[str(counter)], des_folder + "/" + str(counter) + "_" + file_name)
-                counter += 1
+    jplag_detector.get_results(TEMP_WORKING_PATH)
 
-    Jplag_detector.run_detection(upload_file_path="%cd%\\misconduct_detection_app\\uploads\\temp")
-
-    file_content = os.listdir(path_res)
+    file_content = os.listdir(RESULTS_PATH)
 
     context = {
         'file_content': file_content

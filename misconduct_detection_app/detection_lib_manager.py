@@ -1,13 +1,30 @@
 import os
+import shutil
 
 
 class DetectionLib:
-    def __init__(self, name, lib_path, results_path):
+    def __init__(self, name, lib_path, results_path, file_to_compare_path, folder_to_compare_path):
         self.name = name
         self.lib_path = lib_path
         self.results_path = results_path
+        self.file_to_compare_path = file_to_compare_path
+        self.folder_to_compare_path = folder_to_compare_path
+        self.file_language_supported = []
 
-    def run_detection(self, upload_file_path):
+    def get_results(self, temp_working_path):
+        assert (len(self.file_language_supported) != 0), "No support language defined for " + self.name
+        self.run_detection(temp_working_path=temp_working_path)
+        results = self.results_interpretation()
+        self.clean_working_envs(temp_working_path=temp_working_path)
+        return results
+
+    def run_detection(self, temp_working_path):
+        raise NotImplementedError
+
+    def results_interpretation(self):
+        raise NotImplementedError
+
+    def clean_working_envs(self, temp_working_path):
         raise NotImplementedError
 
     @property
@@ -24,7 +41,10 @@ class DetectionLib:
 
     @lib_path.setter
     def lib_path(self, lib_path):
-        self.__lib_path = lib_path
+        if os.path.isfile(lib_path):
+            self.__lib_path = lib_path
+        else:
+            raise FileNotFoundError("The library given is not found")
 
     @property
     def results_path(self):
@@ -34,20 +54,66 @@ class DetectionLib:
     def results_path(self, results_path):
         self.__results_path = results_path
 
+    @property
+    def file_to_compare_path(self):
+        return self.__file_to_compare_path
+
+    @file_to_compare_path.setter
+    def file_to_compare_path(self, file_to_compare_path):
+        self.__file_to_compare_path = file_to_compare_path
+
+    @property
+    def folder_to_compare_path(self):
+        return self.__folder_to_compare_path
+
+    @folder_to_compare_path.setter
+    def folder_to_compare_path(self, folder_to_compare_path):
+        self.__folder_to_compare_path = folder_to_compare_path
+
+    @property
+    def file_language_supported(self):
+        return self.__file_language_supported
+
+    @file_language_supported.setter
+    def file_language_supported(self, file_language_supported):
+        self.__file_language_supported = file_language_supported
+
 
 class Jplag(DetectionLib):
-    def __init__(self, name, lib_path, results_path, file_language, number_of_matches):
+    def __init__(self, name, lib_path, results_path, file_to_compare_path, folder_to_compare_path, file_language,
+                 number_of_matches):
+        super().__init__(name, lib_path, results_path, file_to_compare_path, folder_to_compare_path)
+        self.file_language_supported = ["java17", "java15", "java15dm", "java12", "java11", "python3", "c/c++",
+                                        "c#-1.2", "char", "text", "scheme"]
         self.file_language = file_language
         self.number_of_matches = number_of_matches
-        super().__init__(name, lib_path, results_path)
+        self.file_relation = {}
 
-    def run_detection(self, upload_file_path):
-        os.system(
-            "java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
-                                                            self.number_of_matches,
-                                                            self.file_language,
-                                                            self.results_path,
-                                                            upload_file_path))
+    def run_detection(self, temp_working_path):
+        counter = 0
+
+        for (dir_path, dir_names, file_names) in os.walk(self.file_to_compare_path):
+            for file_name in file_names:
+                shutil.copy(os.path.join(dir_path, file_name), os.path.join(temp_working_path, file_name))
+
+        for (dir_path, dir_names, file_names) in os.walk(self.folder_to_compare_path):
+            for file_name in file_names:
+                if not os.path.exists(temp_working_path + file_name):
+                    self.file_relation[str(counter)] = os.path.join(dir_path, file_name)
+                    shutil.copy(self.file_relation[str(counter)], temp_working_path + "/" + str(counter) + "_" + file_name)
+                    counter += 1
+
+        os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
+                                                                  self.number_of_matches,
+                                                                  self.file_language,
+                                                                  self.results_path,
+                                                                  temp_working_path))
+
+    def results_interpretation(self):
+        return 0
+
+    def clean_working_envs(self, temp_working_path):
+        shutil.rmtree(temp_working_path)
 
     @property
     def file_language(self):
@@ -55,7 +121,7 @@ class Jplag(DetectionLib):
 
     @file_language.setter
     def file_language(self, file_language):
-        if file_language not in ["java17", "java15", "java15dm", "java12", "java11", "python3", "c/c++", "c#-1.2", "char", "text", "scheme"]:
+        if file_language not in self.file_language_supported:
             raise TypeError("Following language type is not supported by Jplag: " + file_language)
         self.__file_language = file_language
 
