@@ -18,6 +18,11 @@ class DetectionLib:
         results = self.results_interpretation()
         self.clean_working_envs(temp_working_path=temp_working_path)
         return results
+    
+    def run_without_getting_results(self, temp_working_path):
+        assert (len(self.file_language_supported) != 0), "No support language defined for " + self.name
+        self.run_detection(temp_working_path=temp_working_path)
+        self.clean_working_envs(temp_working_path=temp_working_path)
 
     def run_detection(self, temp_working_path):
         raise NotImplementedError
@@ -120,6 +125,8 @@ class Jplag(DetectionLib):
             soup = BeautifulSoup(fp, 'html.parser')
 
         search_files = os.listdir(self.file_to_compare_path)
+        for i in range(len(search_files)):
+            search_files[i] = search_files[i][:search_files[i].find(".")]
 
         results = {}
 
@@ -128,7 +135,7 @@ class Jplag(DetectionLib):
             for tag in soup.find_all('h4'):
                 if 'Matches sorted by maximum similarity (' in tag.contents:
                     for tr_tag in tag.parent.find_all('tr'):
-                        if search_file in tr_tag.contents[0].contents:
+                        if search_file in tr_tag.contents[0].contents[0]:
                             only_similarities = tr_tag.contents[2:]
                             for one_similarity in only_similarities:
                                 original_file_name = one_similarity.contents[0].contents[0]

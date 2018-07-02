@@ -2,10 +2,12 @@ import shutil
 
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from django.core.files.uploadhandler import MemoryFileUploadHandler, TemporaryFileUploadHandler
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
 import os
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 from .env_settings import *
 
@@ -109,7 +111,16 @@ def select_index(request):
 
 
 def results_index(request):
-    return render(request, 'misconduct_detection_app/results.html')
+    jplag_results = jplag_detector.results_interpretation()
+    print(jplag_results)
+
+    jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
+
+    context = {
+        "jplag_results_json_string": jplag_results_json_string
+    }
+
+    return render(request, 'misconduct_detection_app/results.html', context)
 
 
 # ------------------------------------Uploading single file------------------------------------
@@ -248,10 +259,7 @@ def run_detection(request):
 
 
 def run_detection_core(request):
-    jplag_results = jplag_detector.get_results(TEMP_WORKING_PATH)
+    jplag_detector.run_without_getting_results(TEMP_WORKING_PATH)
 
-    context = {
-        'similarities': jplag_results
-    }
-
-    return render(request, 'misconduct_detection_app/results.html', context)
+    # return render(request, 'misconduct_detection_app/results.html', context)
+    return redirect('/results/')

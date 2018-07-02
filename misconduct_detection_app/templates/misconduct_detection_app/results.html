@@ -14,14 +14,31 @@
 {% endblock %}
 
 {% block content %}
-    {% for file in file_content %}
-        <a href="results/{{ file }}" target="_blank">{{ file }}</a>
-        <br>
-    {% endfor %}
+    <div class="container-fluid">
+        <div class="row flex-xl-nowrap">
+            <div class="input-group col-12 col-md-12 col-lg-12">
+                <div class="card border-secondary" style="width: 48rem;" id="segmentDisplayBox">
+                    <div class="card-body text-secondary text-center">
+                        <h5 class="card-title">You have not added any code segment yet.</h5>
+                    </div>
+                </div>
+
+                <div class="card border-secondary" style="width: 48rem;" id="segmentDetailsDisplayBox">
+                    <div class="card-body text-secondary text-center">
+                        <h5 class="card-title">Select one segment to examine details</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block javaScriptOnPage %}
     <script>
         pageName = "Results";
+        var jplag_results_json_string = JSON.parse("{{jplag_results_json_string|escapejs}}");
+
+        // jplag_results_json_string["Segment_1"]["misconduct_detection_app\\uploads\\folders\\inf2c-cs\\0\\palin_finder.c"]
+
     </script>
 {% endblock %}
