@@ -257,11 +257,37 @@ def run_detection_core(request):
     file_relation = {}
 
     counter = 0
+
+    # for (dir_path, dir_names, file_names) in os.walk(path_folder):
+    #     for file_name in file_names:
+    #         if not os.path.exists(des_folder + file_name):
+    #             file_relation[str(counter)] = os.path.join(dir_path, file_name)
+    #             Jplag_detector.results_path = path_res + "/" + str(counter) + "/"
+    #             shutil.copy(file_relation[str(counter)], des_folder + "/" + str(counter) + "_" + file_name)
+    #             Jplag_detector.run_detection(upload_file_path="%cd%\\misconduct_detection_app\\uploads\\temp")
+    #             os.remove(des_folder + "/" + str(counter) + "_" + file_name)
+    #             counter += 1
+
+    # for (dir_path, dir_names, file_names) in os.walk(path_folder):
+    #     for file_name in file_names:
+    #         if not os.path.exists(des_folder + file_name):
+    #             file_relation[str(counter)] = os.path.join(dir_path, file_name)
+    #             if not os.path.exists(des_folder + "/" + str(counter) + "/"):
+    #                 os.makedirs(des_folder + "/" + str(counter) + "/")
+    #             shutil.copy(file_relation[str(counter)], des_folder + "/" + str(counter) + "/" + file_name)
+    #             shutil.copy(des_folder + "/" + "Segment_1.c", des_folder + "/" + str(counter) + "/" + "Segment_1.c")
+    #             shutil.copy(des_folder + "/" + "Segment_2.c", des_folder + "/" + str(counter) + "/" + "Segment_2.c")
+    #             counter += 1
+    #
+    # for count in range(counter):
+    #     Jplag_detector.results_path = path_res + "/" + str(count) + "/"
+    #     Jplag_detector.run_detection(upload_file_path="%cd%\\misconduct_detection_app\\uploads\\temp" + "\\" + str(count))
+
     for (dir_path, dir_names, file_names) in os.walk(path_folder):
         for file_name in file_names:
             if not os.path.exists(des_folder + file_name):
-                file_relation[str(counter) + "_" + file_name] = os.path.join(dir_path, file_name)
-                shutil.copy(file_relation[str(counter) + "_" + file_name], des_folder + "/" + str(counter) + "_" + file_name)
+                file_relation[str(counter)] = os.path.join(dir_path, file_name)
+                shutil.copy(file_relation[str(counter)], des_folder + "/" + str(counter) + "_" + file_name)
                 counter += 1
 
     Jplag_detector.run_detection(upload_file_path="%cd%\\misconduct_detection_app\\uploads\\temp")
