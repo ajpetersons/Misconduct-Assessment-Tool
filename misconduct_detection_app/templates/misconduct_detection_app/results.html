@@ -16,13 +16,21 @@
 {% block content %}
     <div class="container-fluid">
         <div class="row flex-xl-nowrap">
-            <div class="input-group col-12 col-md-12 col-lg-12">
+            <div class="col-12 col-md-6 col-lg-6">
                 <div class="card border-secondary" style="width: 48rem;" id="segmentDisplayBox">
-                    <div class="card-body text-secondary text-center">
-                        <h5 class="card-title">You have not added any code segment yet.</h5>
+                    {% for key, values in segment_files.items %}
+                    <div class="card-header">{{ key }}</div>
+                    <div class="card-body text-secondary">
+                        <p class="card-text">
+                            <pre> {{ values }} </pre>
+                        </p>
                     </div>
+                    {% endfor %}
                 </div>
 
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-6">
                 <div class="card border-secondary" style="width: 48rem;" id="segmentDetailsDisplayBox">
                     <div class="card-body text-secondary text-center">
                         <h5 class="card-title">Select one segment to examine details</h5>
@@ -36,7 +44,30 @@
 {% block javaScriptOnPage %}
     <script>
         pageName = "Results";
-        var jplag_results_json_string = JSON.parse("{{jplag_results_json_string|escapejs}}");
+        var jplag_results = JSON.parse("{{jplag_results_json_string|escapejs}}");
+
+        var keys = [];
+        for (var key in jplag_results) {      
+            if (jplag_results.hasOwnProperty(key)) keys.push(key);
+        }
+
+        document.getElementById("segmentDetailsDisplayBox").innerHTML = "";
+
+        for (var i = 0; i < keys.length; i++) { 
+            var codeSegmentHeader = document.createElement("div");
+            codeSegmentHeader.setAttribute("class", "card-header");
+            codeSegmentHeader.innerHTML = keys[i];
+
+            // var segment_keys = [];
+            // for (var segment_keys in jplag_results[keys]) {      
+            //     if (jplag_results[keys].hasOwnProperty(segment_keys)) keys.push(segment_keys);
+            // }
+
+            // codeSegmentDetails = document.createElement("div");
+            // codeSegmentDetails.setAttribute("class", "card-header")
+
+            document.getElementById("segmentDetailsDisplayBox").appendChild(codeSegmentHeader);
+        }
 
         // jplag_results_json_string["Segment_1"]["misconduct_detection_app\\uploads\\folders\\inf2c-cs\\0\\palin_finder.c"]
 
