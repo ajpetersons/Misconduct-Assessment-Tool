@@ -18,7 +18,7 @@ class DetectionLib:
         results = self.results_interpretation()
         self.clean_working_envs(temp_working_path=temp_working_path)
         return results
-    
+
     def run_without_getting_results(self, temp_working_path):
         assert (len(self.file_language_supported) != 0), "No support language defined for " + self.name
         self.run_detection(temp_working_path=temp_working_path)
@@ -130,6 +130,10 @@ class Jplag(DetectionLib):
 
         results = {}
 
+        for tag in soup.find_all('td'):
+            if 'Submissions:' in tag.contents:
+                submission_number = tag.next_sibling.contents[0]
+
         for search_file in search_files:
             temp_similarities_for_searching_file = {}
             for tag in soup.find_all('h4'):
@@ -146,7 +150,7 @@ class Jplag(DetectionLib):
                                     similarity, original_result_link]
             results[search_file] = temp_similarities_for_searching_file
 
-        return results
+        return results, submission_number
 
     def clean_working_envs(self, temp_working_path):
         shutil.rmtree(temp_working_path)

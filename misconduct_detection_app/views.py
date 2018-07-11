@@ -111,10 +111,6 @@ def select_index(request):
 
 
 def results_index(request):
-    jplag_results = jplag_detector.results_interpretation()
-
-    jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
-
     segment_dir = os.listdir(SEGMENTS_PATH)
     segment_files = {}
 
@@ -122,9 +118,15 @@ def results_index(request):
         with open(SEGMENTS_PATH + "/" + segment, 'r+') as f:
             segment_files[segment[:segment.find(".")]] = f.read()
 
+    jplag_results, jplag_submission_number = jplag_detector.results_interpretation()
+
+    segment_files_json_string = json.dumps(segment_files, cls=DjangoJSONEncoder)
+    jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
+
     context = {
         "jplag_results_json_string": jplag_results_json_string,
-        "segment_files": segment_files,
+        "jplag_submission_number": jplag_submission_number,
+        "segment_files_json_string": segment_files_json_string,
     }
 
     return render(request, 'misconduct_detection_app/results.html', context)

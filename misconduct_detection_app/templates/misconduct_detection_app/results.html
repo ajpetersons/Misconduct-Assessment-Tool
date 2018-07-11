@@ -18,14 +18,14 @@
         <div class="row flex-xl-nowrap">
             <div class="col-12 col-md-6 col-lg-6">
                 <div class="card border-secondary" style="width: 48rem;" id="segmentDisplayBox">
-                    {% for key, values in segment_files.items %}
+                    <!-- {% for key, values in segment_files.items %}
                     <div class="card-header">{{ key }}</div>
                     <div class="card-body text-secondary">
                         <p class="card-text">
                             <pre> {{ values }} </pre>
                         </p>
                     </div>
-                    {% endfor %}
+                    {% endfor %} -->
                 </div>
 
             </div>
@@ -44,19 +44,57 @@
 {% block javaScriptOnPage %}
     <script>
         pageName = "Results";
-        var jplag_results = JSON.parse("{{jplag_results_json_string|escapejs}}");
+        const jplag_results = JSON.parse("{{ jplag_results_json_string|escapejs }}");
+        const segment_files = JSON.parse("{{ segment_files_json_string|escapejs }}");
+        var jplag_submission_number = "{{ jplag_submission_number }}";
 
-        var keys = [];
-        for (var key in jplag_results) {      
-            if (jplag_results.hasOwnProperty(key)) keys.push(key);
+        var segment_files_keys = [];
+        for (var key in segment_files) {
+            if (segment_files.hasOwnProperty(key)) segment_files_keys.push(key);
+        }
+
+        for (var i = 0; i < segment_files_keys.length; i++) { 
+            var originalCodeSegmentHeader = document.createElement("div");
+            originalCodeSegmentHeader.setAttribute("class", "card-header");
+            originalCodeSegmentHeader.innerHTML = segment_files_keys[i];
+
+            var originalCodeSegmentBody = document.createElement("div");
+            originalCodeSegmentBody.setAttribute("class", "card-body text-secondary");
+            var originalCodeSegmentBodyPara = document.createElement("p");
+            originalCodeSegmentBodyPara.setAttribute("class", "card-text");
+            var originalCodeSegmentBodyParaPre = document.createElement("pre");
+            originalCodeSegmentBodyParaPre.innerHTML = segment_files[segment_files_keys[i]];
+            originalCodeSegmentBodyPara.appendChild(originalCodeSegmentBodyParaPre);
+            originalCodeSegmentBody.appendChild(originalCodeSegmentBodyPara);
+
+            document.getElementById("segmentDisplayBox").appendChild(originalCodeSegmentHeader);
+            document.getElementById("segmentDisplayBox").appendChild(originalCodeSegmentBody);
+        }
+
+        var jplag_results_keys = [];
+        for (var key in jplag_results) {
+            if (jplag_results.hasOwnProperty(key)) jplag_results_keys.push(key);
         }
 
         document.getElementById("segmentDetailsDisplayBox").innerHTML = "";
 
-        for (var i = 0; i < keys.length; i++) { 
+        jplag_submission_number -= segment_files_keys.length;
+        var individual_probabilities = [];
+        var joint_probability = 1;
+        var expectation = 0;
+
+        for (var i = 0; i < jplag_results_keys.length; i++) {
+            var temp_probability = Object.keys(jplag_results[jplag_results_keys[i]]).length / (jplag_submission_number - 1)
+            individual_probabilities.push(temp_probability);
+            joint_probability *= temp_probability;
+        }
+
+        expectation = joint_probability * (jplag_submission_number - 1);
+
+        for (var i = 0; i < jplag_results_keys.length; i++) { 
             var codeSegmentHeader = document.createElement("div");
             codeSegmentHeader.setAttribute("class", "card-header");
-            codeSegmentHeader.innerHTML = keys[i];
+            codeSegmentHeader.innerHTML = jplag_results_keys[i];
 
             // var segment_keys = [];
             // for (var segment_keys in jplag_results[keys]) {      
