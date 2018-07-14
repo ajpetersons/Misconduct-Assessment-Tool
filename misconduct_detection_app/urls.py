@@ -30,4 +30,5 @@ urlpatterns = [
     path('select/selectCode/', views.select_code, name='select_code'),
     path('select/runningWaitingPage/', views.run_detection, name='run_detection'),
     path('select/running/', views.run_detection_core, name='run_detection'),
+    path('results/details/<path:name>', views.examine_file_in_result_page, name='examine_file_in_result'),
 ]

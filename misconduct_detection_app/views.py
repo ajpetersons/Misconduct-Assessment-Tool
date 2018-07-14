@@ -124,9 +124,9 @@ def results_index(request):
     jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
 
     context = {
-        "jplag_results_json_string": jplag_results_json_string,
-        "jplag_submission_number": jplag_submission_number,
-        "segment_files_json_string": segment_files_json_string,
+        "jPlagResultsJsonString": jplag_results_json_string,
+        "jPlagSubmissionNumber": jplag_submission_number,
+        "segmentFilesJsonString": segment_files_json_string,
     }
 
     return render(request, 'misconduct_detection_app/results.html', context)
@@ -237,6 +237,14 @@ def examine_folder(request, name):
 
 
 def examine_folder_files(request, name):
+    path_file = "misconduct_detection_app/uploads/folders/"
+    f = open(path_file + name, 'r')
+    file_content = f.read()
+    f.close()
+    return HttpResponse(file_content, content_type="text/plain")
+
+
+def examine_file_in_result_page(request, name):
     path_file = "misconduct_detection_app/uploads/folders/"
     f = open(path_file + name, 'r')
     file_content = f.read()
