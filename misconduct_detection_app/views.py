@@ -2,12 +2,13 @@ import shutil
 
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 from django.core.files.uploadhandler import MemoryFileUploadHandler, TemporaryFileUploadHandler
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
 from django.http import HttpResponse
 
 import os
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from django.template import loader, Context
 
 from .env_settings import *
 
@@ -245,12 +246,16 @@ def examine_folder_files(request, name):
 
 
 def examine_file_in_result_page(request, name):
-    path_file = "misconduct_detection_app/uploads/folders/"
-    f = open(path_file + name, 'r')
-    file_content = f.read()
-    f.close()
-    return HttpResponse(file_content, content_type="text/plain")
-
+    path_file = "misconduct_detection_app/results/" + name
+    # Here we need to deal with the possible picture files
+    if ".gif" in path_file:
+        image_data = open(path_file, "rb").read()
+        return HttpResponse(image_data, content_type="image/png")
+    else:
+        f = open(path_file, 'r')
+        file_content = f.read()
+        f.close()
+        return HttpResponse(file_content)
 
 # ------------------------------------Select Code------------------------------------
 

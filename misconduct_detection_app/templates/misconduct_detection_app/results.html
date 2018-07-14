@@ -118,7 +118,7 @@
                 document.getElementById("segmentDetailsDisplayBox").appendChild(document.createElement("hr"));
 
                 for (var j = 0; j < suspectFilesKeys.length; j++) { 
-                    const filePath = suspectFilesKeys[j].slice(suspectFilesKeys[j].indexOf("folders\\") + 8);
+                    const filePath = jPlagResults[jPlagResultsKeys[i]][suspectFilesKeys[j]][1];
 
                     var linkToJPlagResult = document.createElement("a");
                     linkToJPlagResult.setAttribute("href", "details\\" + filePath);
