@@ -277,7 +277,7 @@ def select_code(request):
 
 
 def run_detection(request):
-    return render(request, 'misconduct_detection_app/running.html')
+    return render(request, 'misconduct_detection_app/runningWaiting.html')
 
 
 def run_detection_core(request):

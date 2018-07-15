@@ -16,27 +16,34 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'css/layout.css' %}">
-    <link rel="stylesheet" href="{% static 'css/upload.css' %}">
-    <link rel="stylesheet" href="{% static 'css/select.css' %}">
 
-    <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>    
+    <script src="{% static 'js/jquery-3.3.1.js' %}" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous" defer></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous" defer></script>    
 
     <link rel="icon" href="{% static 'ico/tinyi.ico' %}" type="image/x-icon">
     <link rel="shortcut icon" href="{% static 'ico/tinyi.ico' %}" type="image/x-icon">
 
+    <!-- Global variables defined here -->
     <script>
-        var toolName = "";
+        var toolName = "MDA Tool";
         var pageName = "";
     </script>
+
+    <script src="{% static 'js/layout_load_before.js' %}" defer></script>
+    {% block head %}
+    {% endblock %}
+    <script src="{% static 'js/layout_load_after.js' %}" defer></script>
+
+    {% block overWrite %}
+    {% endblock %}
 
 </head>
 
 <body>
     <!--Build the top navbar in the template-->
     <nav class="navbar navbar-light bg-light border-bottom" id="topBar">
-        <a class="navbar-brand" href="/">Tool-Name</a>
+        <a class="navbar-brand" href="/" id="layoutToolName">Tool-Name</a>
         <header id="layoutHeader">#Title</header>
         <div class="btn-group">
             <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -104,18 +111,5 @@
         </div>
     </div>
 
-    {% block javaScriptOnPage %}
-    {% endblock %}
-
-    <script>
-
-
-        document.getElementById("layoutHeader").innerHTML = pageName;
-        document.getElementById("title").innerHTML = toolName + " -- " + pageName;
-    </script>
-
-    <!-- <nav class="navbar fixed-bottom navbar-light bg-light" id="bottombar">
-        <a class="navbar-brand" href="#" id="Developer-Message">buttons</a>
-    </nav> -->
 </body>
 </html>

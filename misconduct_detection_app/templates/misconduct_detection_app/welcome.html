@@ -1,5 +1,10 @@
 {% extends 'misconduct_detection_app/layout.html' %}
 
+{% block head %}
+    {% load staticfiles %}
+    <script src="{% static 'js/welcome.js' %}" defer></script>
+{% endblock %}
+
 {% block sideButton %}
     <div class="offset-md-3">
         <a href="upload"><button class="btn btn-outline-secondary btn-lg btn-custom-size">Next</button></a>
@@ -23,10 +28,4 @@
     <p>
         Click "Next" to begin.
     </p>
-{% endblock %}
-
-{% block javaScriptOnPage %}
-    <script>
-        pageName = "Welcome";
-    </script>
 {% endblock %}
