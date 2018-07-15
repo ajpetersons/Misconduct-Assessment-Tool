@@ -1,3 +1,4 @@
+// Set name and other global variables, Django variables for this page
 pageName = "Uploading";
 
 uploadFileFinish = false;

@@ -1,5 +1,7 @@
+// Set name and other global variables, Django variables for this page
 pageName = "Results";
 
+//------------------------Print original segments------------------------
 var segmentFilesKeys = [];
 for (var key in segmentFiles) {
     if (segmentFiles.hasOwnProperty(key)) segmentFilesKeys.push(key);
@@ -23,6 +25,7 @@ for (var i = 0; i < segmentFilesKeys.length; i++) {
     document.getElementById("segmentDisplayBox").appendChild(originalCodeSegmentBody);
 }
 
+//------------------------Print segments details------------------------
 var jPlagResultsKeys = [];
 for (var key in jPlagResults) {
     if (jPlagResults.hasOwnProperty(key)) jPlagResultsKeys.push(key);
@@ -35,6 +38,7 @@ var individual_probabilities = [];
 var joint_probability = 1;
 var expectation = 0;
 
+//------------------------Calculation part------------------------
 for (var i = 0; i < jPlagResultsKeys.length; i++) {
     var temp_probability = Object.keys(jPlagResults[jPlagResultsKeys[i]]).length / (jPlagSubmissionNumber - 1)
     individual_probabilities.push(temp_probability);

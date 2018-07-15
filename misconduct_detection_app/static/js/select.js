@@ -1,3 +1,4 @@
+// Set name and other global variables, Django variables for this page
 pageName = "Selection";
 document.getElementById("codeDisplayText").innerHTML = code;
 var segmentNumber = 0;

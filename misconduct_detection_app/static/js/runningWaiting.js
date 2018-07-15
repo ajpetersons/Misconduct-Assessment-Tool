@@ -1,3 +1,4 @@
+// Set name and other global variables, Django variables for this page
 document.getElementById("title").innerHTML = "Please Wait...";
 
 // Clear body content
