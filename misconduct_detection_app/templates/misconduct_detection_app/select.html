@@ -3,15 +3,16 @@
 {% block head %}
     {% load staticfiles %}
     <link rel="stylesheet" href="{% static 'css/select.css' %}">
+    <!-- Receive Django templates results here-->
     <script>
-        const code = `{{ file_content }}`;
+        const codeToCompare = `{{ file_content }}`;
     </script>
     <script src="{% static 'js/select.js' %}" defer></script>
 {% endblock %}
 
 {% block sideButton %}
     <div class="offset-md-3">
-        <a href="runningWaitingPage\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" disabled id="nextButton">Next</button></a>
+        <a href="runningWaitingPage\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" id="nextButton">Next</button></a>
         <br><br>
         <a href="\examine\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
         <br><br>
@@ -23,28 +24,32 @@
 
     <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" action="uploadFile/" id="selectCode_Form">
         {% csrf_token %}
-        <label for="selectCode_Input" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="selectCode_Label">
-            Continue
-        </label>
     </form>
 {% endblock %}
 
 {% block content %}
     <div class="container-fluid">
         <div class="row flex-xl-nowrap">
-            <div class="input-group col-12 col-md-12 col-lg-12">
-                <textarea class="form-control" id="codeDisplayText" rows="30" readonly>#Code Here</textarea>
-
-                <div class="flex-xl-nowrap">
-                    <br><br>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id="addSegment"><i class="material-icons">keyboard_arrow_right</i></button>
-                    <div class="row"><br></div>
-                    <div class="row"><br></div>
-                    <div class="row"><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id="delSegment"><i class="material-icons">clear</i></button>
-                    <div class="row"><br></div>
+            <div class="input-group col-12 col-md-6 col-lg-6">
+                <!-- Left side code showing area-->
+                <div class="card border-secondary" style="width: 48rem;">
+                    <div class="card-body text-secondary" id="codeDisplayText">
+                        <h5 class="card-title">#Code Here</h5>
+                    </div>
                 </div>
+            </div>
+            
+            <!-- Buttons in the middle -->
+            <div class="flex-xl-nowrap" id="middleButtons">
+                <br><br>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="addSegment"><i class="material-icons">keyboard_arrow_right</i></button>
+                <div class="row"><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="delSegment"><i class="material-icons">clear</i></button>
+                <div class="row"><br></div>
+            </div>
 
+            <div class="input-group col-12 col-md-6 col-lg-6">
+                <!-- Right side segments showing area-->
                 <div class="card border-secondary" style="width: 48rem;" id="segmentDisplayBox">
                     <div class="card-body text-secondary text-center">
                         <h5 class="card-title">You have not added any code segment yet.</h5>

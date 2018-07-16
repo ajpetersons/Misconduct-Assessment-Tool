@@ -1,5 +1,8 @@
 #codeDisplayText {
     font-size: 20px;
+    height: 90vh;
+    overflow-y: scroll;
+    overflow-x: scroll;
 }
 
 #inputText {
@@ -12,4 +15,77 @@ input[type="text"] {
 
 #addSegmentIcon {
     font-size: 26px;
+}
+
+#middleButtons{
+    margin-left: -1%;
+    margin-right: -1%;
+    position: relative;
+}
+
+.highLighter1{
+    color:#51574a;
+}
+.highLighter2{
+    color:#447c69;
+}
+.highLighter3{
+    color:#74c493;
+}
+.highLighter4{
+    color:#8e8c6d;
+}
+.highLighter5{
+    color:#f19670;
+}
+.highLighter6{
+    color:#e4bf80;
+}
+.highLighter7{
+    color:#e9d78e;
+}
+.highLighter8{
+    color:#e16552;
+}
+.highLighter9{
+    color:#74c493;
+}
+.highLighter10{
+    color:#e2975d;
+}
+.highLighter11{
+    color:#c94a53;
+}
+.highLighter12{
+    color:#be5168;
+}
+.highLighter13{
+    color:#a34974;
+}
+.highLighter14{
+    color:#65387d;
+}
+.highLighter15{
+    color:#4e2472;
+}
+.highLighter16{
+    color:#993767;
+}
+.highLighter17{
+    color:#9163b6;
+}
+.highLighter18{
+    color:#e279a3;
+}
+.highLighter19{
+    color:#e0598b;
+}
+.highLighter20{
+    color:#5698c4;
+}
+.highLighter21{
+    color:#7c9fb0;
+}
+.highLighter22{
+    color:#9abf88;
 }

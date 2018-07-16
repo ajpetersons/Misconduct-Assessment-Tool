@@ -1,10 +1,18 @@
-// Set name and other global variables, Django variables for this page
-pageName = "Selection";
-document.getElementById("codeDisplayText").innerHTML = code;
-var segmentNumber = 0;
-var firstCall = true;
+// Local sharing variables defined here
+let segmentNumber = 0;
+let firstCall = true;
+let numberOfHighLighters = 22;
 
-document.getElementById("selectCode_Label").onclick = function() {
+function highLightOriginalText(segmentNumber) {
+    let selectedText = window.getSelection().getRangeAt(0);
+    var newNode = document.createElement("span");
+    newNode.setAttribute("style", "background: red");
+    selectedText.surroundContents(newNode);
+}
+
+$("#nextButton").click(function(evt) {
+    evt.preventDefault();
+
     selectedCode = new FormData($('#selectCode_Form')[0]);
     $.ajax({
         url: "selectCode/",
@@ -21,68 +29,44 @@ document.getElementById("selectCode_Label").onclick = function() {
             uploading = false;
         }
     });
-    
-    document.getElementById("nextButton").removeAttribute("disabled");
-}
 
+    $(document).ajaxStop(function() {
+    window.location.replace('/select/runningWaitingPage/');
+    });
+});
 
-document.onmouseup = document.getElementById("codeDisplayText").ondbclick= function(){
-    /*
-    TODO: Support multiple browser here
-    */
-
-    // var txt;
-    // if(document.selection){
-    //     txt = document.selection.createRange().text
-    // }else{
-    //     txt = window.getSelection()+'';
-    // }
-    // if(txt){alert(txt)}
-
-    // TODO: Deselect example here.
-    // if (window.getSelection) {
-    //     if (window.getSelection().empty) {  // Chrome
-    //         window.getSelection().empty();
-    //     } else if (window.getSelection().removeAllRanges) {  // Firefox
-    //         window.getSelection().removeAllRanges();
-    //     }
-    //     } else if (document.selection) {  // IE?
-    //     document.selection.empty();
-    // }
-
-    // var selObj = window.getSelection(); 
-    // if(selObj != ""){alert(selObj);}
-    // var selRange = selObj.getRangeAt(0);
-    // do stuff with the range
-}
-
-document.getElementById("addSegment").onclick = function() {
+$("#addSegment").click(function() {
+    // Remove the reminder
     if (firstCall) {
-        document.getElementById("segmentDisplayBox").innerHTML = "";
+        $("#segmentDisplayBox").empty();
         firstCall = false;
     }
-    var selectText = window.getSelection(); 
+
+    // Get the selected segment and add it
+    let selectText = window.getSelection(); 
     if(selectText != ""){
+        highLightOriginalText(segmentNumber);
         segmentNumber++;
-        var codeSegmentHeader = document.createElement("div");
-        codeSegmentHeader.setAttribute("class", "card-header")
-        codeSegmentHeader.innerHTML = "Segment " + segmentNumber;
-        
-        var codeSegmentDiv = document.createElement("div");
-        codeSegmentDiv.setAttribute("class", "card-body text-secondary");
 
-        var codeSegment = document.createElement("textarea");
-        codeSegment.setAttribute("class", "form-control");
-        codeSegment.setAttribute("id", "inputText");
-        codeSegment.setAttribute("rows", "10");
-        codeSegment.setAttribute("name", "Segment_" + segmentNumber);
-        codeSegment.setAttribute("form", "selectCode_Form");
-        codeSegment.setAttribute("readonly", "readonly");
-        codeSegment.innerHTML = selectText;
+        let codeSegment = $("<textarea></textarea>").attr({
+            "class": "form-control",
+            "id": "inputText",
+            "rows": "10",
+            "form": "selectCode_Form",
+            "readonly": "readonly",
+            "name": "Segment_" + segmentNumber,
+        }).text(selectText)
 
-        codeSegmentDiv.appendChild(codeSegment);
-        document.getElementById("segmentDisplayBox").appendChild(codeSegmentHeader);
-        document.getElementById("segmentDisplayBox").appendChild(codeSegmentDiv);
+        let codeSegmentHeader = $("<div class='card-header'></div>").text("Segment " + segmentNumber);        
+        let codeSegmentDiv = $("<div class='card-body text-secondary'></div>").append(codeSegment);
 
+        $("#segmentDisplayBox").append(codeSegmentHeader, codeSegmentDiv);
     }
-}
+});
+
+$(document).ready(function (){
+    // Set name and Django variables for this page
+    pageName = "Selection";
+    $("#codeDisplayText").empty().append("<pre id='codeDisplayTextPre' style='white-space:pre-wrap'></pre>");
+    $("#codeDisplayTextPre").text(codeToCompare);
+});
