@@ -1,12 +1,11 @@
 // Local sharing variables defined here
 let segmentNumber = 0;
 let firstCall = true;
-let numberOfHighLighters = 22;
 
 function highLightOriginalText(segmentNumber) {
     let selectedText = window.getSelection().getRangeAt(0);
     var newNode = document.createElement("span");
-    newNode.setAttribute("style", "background: red");
+    newNode.setAttribute("style", "background: " + highLighterColors[segmentNumber % highLighterColors.length]);
     selectedText.surroundContents(newNode);
 }
 
@@ -57,7 +56,10 @@ $("#addSegment").click(function() {
             "name": "Segment_" + segmentNumber,
         }).text(selectText)
 
-        let codeSegmentHeader = $("<div class='card-header'></div>").text("Segment " + segmentNumber);        
+        let codeSegmentHeader = $("<div ></div>").attr({
+            "class": 'card-header',
+            "style": 'background: ' + highLighterColors[(segmentNumber - 1) % highLighterColors.length],
+        }).text("Segment " + segmentNumber);        
         let codeSegmentDiv = $("<div class='card-body text-secondary'></div>").append(codeSegment);
 
         $("#segmentDisplayBox").append(codeSegmentHeader, codeSegmentDiv);
