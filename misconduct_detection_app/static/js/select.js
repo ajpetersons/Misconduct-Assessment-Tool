@@ -4,9 +4,11 @@ let firstCall = true;
 
 function highLightOriginalText(segmentNumber) {
     let selectedText = window.getSelection().getRangeAt(0);
-    var newNode = document.createElement("span");
-    newNode.setAttribute("style", "background: " + highLighterColors[segmentNumber % highLighterColors.length]);
-    selectedText.surroundContents(newNode);
+    var highLighted = document.createElement("a");
+    highLighted.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
+    highLighted.setAttribute("id", "highLightedSegment-" + (segmentNumber + 1));
+    highLighted.setAttribute("href", "#highLightedSegmentHeader-" + segmentNumber);
+    selectedText.surroundContents(highLighted);
 }
 
 $("#nextButton").click(function(evt) {
@@ -56,10 +58,15 @@ $("#addSegment").click(function() {
             "name": "Segment_" + segmentNumber,
         }).text(selectText)
 
-        let codeSegmentHeader = $("<div ></div>").attr({
+        let codeSegmentHeaderLink = $("<a></a>").attr({
+            "href": "#highLightedSegment-" + segmentNumber
+        }).text("Segment " + segmentNumber);
+        let codeSegmentHeader = $("<div></div>").attr({
             "class": 'card-header',
             "style": 'background: ' + highLighterColors[(segmentNumber - 1) % highLighterColors.length],
-        }).text("Segment " + segmentNumber);        
+            "id": "highLightedSegmentHeader-" + segmentNumber,
+        }).append(codeSegmentHeaderLink);
+                
         let codeSegmentDiv = $("<div class='card-body text-secondary'></div>").append(codeSegment);
 
         $("#segmentDisplayBox").append(codeSegmentHeader, codeSegmentDiv);
