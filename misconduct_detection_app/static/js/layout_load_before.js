@@ -65,7 +65,7 @@ function loadDetectionLib() {
     if (detectionLibSelection === "") {
         $("#detectionLibSelection").append("No detection library");
     } else {
-        $("#detectionLibSelection").append("Some detection library");
+        $("#detectionLibSelection").append("Using Lib:" + detectionLibSelection);
     }
 }
 

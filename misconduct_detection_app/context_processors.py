@@ -40,6 +40,8 @@ def generate_uploaded_file_list(request):
     for (dir_path, dir_names, file_names) in os.walk(folder_path):
         for file_name in file_names:
             folder_path_list.append(os.path.join(dir_path, file_name))
+    if len(folder_path_list) == 0:
+        folder_path_list = ["NOFOLDEREXISTS"]
 
     return file_to_compare_path_list, results_path_list, folder_path_list, segments_path_list
 

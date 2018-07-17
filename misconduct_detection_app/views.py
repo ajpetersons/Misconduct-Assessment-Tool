@@ -244,6 +244,21 @@ def run_detection_core(request):
 
 
 def clean(request):
-    shutil.rmtree(get_results_path(request))
+    file_to_compare_path = get_file_to_compare_path(request)
+    results_path = get_results_path(request)
+    folder_path = get_folder_path(request)
+    segments_path = get_segments_path(request)
+    temp_working_path = get_temp_working_path(request)
+
+    if os.path.exists(file_to_compare_path):
+        shutil.rmtree(file_to_compare_path)
+    if os.path.exists(results_path):
+        shutil.rmtree(results_path)
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)
+    if os.path.exists(segments_path):
+        shutil.rmtree(segments_path)
+    if os.path.exists(temp_working_path):
+        shutil.rmtree(temp_working_path)
 
     return HttpResponse("Clean Succeeded")
