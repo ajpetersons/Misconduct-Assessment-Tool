@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'misconduct_detection_app.context_processors.return_uploaded_files',
+                'misconduct_detection_app.context_processors.return_supported_detection_lib',
             ],
         },
     },

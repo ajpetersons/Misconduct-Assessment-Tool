@@ -83,10 +83,11 @@ for (var i = 0; i < jPlagResultsKeys.length; i++) {
         document.getElementById("segmentDetailsDisplayBox").appendChild(document.createElement("hr"));
 
         for (var j = 0; j < suspectFilesKeys.length; j++) { 
-            const filePath = jPlagResults[jPlagResultsKeys[i]][suspectFilesKeys[j]][1];
+            const filePath = suspectFilesKeys[j];
+            const fileLink = jPlagResults[jPlagResultsKeys[i]][suspectFilesKeys[j]][1];
 
             var linkToJPlagResult = document.createElement("a");
-            linkToJPlagResult.setAttribute("href", "details\\" + filePath);
+            linkToJPlagResult.setAttribute("href", "details\\" + fileLink);
             linkToJPlagResult.innerHTML = filePath;
             linkToJPlagResult.appendChild(document.createElement("br"));
 

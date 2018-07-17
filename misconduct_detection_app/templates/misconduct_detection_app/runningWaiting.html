@@ -3,4 +3,8 @@
 {% block overWrite %}
     {% load staticfiles %}
     <script src="{% static 'js/runningWaiting.js' %}" defer></script>
+    <form method="post" id="detectionLibSelectionForm">
+        {% csrf_token %}
+        <input type="hidden" name="detectionLibSelectionInput" id="detectionLibSelectionInput">
+    </form>
 {% endblock %}

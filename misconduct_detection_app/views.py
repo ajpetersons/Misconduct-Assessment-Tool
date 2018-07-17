@@ -48,10 +48,10 @@ def examine_index(request):
 
 
 def select_index(request):
-    path_file = "misconduct_detection_app/uploads/singlefiles/"
-    local_files = os.listdir(path_file)
+    path = get_file_to_compare_path(request)
+    local_files = os.listdir(path)
 
-    f = open(path_file + local_files[0], 'r')
+    f = open(os.path.join(path, local_files[0]), 'r')
     file_content = f.read()
     f.close()
     context = {
@@ -69,8 +69,7 @@ def results_index(request):
         with open(get_segments_path(request) + "/" + segment, 'r+') as f:
             segment_files[segment[:segment.find(".")]] = f.read()
 
-    # jplag_results, jplag_submission_number = jplag_detector.results_interpretation()
-    jplag_results, jplag_submission_number = ("change", "this!")
+    jplag_results, jplag_submission_number = DETECTION_LIBS["Jplag"].results_interpretation()
 
     segment_files_json_string = json.dumps(segment_files, cls=DjangoJSONEncoder)
     jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
@@ -172,8 +171,8 @@ def handle_upload_folder(request, file, file_name, file_extension, original_path
 
 # ------------------------------------Examination Page------------------------------------
 def examine_file(request, name):
-    path_file = "misconduct_detection_app/uploads/singlefiles/"
-    f = open(path_file + name, 'r')
+    path = get_file_to_compare_path(request)
+    f = open(os.path.join(path, name), 'r')
     file_content = f.read()
     f.close()
     return HttpResponse(file_content, content_type="text/plain")
@@ -194,7 +193,7 @@ def examine_folder_files(request, name):
 
 
 def examine_file_in_result_page(request, name):
-    path_file = "misconduct_detection_app/results/" + name
+    path_file = os.path.join(get_results_path(request), name)
     # Here we need to deal with the possible picture files
     if ".gif" in path_file:
         image_data = open(path_file, "rb").read()
@@ -226,7 +225,25 @@ def run_detection(request):
 
 
 def run_detection_core(request):
-    # jplag_detector.run_without_getting_results(get_temp_working_path(request))
+    for selection in request.POST.keys():
+        if selection == "detectionLibSelectionInput":
+            detection_lib_selection = request.POST[selection]
+    name = "Jplag_default"
+    results_path = get_results_path(request)
+    file_to_compare_path = get_segments_path(request)
+    folder_to_compare_path = get_folder_path(request)
+    file_language = "c/c++"
+    number_of_matches = "1%"
+    parameters = name, results_path, file_to_compare_path, folder_to_compare_path, file_language, number_of_matches
 
-    # return render(request, 'misconduct_detection_app/results.html', context)
-    return redirect('/results/')
+    detection_lib = detection_lib_selector(detection_lib_selection, parameters)
+    detection_lib.run_without_getting_results(get_temp_working_path(request))
+    DETECTION_LIBS["Jplag"] = detection_lib
+
+    return HttpResponse("Detection Finished")
+
+
+def clean(request):
+    shutil.rmtree(get_results_path(request))
+
+    return HttpResponse("Clean Succeeded")

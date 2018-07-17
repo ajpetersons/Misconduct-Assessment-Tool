@@ -32,7 +32,7 @@ $("#nextButton").click(function(evt) {
     });
 
     $(document).ajaxStop(function() {
-    window.location.replace('/select/runningWaitingPage/');
+        window.location.replace('/select/runningWaitingPage/');
     });
 });
 
@@ -45,7 +45,7 @@ $("#addSegment").click(function() {
 
     // Get the selected segment and add it
     let selectText = window.getSelection(); 
-    if(selectText != ""){
+    if(selectText != "") {
         highLightOriginalText(segmentNumber);
         segmentNumber++;
 

@@ -1,8 +1,8 @@
 // Set name and other global variables, Django variables for this page
 pageName = "Uploading";
 
-uploadFileFinish = false;
-uploadFolderFinish = false;
+let uploadFileFinish = false;
+let uploadFolderFinish = false;
 
 function uploadFile() {
     uploadFileFinish = true;
@@ -63,3 +63,12 @@ function openNextButton() {
         document.getElementById("nextButton").removeAttribute("title");
     }
 }
+
+$(document).ready(function () {
+    if ((fileToComparePathList != "NOFOLDEREXISTS") && folderPathList[0] != "NOFOLDEREXISTS")
+    {
+        uploadFileFinish = true;
+        uploadFolderFinish = true;
+        openNextButton();
+    }
+});
