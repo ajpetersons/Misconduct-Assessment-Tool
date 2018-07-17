@@ -1,83 +1,26 @@
 import shutil
+import os
 
-from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
-from django.core.files.uploadhandler import MemoryFileUploadHandler, TemporaryFileUploadHandler
-from django.shortcuts import render, redirect, render_to_response
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
-import os
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-from django.template import loader, Context
 
 from .env_settings import *
 
 
 # Create your views here.
-# ------------------------------------Custom File Handler------------------------------------
-
-
-class MDPCustomInMemoryUploadedFile(InMemoryUploadedFile):
-    """The custom InMemoryUploadedFile data type
-    
-    In our MDP project, we need to know the original file path to show the details when
-    user asks. Therefore, we added the support of original file path to the file type.
-    """
-
-    def __init__(self, file, field_name, name, content_type, size, charset, content_type_extra=None):
-        super().__init__(file, field_name, name, content_type, size, charset, content_type_extra)
-        self.original_path = name[:name.rfind('/')] + "/"
-
-
-class MDPCustomMemoryFileUploadHandler(MemoryFileUploadHandler):
-    """The custom file upload handler 
-    
-    This file handler uses MDP_CustomInMemoryUploadedFile we defined above to support 
-    save the original file path on the server.
-    """
-
-    def file_complete(self, file_size):
-        """Return a file object if this handler is activated."""
-        if not self.activated:
-            return
-
-        self.file.seek(0)
-        return MDPCustomInMemoryUploadedFile(
-            file=self.file,
-            field_name=self.field_name,
-            name=self.file_name,
-            content_type=self.content_type,
-            size=file_size,
-            charset=self.charset,
-            content_type_extra=self.content_type_extra
-        )
-
-
-class MDPCustomTemporaryUploadedFile(TemporaryUploadedFile):
-    def __init__(self, name, content_type, size, charset, content_type_extra=None):
-        super().__init__(name, content_type, size, charset, content_type_extra)
-        self.original_path = name[:name.rfind('/')] + "/"
-
-
-class MDPCustomTemporaryFileUploadHandler(TemporaryFileUploadHandler):
-    def new_file(self, *args, **kwargs):
-        super().new_file(*args, **kwargs)
-        self.file = MDPCustomTemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset,
-                                                   self.content_type_extra)
-
-
 # ------------------------------------Index------------------------------------
-
-
 def index(request):
     """The index page
-    
+
+    Provide the welcome page and store user's ip.
     :param request: request
     :type request: HttpRequest
     :return: render
     :rtype: render
     """
-
     return render(request, 'misconduct_detection_app/welcome.html')
 
 
@@ -86,6 +29,13 @@ def upload_index(request):
 
 
 def examine_index(request):
+    """
+
+    :param request:
+    :type request:
+    :return:
+    :rtype:
+    """
     path_file = "misconduct_detection_app/uploads/singlefiles/"
     path_folder = "misconduct_detection_app/uploads/folders/"
     local_files = os.listdir(path_file)
@@ -112,14 +62,15 @@ def select_index(request):
 
 
 def results_index(request):
-    segment_dir = os.listdir(SEGMENTS_PATH)
+    segment_dir = os.listdir(get_segments_path(request))
     segment_files = {}
 
     for segment in segment_dir:
-        with open(SEGMENTS_PATH + "/" + segment, 'r+') as f:
+        with open(get_segments_path(request) + "/" + segment, 'r+') as f:
             segment_files[segment[:segment.find(".")]] = f.read()
 
-    jplag_results, jplag_submission_number = jplag_detector.results_interpretation()
+    # jplag_results, jplag_submission_number = jplag_detector.results_interpretation()
+    jplag_results, jplag_submission_number = ("change", "this!")
 
     segment_files_json_string = json.dumps(segment_files, cls=DjangoJSONEncoder)
     jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
@@ -133,8 +84,7 @@ def results_index(request):
     return render(request, 'misconduct_detection_app/results.html', context)
 
 
-# ------------------------------------Uploading single file------------------------------------
-
+# ------------------------------------File uploading functions------------------------------------
 def upload_file(request):
     """Single file upload function
 
@@ -147,13 +97,13 @@ def upload_file(request):
     """
 
     if request.method == 'POST':
-        handle_upload_file(request.FILES['file'], str(request.FILES['file']))
+        handle_upload_file(request, request.FILES['file'], str(request.FILES['file']))
         return HttpResponse('Uploading Success')
     else:
         return HttpResponse('Uploading Failed')
 
 
-def handle_upload_file(file, filename):
+def handle_upload_file(request, file, filename):
     """Store the file from memory to disk
     
     :param file: the file to store
@@ -162,17 +112,15 @@ def handle_upload_file(file, filename):
     :type filename: str
     """
 
-    path = 'misconduct_detection_app/uploads/singlefiles/'
+    path = get_file_to_compare_path(request)
     if not os.path.exists(path):
         os.makedirs(path)
-    with open(path + filename, 'wb+')as destination:
+    with open(os.path.join(path, filename), 'wb+')as destination:
         for chunk in file.chunks():
             destination.write(chunk)
 
 
-# ------------------------------------Uploading folder------------------------------------
-
-
+# ------------------------------------Folder uploading functions------------------------------------
 def upload_folder(request):
     """Folder upload function
 
@@ -190,7 +138,7 @@ def upload_folder(request):
             file_name, file_extension = os.path.splitext(str(f))
             original_path = f.original_path
             # if file_extension == '.c':
-            handle_upload_folder(f, file_name, file_extension, original_path)
+            handle_upload_folder(request, f, file_name, file_extension, original_path)
         return HttpResponse('Upload Success')
     else:
         return HttpResponse('Uploading Failed')
@@ -201,7 +149,7 @@ TODO: merge these two file handler function.
 """
 
 
-def handle_upload_folder(file, file_name, file_extension, original_path):
+def handle_upload_folder(request, file, file_name, file_extension, original_path):
     """handle the folder uploading and store the files to disk
     
     :param file: one file 
@@ -210,19 +158,19 @@ def handle_upload_folder(file, file_name, file_extension, original_path):
     :type file_name: str
     :param file_extension: the extension of the file
     :type file_extension: str
+    :param original_path: the path of the file on client
+    :type original_path: str
     """
 
-    path = 'misconduct_detection_app/uploads/folders/' + original_path
+    path = os.path.join(get_folder_path(request), original_path)
     if not os.path.exists(path):
         os.makedirs(path)
-    with open(path + file_name + file_extension, 'wb+') as destination:
+    with open(os.path.join(path, file_name + file_extension), 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
 
 
 # ------------------------------------Examination Page------------------------------------
-
-
 def examine_file(request, name):
     path_file = "misconduct_detection_app/uploads/singlefiles/"
     f = open(path_file + name, 'r')
@@ -257,16 +205,15 @@ def examine_file_in_result_page(request, name):
         f.close()
         return HttpResponse(file_content)
 
+
 # ------------------------------------Select Code------------------------------------
-
-
 def select_code(request):
     if request.method == 'POST':
-        if not os.path.exists(SEGMENTS_PATH):
-            os.makedirs(SEGMENTS_PATH)
+        if not os.path.exists(get_segments_path(request)):
+            os.makedirs(get_segments_path(request))
         for code_segment in request.POST.keys():
             if code_segment != "csrfmiddlewaretoken":
-                with open(SEGMENTS_PATH + "/" + code_segment + '.c', 'w+') as f:
+                with open(get_segments_path(request) + "/" + code_segment + '.c', 'w+') as f:
                     f.write(request.POST[code_segment])
         return HttpResponse('Selection Succeeded')
     else:
@@ -274,14 +221,12 @@ def select_code(request):
 
 
 # ------------------------------------Run the Jplag jar------------------------------------
-
-
 def run_detection(request):
     return render(request, 'misconduct_detection_app/runningWaiting.html')
 
 
 def run_detection_core(request):
-    jplag_detector.run_without_getting_results(TEMP_WORKING_PATH)
+    # jplag_detector.run_without_getting_results(get_temp_working_path(request))
 
     # return render(request, 'misconduct_detection_app/results.html', context)
     return redirect('/results/')

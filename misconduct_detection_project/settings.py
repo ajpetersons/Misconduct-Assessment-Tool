@@ -65,6 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'misconduct_detection_app.context_processors.return_uploaded_files',
             ],
         },
     },
@@ -135,8 +136,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 FILE_UPLOAD_HANDLERS = [
-    'misconduct_detection_app.views.MDPCustomMemoryFileUploadHandler',
-    'misconduct_detection_app.views.MDPCustomTemporaryFileUploadHandler',
+    'misconduct_detection_app.custom_file_handlers.MDPCustomMemoryFileUploadHandler',
+    'misconduct_detection_app.custom_file_handlers.MDPCustomTemporaryFileUploadHandler',
     # 'django.core.files.uploadhandler.MemoryFileUploadHandler',
     # 'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]

@@ -49,6 +49,8 @@
             "#a6d96a",
             "#66bd63",
         ];
+
+        var uploadedFileList = "{{ fileList }}"
     </script>
 
     <script src="{% static 'js/layout_load_before.js' %}" defer></script>
@@ -66,7 +68,7 @@
 </head>
 
 <body>
-    <!--Build the top navbar in the template-->
+    <!--The top navbar-->
     <nav class="navbar navbar-light bg-light border-bottom" id="topBar">
         <!-- Name shown-->
         <a class="navbar-brand" href="/" id="layoutToolName">Tool-Name</a>
@@ -102,11 +104,21 @@
         </div>
     </nav>
 
-    <!-- Contents of one page-->
+    <!--The bottom navbar-->
+    <nav class="navbar navbar-light bg-light fixed-bottom border-top" id="bottomBar">
+        <!-- Name shown-->
+        <a class="navbar-brand" href="/" id="layoutToolName">Tool-Name</a>
+        <!-- Page Title-->
+        <header id="layoutHeader">#Title</header>
+        <header id="layoutHeader">#Title</header>
+        <header id="layoutHeader">#Title</header>
+    </nav>
+
+    <!-- Contents on rest of the page-->
     <div class="container-fluid">
         <br>
         <div class="row flex-xl-nowrap">
-            <!-- Left side button-->
+            <!-- Left side button area-->
             <div class="col-12 col-md-2 col-lg-2 bd-sidebar border-right">
                 {% block sideButton %}
                 {% endblock %}
@@ -134,7 +146,7 @@
 
             </div>
 
-            <!-- Right side contents-->
+            <!-- Right side contents area-->
             <div class="col-12 col-md-10 col-lg-10 bd-content">
                 {% block content %}
                 {% endblock %}
