@@ -4,7 +4,7 @@ let firstCall = true;
 
 function highLightOriginalText(segmentNumber) {
     let selectedText = window.getSelection().getRangeAt(0);
-    var highLighted = document.createElement("a");
+    let highLighted = document.createElement("a");
     highLighted.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
     highLighted.setAttribute("id", "highLightedSegment-" + (segmentNumber + 1));
     highLighted.setAttribute("href", "#highLightedSegmentHeader-" + segmentNumber);

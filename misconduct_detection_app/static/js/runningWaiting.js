@@ -1,3 +1,4 @@
+// Send selected file type and detection library
 $("#detectionLibSelectionInput").val("Jplag");
 detectionLibSelectionSubmit = new FormData($('#detectionLibSelectionForm')[0]);
 $.ajax({
@@ -18,35 +19,22 @@ $.ajax({
 
 $(document).ready(function () {
     // Set name and other global variables, Django variables for this page
-    document.getElementById("title").innerHTML = "Please Wait...";
+    $("#title").text("Please Wait...");
 
     // Clear body content
-    var body = document.querySelector("body");
-    body.innerHTML = "";
+    $("body").empty();
+    $("body").append("<br>");
 
     // Create first h1 element and attach it
-    body.appendChild(document.createElement("br"));
-    var tempElement = document.createElement("h1");
-    tempElement.style = "text-align: center";
-    tempElement.innerHTML = "Please wait, the detection is in progress.";
-    body.appendChild(tempElement);
-    body.appendChild(document.createElement("br"));
+    $("body").append("<h1 style='text-align: center'>Please wait, the detection is in progress.</h1>");
+    $("body").append("<br>");
 
     // Crate second h1 element and attach it
-    tempElement = document.createElement("h1");
-    tempElement.style = "text-align: center";
-    tempElement.innerHTML = "This might take a few minutes.";
-    body.appendChild(tempElement);
+    $("body").append("<h1 style='text-align: center'>This might take a few minutes.</h1>")
+    $("body").append("<br>");
 
     // Crate the image and attach it
-    body.appendChild(document.createElement("br"));
-    tempElement = document.createElement("h1");
-    tempElement.style = "text-align: center";
-    var tempImage = document.createElement("i");
-    tempImage.setAttribute("class", "fa fa-spinner fa-spin");
-    tempImage.setAttribute("style", "font-size:68px");
-    tempElement.appendChild(tempImage);
-    body.appendChild(tempElement);
+    $("body").append("<h1 style='text-align: center'><i class='fa fa-spinner fa-spin' style='font-size:68px'></i></h1>")
 
     // Redirect
     $(document).ajaxStop(function() {

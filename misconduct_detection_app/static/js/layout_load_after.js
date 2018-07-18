@@ -21,7 +21,7 @@ $("#cancelButtonFinal").click(function () {
 });
 
 $(document).ready(function (){
-    document.getElementById("layoutHeader").innerHTML = pageName;
-    document.getElementById("title").innerHTML = toolName + " -- " + pageName;
-    document.getElementById("layoutToolName").innerHTML = toolName;
+    $("#layoutHeader").text(pageName);
+    $("#title").text(toolName + " -- " + pageName);
+    $("#layoutToolName").text(toolName);
 });
