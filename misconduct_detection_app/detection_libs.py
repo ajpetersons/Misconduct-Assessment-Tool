@@ -4,7 +4,23 @@ from bs4 import BeautifulSoup
 
 
 class DetectionLib:
+    """General detection library."""
+
     def __init__(self, name, lib_path, results_path, file_to_compare_path, folder_to_compare_path):
+        """Create a new detection library object.
+        
+        :param name: the name of this library
+        :type name: str
+        :param lib_path: the path of the library on the server
+        :type lib_path: str
+        :param results_path: the path to store produced results
+        :type results_path: str
+        :param file_to_compare_path: the path where stores the uploaded single file
+        :type file_to_compare_path: str
+        :param folder_to_compare_path: the path where sotres the uploaded folder
+        :type folder_to_compare_path: str
+        """
+
         self.name = name
         self.lib_path = lib_path
         self.results_path = results_path
@@ -13,6 +29,14 @@ class DetectionLib:
         self.file_language_supported = []
 
     def get_results(self, temp_working_path):
+        """Run the detection by the current library on given temp_working_path
+        
+        :param temp_working_path: the path where to run the detection library
+        :type temp_working_path: str
+        :return: the results produced by the detection library. BE AWARE:
+        :rtype: [type]
+        """
+
         assert (len(self.file_language_supported) != 0), "No support language defined for " + self.name
         self.run_detection(temp_working_path=temp_working_path)
         results = self.results_interpretation()
@@ -20,19 +44,45 @@ class DetectionLib:
         return results
 
     def run_without_getting_results(self, temp_working_path):
+        """[summary]
+        
+        :param temp_working_path: [description]
+        :type temp_working_path: [type]
+        """
+
         assert (len(self.file_language_supported) != 0), "No support language defined for " + self.name
         self.run_detection(temp_working_path=temp_working_path)
         self.clean_working_envs(temp_working_path=temp_working_path)
 
     def run_detection(self, temp_working_path):
+        """[summary]
+        
+        :param temp_working_path: [description]
+        :type temp_working_path: [type]
+        :raises NotImplementedError: [description]
+        """
+
         raise NotImplementedError
 
     def results_interpretation(self):
+        """[summary]
+        
+        :raises NotImplementedError: [description]
+        """
+
         raise NotImplementedError
 
     def clean_working_envs(self, temp_working_path):
+        """[summary]
+        
+        :param temp_working_path: [description]
+        :type temp_working_path: [type]
+        :raises NotImplementedError: [description]
+        """
+
         raise NotImplementedError
 
+    # To improve the code readability, following getters setters will not contain comments.
     @property
     def name(self):
         return self.__name
@@ -88,8 +138,35 @@ class DetectionLib:
 
 
 class Jplag(DetectionLib):
+    """[summary]
+    
+    :param DetectionLib: [description]
+    :type DetectionLib: [type]
+    :raises TypeError: [description]
+    :return: [description]
+    :rtype: [type]
+    """
+
     def __init__(self, name, lib_path, results_path, file_to_compare_path, folder_to_compare_path, file_language,
                  number_of_matches):
+        """[summary]
+        
+        :param name: [description]
+        :type name: [type]
+        :param lib_path: [description]
+        :type lib_path: [type]
+        :param results_path: [description]
+        :type results_path: [type]
+        :param file_to_compare_path: [description]
+        :type file_to_compare_path: [type]
+        :param folder_to_compare_path: [description]
+        :type folder_to_compare_path: [type]
+        :param file_language: [description]
+        :type file_language: [type]
+        :param number_of_matches: [description]
+        :type number_of_matches: [type]
+        """
+
         super().__init__(name, lib_path, results_path, file_to_compare_path, folder_to_compare_path)
         self.file_language_supported = ["java17", "java15", "java15dm", "java12", "java11", "python3", "c/c++",
                                         "c#-1.2", "char", "text", "scheme"]
@@ -98,6 +175,12 @@ class Jplag(DetectionLib):
         self.file_relation = {}
 
     def run_detection(self, temp_working_path):
+        """[summary]
+        
+        :param temp_working_path: [description]
+        :type temp_working_path: [type]
+        """
+
         counter = 0
 
         if not os.path.exists(temp_working_path):
@@ -121,6 +204,12 @@ class Jplag(DetectionLib):
                                                                   temp_working_path))
 
     def results_interpretation(self):
+        """[summary]
+        
+        :return: [description]
+        :rtype: [type]
+        """
+
         with open(os.path.join(self.results_path, "index.html")) as fp:
             soup = BeautifulSoup(fp, 'html.parser')
 
@@ -153,8 +242,15 @@ class Jplag(DetectionLib):
         return results, submission_number
 
     def clean_working_envs(self, temp_working_path):
+        """[summary]
+        
+        :param temp_working_path: [description]
+        :type temp_working_path: [type]
+        """
+
         shutil.rmtree(temp_working_path)
 
+    # To improve the code readability, following getters setters will not contain comments.
     @property
     def file_language(self):
         return self.__file_language
