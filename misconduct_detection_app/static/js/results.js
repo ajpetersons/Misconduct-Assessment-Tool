@@ -2,48 +2,31 @@
 pageName = "Results";
 
 //------------------------Print original segments------------------------
-let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true).map(key =>{
-    let originalCodeSegmentHeader = $("<div class='card-header'></div>").text(key);
-    let originalCodeSegmentBody = $("<div class='card-body text-secondary'></div>");
-    let originalCodeSegmentBodyPara = $("<p class='card-text'></p>");
-    let originalCodeSegmentBodyParaPre = $("<pre></pre>").text(segmentFiles[key]);
-});
-/* for (let key in segmentFiles) {
-    if (segmentFiles.hasOwnProperty(key)) segmentFilesKeys.push(key);
-}
+let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
 
-segmentFilesKeys.map(key =>{
-    let originalCodeSegmentHeader = $("<div class='card-header'></div>").text(segmentFilesKeys[i]);
-    let originalCodeSegmentBody = $("<div class='card-body text-secondary'></div>");
-    let originalCodeSegmentBodyPara = $("<p class='card-text'></p>");
-    let originalCodeSegmentBodyParaPre = $("<pre></pre>").text(segmentFiles[key]);
-})
-*/
+segmentFilesKeys.map(segmentFilesKey =>{ 
+    var originalCodeSegmentHeader = document.createElement("div");
+    originalCodeSegmentHeader.setAttribute("class", "card-header");
+    originalCodeSegmentHeader.innerHTML = segmentFilesKey;
 
-
-for (var i = 0; i < segmentFilesKeys.length; i++) { 
-    let originalCodeSegmentHeader = $("<div class='card-header'></div>").text(segmentFilesKeys[i]);
-
-    let originalCodeSegmentBody = $("<div class='card-body text-secondary'></div>");
-    let originalCodeSegmentBodyPara = $("<p class='card-text'></p>");
-    let originalCodeSegmentBodyParaPre = $("<pre></pre>").text(segmentFiles[segmentFilesKeys[i]]);
-
-    
+    var originalCodeSegmentBody = document.createElement("div");
+    originalCodeSegmentBody.setAttribute("class", "card-body text-secondary");
+    var originalCodeSegmentBodyPara = document.createElement("p");
+    originalCodeSegmentBodyPara.setAttribute("class", "card-text");
+    var originalCodeSegmentBodyParaPre = document.createElement("pre");
+    originalCodeSegmentBodyParaPre.innerHTML = segmentFiles[segmentFilesKey];
 
     originalCodeSegmentBodyPara.appendChild(originalCodeSegmentBodyParaPre);
     originalCodeSegmentBody.appendChild(originalCodeSegmentBodyPara);
 
     document.getElementById("segmentDisplayBox").appendChild(originalCodeSegmentHeader);
     document.getElementById("segmentDisplayBox").appendChild(originalCodeSegmentBody);
-}
+});
 
 //------------------------Print segments details------------------------
-var jPlagResultsKeys = [];
-for (var key in jPlagResults) {
-    if (jPlagResults.hasOwnProperty(key)) jPlagResultsKeys.push(key);
-}
+let jPlagResultsKeys = Object.keys(jPlagResults).filter(key => jPlagResults.hasOwnProperty(key) === true);
 
-document.getElementById("segmentDetailsDisplayBox").innerHTML = "";
+$("#segmentDetailsDisplayBox").empty();
 
 jPlagSubmissionNumber -= segmentFilesKeys.length;
 let individual_probabilities = [];
@@ -51,25 +34,25 @@ let joint_probability = 1;
 let expectation = 0;
 
 //------------------------Calculation part------------------------
-for (let i = 0; i < jPlagResultsKeys.length; i++) {
-    let temp_probability = Object.keys(jPlagResults[jPlagResultsKeys[i]]).length / (jPlagSubmissionNumber - 1)
-    individual_probabilities.push(temp_probability);
+jPlagResultsKeys.map(jPlagResultsKey => {
+    let temp_probability = Object.keys(jPlagResults[jPlagResultsKey]).length / (jPlagSubmissionNumber - 1)
+    individual_probabilities.jPlagResultsKey = temp_probability;
     joint_probability *= temp_probability;
-}
+})
 
 expectation = joint_probability * (jPlagSubmissionNumber - 1);
 
-for (let i = 0; i < jPlagResultsKeys.length; i++) { 
+jPlagResultsKeys.map(jPlagResultsKey => { 
     // Print individual probability, joint probability and joint expectation
     let codeSegmentHeader = document.createElement("div");
     codeSegmentHeader.setAttribute("class", "card-header");
-    codeSegmentHeader.innerHTML = jPlagResultsKeys[i];
+    codeSegmentHeader.innerHTML = jPlagResultsKey;
 
     let codeSegmentBody = document.createElement("div");
     codeSegmentBody.setAttribute("class", "card-body text-secondary");
     let codeSegmentBodyIndi = document.createElement("p");
     codeSegmentBodyIndi.setAttribute("class", "card-text");
-    codeSegmentBodyIndi.innerHTML = "Individual Probabilities: " + individual_probabilities[i].toString();
+    codeSegmentBodyIndi.innerHTML = "Individual Probabilities: " + individual_probabilities.jPlagResultsKey.toString();
     let codeSegmentBodyJoin = document.createElement("p");
     codeSegmentBodyJoin.setAttribute("class", "card-text");
     codeSegmentBodyJoin.innerHTML = "Joint Probabilities: " + joint_probability.toString();
@@ -86,17 +69,14 @@ for (let i = 0; i < jPlagResultsKeys.length; i++) {
 
     // Print super link to original suspect code, if there is any.
 
-    let suspectFilesKeys = [];
-    for (let key in jPlagResults[jPlagResultsKeys[i]]) {
-        if (jPlagResults[jPlagResultsKeys[i]].hasOwnProperty(key)) suspectFilesKeys.push(key);
-    }
+    let suspectFilesKeys = Object.keys(jPlagResults[jPlagResultsKey]).filter(key => jPlagResults[jPlagResultsKey].hasOwnProperty(key) === true);
 
     if (suspectFilesKeys.length != 0) {
-        document.getElementById("segmentDetailsDisplayBox").appendChild(document.createElement("hr"));
+        $("#segmentDetailsDisplayBox").append("<hr>");
 
-        for (let j = 0; j < suspectFilesKeys.length; j++) { 
-            const filePath = suspectFilesKeys[j];
-            const fileLink = jPlagResults[jPlagResultsKeys[i]][suspectFilesKeys[j]][1];
+        suspectFilesKeys.map(suspectFilesKey => { 
+            const filePath = suspectFilesKey;
+            const fileLink = jPlagResults[jPlagResultsKey][suspectFilesKey][1];
 
             let linkToJPlagResult = document.createElement("a");
             linkToJPlagResult.setAttribute("href", "details\\" + fileLink);
@@ -104,6 +84,6 @@ for (let i = 0; i < jPlagResultsKeys.length; i++) {
             linkToJPlagResult.appendChild(document.createElement("br"));
 
             document.getElementById("segmentDetailsDisplayBox").appendChild(linkToJPlagResult);
-        }
+        });
     }
-}
+})
