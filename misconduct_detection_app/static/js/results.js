@@ -1,21 +1,26 @@
 // Set name and other global variables, Django variables for this page
 pageName = "Results";
 
-
 $(document).ready(function (){
+    /*
+    Here I built the following structure by pure javascript rather than jQuery. This is because 
+    jQuery is not easy to use under this situation. If later jQuery is updated and a new way is
+    provided by jQuery, please rewrite these following parts.
+    */
+   
     //------------------------Print original segments------------------------
     let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
 
     segmentFilesKeys.map(segmentFilesKey =>{ 
-        var originalCodeSegmentHeader = document.createElement("div");
+        let originalCodeSegmentHeader = document.createElement("div");
         originalCodeSegmentHeader.setAttribute("class", "card-header");
         originalCodeSegmentHeader.innerHTML = segmentFilesKey;
 
-        var originalCodeSegmentBody = document.createElement("div");
+        let originalCodeSegmentBody = document.createElement("div");
         originalCodeSegmentBody.setAttribute("class", "card-body text-secondary");
-        var originalCodeSegmentBodyPara = document.createElement("p");
+        let originalCodeSegmentBodyPara = document.createElement("p");
         originalCodeSegmentBodyPara.setAttribute("class", "card-text");
-        var originalCodeSegmentBodyParaPre = document.createElement("pre");
+        let originalCodeSegmentBodyParaPre = document.createElement("pre");
         originalCodeSegmentBodyParaPre.innerHTML = segmentFiles[segmentFilesKey];
 
         originalCodeSegmentBodyPara.appendChild(originalCodeSegmentBodyParaPre);

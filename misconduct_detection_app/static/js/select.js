@@ -8,20 +8,13 @@ function highLightOriginalText(segmentNumber) {
     highLighted.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
     highLighted.setAttribute("id", "highLightedSegment-" + (segmentNumber + 1));
     highLighted.setAttribute("href", "#highLightedSegmentHeader-" + segmentNumber);
-    /*
-    let highLighted = $("<a></a>").attr({
-        "style": "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length],
-        "id": "highLightedSegment-" + (segmentNumber + 1),
-        "href": "#highLightedSegmentHeader-" + segmentNumber,
-    });
-    */
     selectedText.surroundContents(highLighted);
 }
 
 $("#nextButton").click(function(evt) {
     evt.preventDefault();
 
-    selectedCode = new FormData($('#selectCode_Form')[0]);
+    let selectedCode = new FormData($('#selectCode_Form')[0]);
     $.ajax({
         url: "selectCode/",
         type: 'POST',

@@ -10,7 +10,8 @@ function uploadFile() {
     document.getElementById("uploadFile_Label").classList.remove("btn-outline-primary");
     document.getElementById("uploadFile_Label").classList.add("btn-outline-secondary");
     document.getElementById("uploadFile_Label").classList.add("disabled");
-    singleFile = new FormData($('#uploadFile_Form')[0]);
+    let singleFile = new FormData($('#uploadFile_Form')[0]);
+    
     $.ajax({
         url: "uploadFile/",
         type: 'POST',
@@ -34,10 +35,7 @@ function uploadFolder() {
     document.getElementById("uploadFolder_Label").classList.remove("btn-outline-primary");
     document.getElementById("uploadFolder_Label").classList.add("btn-outline-secondary");
     document.getElementById("uploadFolder_Label").classList.add("disabled");
-    var folderFileList = $('#uploadFolder_Form')[0];
-
-    folderFile = new FormData(folderFileList);
-
+    let folderFile = new FormData($('#uploadFolder_Form')[0]);
 
     $.ajax({
         url: "uploadFolder/",

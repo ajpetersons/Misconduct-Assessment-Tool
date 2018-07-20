@@ -6,7 +6,7 @@
     <script>
         const jPlagResults = JSON.parse("{{ jPlagResultsJsonString|escapejs }}");
         const segmentFiles = JSON.parse("{{ segmentFilesJsonString|escapejs }}");
-        var jPlagSubmissionNumber = "{{ jPlagSubmissionNumber }}";
+        let jPlagSubmissionNumber = "{{ jPlagSubmissionNumber }}";
     </script>
     <script src="{% static 'js/results.js' %}" defer></script>
 {% endblock %}
@@ -27,8 +27,8 @@
 {% block content %}
     <div class="container-fluid">
         <div class="row flex-xl-nowrap">
+            <!-- Left side segments showing area-->
             <div class="col-12 col-md-6 col-lg-6">
-                <!-- Left side segments showing area-->
                 <div class="card border-secondary" style="width: 48rem;" id="segmentDisplayBox">
                 </div>
             </div>
