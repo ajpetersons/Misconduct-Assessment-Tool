@@ -20,7 +20,6 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('upload/', views.upload_index, name='upload_index'),
-    path('examine/', views.examine_index, name='examine_index'),
     path('select/', views.select_index, name='select_index'),
     path('results/', views.results_index, name='results'),
     path('upload/uploadFile/', views.upload_file, name='upload_file'),

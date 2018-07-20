@@ -18,6 +18,16 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 
 def generate_uploaded_file_list(request):
+    """Read and fetch user files on the server and return to front end.
+
+    If the required files are not exist, the return values will be ["NOFOLDEREXISTS"] (a list contains a string).
+    Otherwise, return value accordingly.
+    :param request: request
+    :type request: HttpRequest
+    :return: file_to_compare_path_list(uploaded single file), results_path_list(results), folder_path_list(uploaded
+    folder), segments_path_list(selected segments from last time)
+    :rtype: (list, list, list, list)
+    """
     file_to_compare_path = get_file_to_compare_path(request)
     results_path = get_results_path(request)
     folder_path = get_folder_path(request)
@@ -47,6 +57,14 @@ def generate_uploaded_file_list(request):
 
 
 def return_uploaded_files(request):
+    """Return the uploaded file information to front end
+
+    :param request: request
+    :type request: HttpRequest
+    :return: uploaded file information, file_to_compare_path_list, results_path_list, folder_path_list and
+    segments_path_list
+    :rtype: (list, list, list, list)
+    """
     file_to_compare_path_list, results_path_list, folder_path_list, segments_path_list \
         = generate_uploaded_file_list(request)
     context = {

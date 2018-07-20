@@ -25,29 +25,24 @@ def index(request):
 
 
 def upload_index(request):
+    """The upload page
+
+    :param request: request
+    :type request: HttpRequest
+    :return: render
+    :rtype: render
+    """
     return render(request, 'misconduct_detection_app/upload.html')
 
 
-def examine_index(request):
-    """
-
-    :param request:
-    :type request:
-    :return:
-    :rtype:
-    """
-    path_file = "misconduct_detection_app/uploads/singlefiles/"
-    path_folder = "misconduct_detection_app/uploads/folders/"
-    local_files = os.listdir(path_file)
-    local_folders = os.listdir(path_folder)
-    context = {
-        'local_files': local_files,
-        'local_folders': local_folders,
-    }
-    return render(request, 'misconduct_detection_app/examine.html', context)
-
-
 def select_index(request):
+    """The select page
+
+    :param request: request
+    :type request: HttpRequest
+    :return: render
+    :rtype: render
+    """
     path = get_file_to_compare_path(request)
     local_files = os.listdir(path)
 
@@ -62,6 +57,13 @@ def select_index(request):
 
 
 def results_index(request):
+    """The results page
+
+    :param request: request
+    :type request: HttpRequest
+    :return: render
+    :rtype: render
+    """
     segment_dir = os.listdir(get_segments_path(request))
     segment_files = {}
 

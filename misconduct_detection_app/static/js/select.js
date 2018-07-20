@@ -76,6 +76,6 @@ $("#addSegment").click(function() {
 $(document).ready(function (){
     // Set name and Django variables for this page
     pageName = "Selection";
-    $("#codeDisplayText").empty().append("<pre id='codeDisplayTextPre' style='white-space:pre-wrap'></pre>");
+    $("#codeDisplayText").empty().append("<code><pre id='codeDisplayTextPre' style='white-space:pre-wrap'></pre></code>");
     $("#codeDisplayTextPre").text(codeToCompare);
 });

@@ -7,7 +7,7 @@ $(document).ready(function (){
     jQuery is not easy to use under this situation. If later jQuery is updated and a new way is
     provided by jQuery, please rewrite these following parts.
     */
-   
+
     //------------------------Print original segments------------------------
     let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
 
@@ -43,7 +43,7 @@ $(document).ready(function (){
     //------------------------Calculation part------------------------
     jPlagResultsKeys.map(jPlagResultsKey => {
         let temp_probability = Object.keys(jPlagResults[jPlagResultsKey]).length / (jPlagSubmissionNumber - 1)
-        individual_probabilities.jPlagResultsKey = temp_probability;
+        individual_probabilities[jPlagResultsKey] = temp_probability;
         joint_probability *= temp_probability;
     })
 
@@ -59,7 +59,7 @@ $(document).ready(function (){
         codeSegmentBody.setAttribute("class", "card-body text-secondary");
         let codeSegmentBodyIndi = document.createElement("p");
         codeSegmentBodyIndi.setAttribute("class", "card-text");
-        codeSegmentBodyIndi.innerHTML = "Individual Probabilities: " + individual_probabilities.jPlagResultsKey.toString();
+        codeSegmentBodyIndi.innerHTML = "Individual Probabilities: " + individual_probabilities[jPlagResultsKey].toString();
         let codeSegmentBodyJoin = document.createElement("p");
         codeSegmentBodyJoin.setAttribute("class", "card-text");
         codeSegmentBodyJoin.innerHTML = "Joint Probabilities: " + joint_probability.toString();
