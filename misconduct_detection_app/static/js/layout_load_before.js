@@ -8,7 +8,8 @@ function loadUploadedComparingFile() {
         $("#fileToComparePathList").append("No uploaded compare file");
     } else {
         let linkToFile = $("<a></a>").attr({
-            "href": "examine/singlefiles/" + fileToComparePathList
+            "href": "/examine/singlefiles/" + fileToComparePathList,
+            "target": "_blank",
         }).text(fileToComparePathList);
         $("#fileToComparePathList").append(linkToFile);
     }
@@ -23,9 +24,9 @@ function loadUploadedFolder() {
         $("#folderPathList").append("No uploaded folder");
     } else {
         let linkToFile = $("<a></a>").attr({
-            "href": "examine/singlefiles/" + folderPathList
+            "href": "/examine/singlefiles/" + folderPathList
         }).text("folderPathList");
-        $("#folderPathList").append(linkToFile);
+        $("#folderPathList").append("Something here");
     }
 }
 

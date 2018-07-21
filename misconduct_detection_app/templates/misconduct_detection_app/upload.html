@@ -18,20 +18,20 @@
     
     <hr>
 
-    <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" action="uploadFile/" id="uploadFile_Form">
+    <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" id="uploadFileForm">
         {% csrf_token %}
-        <input type="file" name="file" onchange="uploadFile();" id="uploadFile_Input"> 
-        <label for="uploadFile_Input" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="uploadFile_Label">
+        <input type="file" name="file" id="uploadFileInput"> 
+        <label for="uploadFileInput" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="uploadFileLabel">
             Upload File
         </label>
     </form>
 
     <br>
 
-    <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" action="uploadFolder/" id="uploadFolder_Form" value="value">
+    <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" id="uploadFolderForm" value="value">
         {% csrf_token %}
-        <input type="file" name="file" onchange="uploadFolder();" id="uploadFolder_Input" directory multiple webkitdirectory mozdirectory> 
-        <label for="uploadFolder_Input" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="uploadFolder_Label">
+        <input type="file" name="file" id="uploadFolderInput" directory multiple webkitdirectory mozdirectory> 
+        <label for="uploadFolderInput" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="uploadFolderLabel">
             Upload Folder
         </label>
     </form>
@@ -41,10 +41,18 @@
 {% endblock %}
 
 {% block content %}
-    <p id="upload_Content">
+    <p id="uploadContent">
         At this page, you need to upload the file to be checked and the folder which contains files to be compared. <br> <br> <br>
         When the files are uploaded, click "Next" to continue. <br>
-        If you wish to cancel your current job and go to last page, click "Back" to cancel your operations and return to last page.<br>
+        If you wish not to cancel your current job and go to last page, click "Back" to return to last page without cancelling your current job.<br>
         If you wish to cancel your current job and go to the first page, click "Cancel" to cancel all your operations and return to first page.<br>
     </p>
+
+    <br><hr><br>
+
+    <div>
+        <h5 id="uploadFileCheck"><i class="material-icons">block</i>You haven't uploaded a file.</h4>
+        <h5 id="uploadFolderCheck"><i class="material-icons">block</i>You haven't uploaded a folder.</h4>
+    </div>
+
 {% endblock %}

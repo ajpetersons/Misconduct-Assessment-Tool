@@ -4,13 +4,24 @@ pageName = "Uploading";
 let uploadFileFinish = false;
 let uploadFolderFinish = false;
 
-function uploadFile() {
+function modifyDOMAfterUploadingFile() {
     uploadFileFinish = true;
     openNextButton();
-    document.getElementById("uploadFile_Label").classList.remove("btn-outline-primary");
-    document.getElementById("uploadFile_Label").classList.add("btn-outline-secondary");
-    document.getElementById("uploadFile_Label").classList.add("disabled");
-    let singleFile = new FormData($('#uploadFile_Form')[0]);
+    $("#uploadFileLabel").text("Reupload File");
+    $("#uploadFileCheck").empty();
+}
+
+function modifyDOMAfterUploadingFolder() {
+    uploadFolderFinish = true;
+    openNextButton();
+    $("#uploadFolderLabel").text("Reupload Folder");
+    $("#uploadFolderCheck").empty();
+}
+
+function uploadFile() {
+    modifyDOMAfterUploadingFile();
+    let singleFile = new FormData($('#uploadFileForm')[0]);
+    $("#uploadFileCheck").append("<i class='fa fa-spinner fa-spin'></i>Please wait while uploading...");
     
     $.ajax({
         url: "uploadFile/",
@@ -27,15 +38,17 @@ function uploadFile() {
             uploading = false;
         }
     });
+
+    $(document).ajaxStop(function() {
+        $("#uploadFileCheck").empty();
+        $("#uploadFileCheck").append("<i class='material-icons'>check</i>Selected file uploaded.");
+    });
 }
 
 function uploadFolder() {
-    uploadFolderFinish = true;
-    openNextButton();
-    document.getElementById("uploadFolder_Label").classList.remove("btn-outline-primary");
-    document.getElementById("uploadFolder_Label").classList.add("btn-outline-secondary");
-    document.getElementById("uploadFolder_Label").classList.add("disabled");
-    let folderFile = new FormData($('#uploadFolder_Form')[0]);
+    modifyDOMAfterUploadingFolder();
+    let folderFile = new FormData($('#uploadFolderForm')[0]);
+    $("#uploadFolderCheck").append("<i class='fa fa-spinner fa-spin'></i>Please wait while uploading...");
 
     $.ajax({
         url: "uploadFolder/",
@@ -52,21 +65,39 @@ function uploadFolder() {
             uploading = false;
         }
     });
+
+    $(document).ajaxStop(function() {
+        $("#uploadFolderCheck").empty();
+        $("#uploadFolderCheck").append("<i class='material-icons'>check</i>Selected folder uploaded.");
+    });
 }
 
 function openNextButton() {
-    if (uploadFileFinish == true && uploadFolderFinish == true)
-    {
+    if (uploadFileFinish == true && uploadFolderFinish == true) {
         document.getElementById("nextButton").removeAttribute("disabled");
         document.getElementById("nextButton").removeAttribute("title");
     }
 }
 
+$("#uploadFileForm").change(function (){
+    uploadFile(); 
+ });
+
+$("#uploadFolderForm").change(function (){
+   uploadFolder(); 
+});
+
 $(document).ready(function () {
-    if ((fileToComparePathList != "NOFOLDEREXISTS") && folderPathList[0] != "NOFOLDEREXISTS")
-    {
-        uploadFileFinish = true;
-        uploadFolderFinish = true;
-        openNextButton();
+    if (fileToComparePathList != "NOFOLDEREXISTS") {
+        modifyDOMAfterUploadingFile();
+        $("#uploadFileCheck").empty();
+        $("#uploadFileCheck").append("<i class='material-icons'>check</i>Selected file uploaded.");
     }
+
+    if (folderPathList[0] != "NOFOLDEREXISTS") {
+        modifyDOMAfterUploadingFolder();
+        $("#uploadFolderCheck").empty();
+        $("#uploadFolderCheck").append("<i class='material-icons'>check</i>Selected folder uploaded.");
+    }
+    openNextButton();
 });
