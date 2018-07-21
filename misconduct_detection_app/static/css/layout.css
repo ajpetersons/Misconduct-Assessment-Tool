@@ -11,3 +11,9 @@ p, ul {
     font-size: 22px;
     line-height: 50px;
 }
+
+.popover {
+    width: 600px;
+    height: 400px;
+    overflow-y: scroll;
+}
