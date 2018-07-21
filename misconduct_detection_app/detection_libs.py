@@ -13,7 +13,10 @@ class DetectionLib:
         :type name: str
         :param lib_path: the path of the library on the server
         :type lib_path: str
-        :param results_path: the path to store produced results
+        :param results_path: the path to store produced results. The results format should be:
+        (results, submission_number), where results should be a dict which contains the results
+        and file relations. And the submission_number should be the number of submissions rather
+        than the number of files.
         :type results_path: str
         :param file_to_compare_path: the path where stores the uploaded single file
         :type file_to_compare_path: str
