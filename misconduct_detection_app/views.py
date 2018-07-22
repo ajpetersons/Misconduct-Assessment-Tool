@@ -113,6 +113,8 @@ def handle_upload_file(request, file, filename):
     :type filename: str
     """
 
+    if os.path.exists(get_file_to_compare_path(request)):
+        shutil.rmtree(get_file_to_compare_path(request))
     path = get_file_to_compare_path(request)
     if not os.path.exists(path):
         os.makedirs(path)
@@ -163,6 +165,8 @@ def handle_upload_folder(request, file, file_name, file_extension, original_path
     :type original_path: str
     """
 
+    if os.path.exists(get_folder_path(request)):
+        shutil.rmtree(get_folder_path(request))
     path = os.path.join(get_folder_path(request), original_path)
     if not os.path.exists(path):
         os.makedirs(path)
@@ -181,14 +185,8 @@ def examine_file(request, name):
 
 
 def examine_folder(request, name):
-    path_folder = "misconduct_detection_app/uploads/folders/" + name
-    local_folders = os.listdir(path_folder)
-    return render(request, 'misconduct_detection_app/examine.html', {"local_folders": local_folders})
-
-
-def examine_folder_files(request, name):
-    path_file = "misconduct_detection_app/uploads/folders/"
-    f = open(path_file + name, 'r')
+    path = os.path.join(get_folder_path(request), name)
+    f = open(path, 'r')
     file_content = f.read()
     f.close()
     return HttpResponse(file_content, content_type="text/plain")

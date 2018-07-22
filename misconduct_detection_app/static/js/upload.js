@@ -91,13 +91,13 @@ $(document).ready(function () {
     if (fileToComparePathList != "NOFOLDEREXISTS") {
         modifyDOMAfterUploadingFile();
         $("#uploadFileCheck").empty();
-        $("#uploadFileCheck").append("<i class='material-icons'>check</i>Selected file uploaded.");
+        $("#uploadFileCheck").append("<i class='material-icons'>check</i>File uploaded.");
     }
 
     if (folderPathList[0] != "NOFOLDEREXISTS") {
         modifyDOMAfterUploadingFolder();
         $("#uploadFolderCheck").empty();
-        $("#uploadFolderCheck").append("<i class='material-icons'>check</i>Selected folder uploaded.");
+        $("#uploadFolderCheck").append("<i class='material-icons'>check</i>Folder uploaded.");
     }
     openNextButton();
 });

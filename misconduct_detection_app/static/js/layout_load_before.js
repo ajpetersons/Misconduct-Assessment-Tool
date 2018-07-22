@@ -39,16 +39,19 @@ function loadUploadedFolder() {
             "data-trigger": "focus",
             "data-placement": "top",
             "id": "folderPathListPopOver",
-        }).text("Uploaded Folder"));
+        }));
+        // Create the up arrow
+        $("#folderPathListPopOver").append("Uploaded Folder<i class='material-icons' style='position: relative;top: 4px;left: 0px;font-size: 18px;'>arrow_drop_up</i>");
 
         folderPathList.map(filePath => {
             $("#hiddenContentsDiv").append($("<a></a>").attr({
-                "href": "#"
+                "href": "/examine/folders/" + filePath.substring(filePath.indexOf("folder") + 8),
+                "target": "_blank",
             }).text(filePath.substring(filePath.indexOf("folder") + 8)));
             $("#hiddenContentsDiv").append("<br>");
         });
-        // These popover functions must be put after above part since our DOM
-        // is built dynamically.
+        // These popover functions must be put after above part since our DOMs
+        // are built dynamically.
         $(function () {
             $('#folderPathListPopOver').popover({
                 html: true,
@@ -76,7 +79,7 @@ function loadSelectedSegments() {
             "role": "button",
         }).text("No segments to show"));
     } else {
-        let linkToRes = $("<a href='#'></a>").text("Check last segment choice");
+        let linkToRes = $("<a href='#'></a>").text("Check segment choice from last detection");
         $("#segmentsPathList").append(linkToRes);
     }
 }
