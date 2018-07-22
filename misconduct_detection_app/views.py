@@ -54,10 +54,10 @@ def select_index(request):
         for segment_file in segment_files:
             with open(os.path.join(get_segments_path(request), segment_file), 'r') as f:
                 segments[segment_file[:segment_file.find('.')]] = f.read()
-    print(segments)
+    file_to_compare_path_json_string = json.dumps(file_to_compare_path, cls=DjangoJSONEncoder)
     segment_json_string = json.dumps(segments, cls=DjangoJSONEncoder)
     context = {
-        "fileToComparePath": file_to_compare_path,
+        "fileToComparePathJsonString": file_to_compare_path_json_string,
         "segmentJsonString": segment_json_string,
     }
 
