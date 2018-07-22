@@ -2,7 +2,7 @@
 let segmentNumber = 0;
 let firstCall = true;
 
-function redrawAccordingToBottomBar(){
+function redrawAccordingToBottomBar() {
     if (segmentsPathList != "NOFOLDEREXISTS") {
         $("#segmentDisplayBox").empty();
         firstCall = false;
@@ -12,6 +12,23 @@ function redrawAccordingToBottomBar(){
             segmentNumber++;
             drawOneSegment(selectedSegments[selectedSegmentsKey], segmentNumber);
         });
+    }
+}
+
+function redrawBottomBar() {
+    $("#segmentsPathList").empty();
+    if (segmentNumber === 0) {
+        $("#segmentsPathList").append($("<div></div>").attr({
+            "class": "btn btn-outline-secondary disabled",
+            "role": "button",
+        }).text("No segments to show"));
+    } else {
+        let linkToRes = $("<a></a>").attr({
+            'href': '/select/',
+            "class": "btn btn-outline-primary",
+            "role": "button",
+        }).text("Check selected segments");
+        $("#segmentsPathList").append(linkToRes);
     }
 }
 
@@ -144,6 +161,7 @@ $("#saveSegmentButton").click(function(evt) {
     $(document).ajaxStop(function() {
         $("#saveSegmentButton").empty();
         $("#saveSegmentButton").append("<i class='material-icons'>save_alt</i>");
+        redrawBottomBar();
     });
 });
 

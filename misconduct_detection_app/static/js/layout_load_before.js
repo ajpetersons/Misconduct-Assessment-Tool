@@ -83,7 +83,7 @@ function loadSelectedSegments() {
             'href': '/select/',
             "class": "btn btn-outline-primary",
             "role": "button",
-        }).text("Check segment choice from last detection");
+        }).text("Check selected segments");
         $("#segmentsPathList").append(linkToRes);
     }
 }
