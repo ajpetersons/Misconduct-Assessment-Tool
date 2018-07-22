@@ -2,6 +2,73 @@
 let segmentNumber = 0;
 let firstCall = true;
 
+function redrawAccordingToBottomBar(){
+    if (segmentsPathList != "NOFOLDEREXISTS") {
+        $("#segmentDisplayBox").empty();
+        firstCall = false;
+        
+        let selectedSegmentsKeys = Object.keys(selectedSegments).filter(key => selectedSegments.hasOwnProperty(key) === true);
+        selectedSegmentsKeys.map(selectedSegmentsKey => {
+            segmentNumber++;
+            drawOneSegment(selectedSegments[selectedSegmentsKey], segmentNumber);
+        });
+    }
+}
+
+function drawOneSegment(selectText, segmentNumber) {
+    // Create inner segment text
+    let codeSegment = $("<textarea></textarea>").attr({
+        "class": "form-control",
+        "id": "inputText" + segmentNumber,
+        "rows": "10",
+        "form": "selectCode_Form",
+        "readonly": "readonly",
+        "name": "Segment_" + segmentNumber,
+    }).text(selectText)
+
+    // Create header
+    // Header link
+    let codeSegmentHeaderLink = $("<a></a>").attr({
+        "href": "#highLightedSegment" + segmentNumber
+    }).text("Segment " + segmentNumber);
+    // Buttons
+    let appendHeaderButton = $("<button></button>").attr({
+        "class": "btn btn-outline-secondary btn-sm append-header-button",
+        "id": "appendHeaderButton" + segmentNumber,
+    }).append("<i class='material-icons'>add</i>");
+    let deleteHeaderButton = $("<button></button>").attr({
+        "class": "btn btn-outline-secondary btn-sm delete-header-button",
+        "id": "deleteHeaderButton" + segmentNumber,
+    }).append("<i class='material-icons'>clear</i>");
+    let includeHeaderButton = $("<button></button>").attr({
+        "class": "btn btn-outline-secondary btn-sm include-header-button",
+        "id": "includeHeaderButton" + segmentNumber,
+    }).append("<i class='material-icons'>report_off</i>");
+    // Header button group
+    let codeSegmentHeaderButtons = $("<div></div>").attr({
+        "id": "highLightedSegmentHeaderButtons" + segmentNumber,
+        "class": "highLightedSegmentHeaderButtons",
+        "style": "float: right;display: inline;",
+    }).append(appendHeaderButton, deleteHeaderButton, includeHeaderButton);
+    // Header text
+    let codeSegmentHeader = $("<div></div>").attr({
+        "class": 'card-header',
+        "style": 'background: ' + highLighterColors[(segmentNumber - 1) % highLighterColors.length],
+        "id": "highLightedSegmentHeader" + segmentNumber,
+    }).append(codeSegmentHeaderLink, codeSegmentHeaderButtons);
+            
+    // Wrapper
+    let codeSegmentDiv = $("<div></div>").attr({
+        "class": "card-body text-secondary",
+        "id": "highLightedSegmentBody" + segmentNumber,
+    }).append(codeSegment);
+    $("#segmentDisplayBox").append(codeSegmentHeader, codeSegmentDiv);
+    /*
+    Here since our DOMs are created dynamically, the event handlers are slightly different
+    from normal ones. You can find them below. 
+    */
+}
+
 function highLightOriginalText(segmentNumber) {
     let selectedText = window.getSelection().getRangeAt(0);
     let highLighted = document.createElement("a");
@@ -49,54 +116,7 @@ $("#addSegmentButton").click(function() {
         highLightOriginalText(segmentNumber);
         segmentNumber++;
 
-        // Create inner segment text
-        let codeSegment = $("<textarea></textarea>").attr({
-            "class": "form-control",
-            "id": "inputText",
-            "rows": "10",
-            "form": "selectCode_Form",
-            "readonly": "readonly",
-            "name": "Segment_" + segmentNumber,
-        }).text(selectText)
-
-        // Create header
-        // Header link
-        let codeSegmentHeaderLink = $("<a></a>").attr({
-            "href": "#highLightedSegment" + segmentNumber
-        }).text("Segment " + segmentNumber);
-        // Buttons
-        let appendHeaderButton = $("<button></button>").attr({
-            "class": "btn btn-outline-secondary btn-sm append-header-button",
-            "id": "appendHeaderButton" + segmentNumber,
-        }).append("<i class='material-icons'>add</i>");
-        let deleteHeaderButton = $("<button></button>").attr({
-            "class": "btn btn-outline-secondary btn-sm delete-header-button",
-            "id": "deleteHeaderButton" + segmentNumber,
-        }).append("<i class='material-icons'>clear</i>");
-        let includeHeaderButton = $("<button></button>").attr({
-            "class": "btn btn-outline-secondary btn-sm include-header-button",
-            "id": "includeHeaderButton" + segmentNumber,
-        }).append("<i class='material-icons'>report_off</i>");
-        // Header button group
-        let codeSegmentHeaderButtons = $("<div></div>").attr({
-            "id": "highLightedSegmentHeaderButtons" + segmentNumber,
-            "class": "highLightedSegmentHeaderButtons",
-            "style": "float: right;display: inline;",
-        }).append(appendHeaderButton, deleteHeaderButton, includeHeaderButton);
-        // Header text
-        let codeSegmentHeader = $("<div></div>").attr({
-            "class": 'card-header',
-            "style": 'background: ' + highLighterColors[(segmentNumber - 1) % highLighterColors.length],
-            "id": "highLightedSegmentHeader" + segmentNumber,
-        }).append(codeSegmentHeaderLink, codeSegmentHeaderButtons);
-                
-        // Wrapper
-        let codeSegmentDiv = $("<div class='card-body text-secondary'></div>").append(codeSegment);
-        $("#segmentDisplayBox").append(codeSegmentHeader, codeSegmentDiv);
-        /*
-        Here since our DOMs are created dynamically, the event handlers are slightly different
-        from normal ones. You can find them below. 
-        */
+        drawOneSegment(selectText, segmentNumber);
     }
 });
 
@@ -131,9 +151,17 @@ $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
     alert(evt.currentTarget.id);
 });
 
+$("#segmentDisplayBox").on("click", ".delete-header-button", function (evt){
+    let currentSegmentNumber = evt.currentTarget.id.substring(evt.currentTarget.id.length - 1);
+    $("#highLightedSegmentBody" + currentSegmentNumber).remove();
+    $("#highLightedSegmentHeader" + currentSegmentNumber).remove();
+});
+
 $(document).ready(function (){
     // Set name and Django variables for this page
     pageName = "Selection";
     $("#codeDisplayText").empty().append("<code><pre id='codeDisplayTextPre' style='white-space:pre-wrap'></pre></code>");
     $("#codeDisplayTextPre").text(codeToCompare);
+
+    redrawAccordingToBottomBar();
 });

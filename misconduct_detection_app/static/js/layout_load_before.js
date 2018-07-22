@@ -79,7 +79,11 @@ function loadSelectedSegments() {
             "role": "button",
         }).text("No segments to show"));
     } else {
-        let linkToRes = $("<a href='#'></a>").text("Check segment choice from last detection");
+        let linkToRes = $("<a></a>").attr({
+            'href': '/select/',
+            "class": "btn btn-outline-primary",
+            "role": "button",
+        }).text("Check segment choice from last detection");
         $("#segmentsPathList").append(linkToRes);
     }
 }

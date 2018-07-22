@@ -5,7 +5,8 @@
     <link rel="stylesheet" href="{% static 'css/select.css' %}">
     <!-- Receive Django templates results here-->
     <script>
-        const codeToCompare = `{{ file_content }}`;
+        const codeToCompare = `{{ fileToComparePath }}`;
+        const selectedSegments = JSON.parse("{{ segmentJsonString|escapejs }}");
     </script>
     <script src="{% static 'js/select.js' %}" defer></script>
 {% endblock %}

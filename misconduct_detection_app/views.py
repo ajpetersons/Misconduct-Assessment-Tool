@@ -43,14 +43,21 @@ def select_index(request):
     :return: render
     :rtype: render
     """
-    path = get_file_to_compare_path(request)
-    local_files = os.listdir(path)
+    file_to_be_compared_path = get_file_to_compare_path(request)
+    file_to_be_compared = os.listdir(file_to_be_compared_path)
+    segments = {}
 
-    f = open(os.path.join(path, local_files[0]), 'r')
-    file_content = f.read()
-    f.close()
+    with open(os.path.join(file_to_be_compared_path, file_to_be_compared[0]), 'r') as f:
+        file_to_compare_path = f.read()
+    if (os.path.exists(get_segments_path(request))):
+        segment_files = os.listdir(get_segments_path(request))
+        for segment_file in segment_files:
+            with open(os.path.join(get_segments_path(request), segment_file), 'r') as f:
+                segments[segment_file[:segment_file.find('.')]] = f.read()
+    segment_json_string = json.dumps(segments, cls=DjangoJSONEncoder)
     context = {
-        "file_content": file_content,
+        "fileToComparePath": file_to_compare_path,
+        "segmentJsonString": segment_json_string,
     }
 
     return render(request, 'misconduct_detection_app/select.html', context)
