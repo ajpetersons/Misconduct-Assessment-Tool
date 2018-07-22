@@ -208,12 +208,17 @@ def examine_file_in_result_page(request, name):
 # ------------------------------------Select Code------------------------------------
 def select_code(request):
     if request.method == 'POST':
+        if os.path.exists(get_segments_path(request)):
+            shutil.rmtree(get_segments_path(request))
         if not os.path.exists(get_segments_path(request)):
             os.makedirs(get_segments_path(request))
-        for code_segment in request.POST.keys():
-            if code_segment != "csrfmiddlewaretoken":
-                with open(get_segments_path(request) + "/" + code_segment + '.c', 'w+') as f:
-                    f.write(request.POST[code_segment])
+        if len(request.POST) > 1:
+            for code_segment in request.POST.keys():
+                if code_segment != "csrfmiddlewaretoken":
+                    with open(get_segments_path(request) + "/" + code_segment + '.c', 'w+') as f:
+                        f.write(request.POST[code_segment])
+        else:
+            shutil.rmtree(get_segments_path(request))
         return HttpResponse('Selection Succeeded')
     else:
         return HttpResponse('Selection Failed')

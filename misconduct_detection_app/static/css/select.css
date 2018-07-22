@@ -27,3 +27,8 @@ input[type="text"] {
     overflow-y: scroll;
     overflow-x: scroll;
 }
+
+.btn-custom-sm {
+    width: 10px;
+    height: 10px;
+}
