@@ -100,7 +100,11 @@ function loadResults() {
             "role": "button",
         }).text("No results to show"));
     } else if (resultsPathList === "RESULTSEXISTS"){
-        let linkToRes = $("<a href='#'></a>").text("Check results from last detection");
+        let linkToRes = $("<a></a>").attr({
+            'href': '/results/',
+            "class": "btn btn-outline-primary",
+            "role": "button",
+        }).text("Check results from last detection");
         $("#resultsPathList").append(linkToRes);
     }
 }

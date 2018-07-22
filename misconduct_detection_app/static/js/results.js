@@ -87,6 +87,7 @@ $(document).ready(function (){
 
                 let linkToJPlagResult = document.createElement("a");
                 linkToJPlagResult.setAttribute("href", "details\\" + fileLink);
+                linkToJPlagResult.setAttribute("target", "_blank");
                 linkToJPlagResult.innerHTML = filePath;
                 linkToJPlagResult.appendChild(document.createElement("br"));
 

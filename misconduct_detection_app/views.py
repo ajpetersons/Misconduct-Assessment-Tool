@@ -49,11 +49,12 @@ def select_index(request):
 
     with open(os.path.join(file_to_be_compared_path, file_to_be_compared[0]), 'r') as f:
         file_to_compare_path = f.read()
-    if (os.path.exists(get_segments_path(request))):
+    if os.path.exists(get_segments_path(request)):
         segment_files = os.listdir(get_segments_path(request))
         for segment_file in segment_files:
             with open(os.path.join(get_segments_path(request), segment_file), 'r') as f:
                 segments[segment_file[:segment_file.find('.')]] = f.read()
+    print(segments)
     segment_json_string = json.dumps(segments, cls=DjangoJSONEncoder)
     context = {
         "fileToComparePath": file_to_compare_path,
@@ -75,7 +76,7 @@ def results_index(request):
     segment_files = {}
 
     for segment in segment_dir:
-        with open(get_segments_path(request) + "/" + segment, 'r+') as f:
+        with open(get_segments_path(request) + "/" + segment, 'r') as f:
             segment_files[segment[:segment.find(".")]] = f.read()
 
     jplag_results, jplag_submission_number = DETECTION_LIBS["Jplag"].results_interpretation()
@@ -125,7 +126,7 @@ def handle_upload_file(request, file, filename):
     path = get_file_to_compare_path(request)
     if not os.path.exists(path):
         os.makedirs(path)
-    with open(os.path.join(path, filename), 'wb+')as destination:
+    with open(os.path.join(path, filename), 'wb')as destination:
         for chunk in file.chunks():
             destination.write(chunk)
 
@@ -177,7 +178,7 @@ def handle_upload_folder(request, file, file_name, file_extension, original_path
     path = os.path.join(get_folder_path(request), original_path)
     if not os.path.exists(path):
         os.makedirs(path)
-    with open(os.path.join(path, file_name + file_extension), 'wb+') as destination:
+    with open(os.path.join(path, file_name + file_extension), 'wb') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
 
@@ -222,7 +223,7 @@ def select_code(request):
         if len(request.POST) > 1:
             for code_segment in request.POST.keys():
                 if code_segment != "csrfmiddlewaretoken":
-                    with open(get_segments_path(request) + "/" + code_segment + '.c', 'w+') as f:
+                    with open(get_segments_path(request) + "/" + code_segment + '.c', 'w', newline="\n") as f:
                         f.write(request.POST[code_segment])
         else:
             shutil.rmtree(get_segments_path(request))
@@ -233,6 +234,8 @@ def select_code(request):
 
 # ------------------------------------Run the Jplag jar------------------------------------
 def run_detection(request):
+    if os.path.exists(get_results_path(request)):
+        shutil.rmtree(get_results_path(request))
     return render(request, 'misconduct_detection_app/runningWaiting.html')
 
 
