@@ -66,15 +66,15 @@ $("#addSegmentButton").click(function() {
         }).text("Segment " + segmentNumber);
         // Buttons
         let appendHeaderButton = $("<button></button>").attr({
-            "class": "btn btn-outline-secondary btn-sm",
+            "class": "btn btn-outline-secondary btn-sm append-header-button",
             "id": "appendHeaderButton" + segmentNumber,
         }).append("<i class='material-icons'>add</i>");
         let deleteHeaderButton = $("<button></button>").attr({
-            "class": "btn btn-outline-secondary btn-sm",
+            "class": "btn btn-outline-secondary btn-sm delete-header-button",
             "id": "deleteHeaderButton" + segmentNumber,
         }).append("<i class='material-icons'>clear</i>");
         let includeHeaderButton = $("<button></button>").attr({
-            "class": "btn btn-outline-secondary btn-sm",
+            "class": "btn btn-outline-secondary btn-sm include-header-button",
             "id": "includeHeaderButton" + segmentNumber,
         }).append("<i class='material-icons'>report_off</i>");
         // Header button group
@@ -93,6 +93,10 @@ $("#addSegmentButton").click(function() {
         // Wrapper
         let codeSegmentDiv = $("<div class='card-body text-secondary'></div>").append(codeSegment);
         $("#segmentDisplayBox").append(codeSegmentHeader, codeSegmentDiv);
+        /*
+        Here since our DOMs are created dynamically, the event handlers are slightly different
+        from normal ones. You can find them below. 
+        */
     }
 });
 
@@ -123,8 +127,8 @@ $("#saveSegmentButton").click(function(evt) {
     });
 });
 
-$("#appendHeaderButton" + segmentNumber).on("click", ".highLightedSegmentHeaderButtons", function (){
-    alert("button clicked");
+$("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
+    alert(evt.currentTarget.id);
 });
 
 $(document).ready(function (){
