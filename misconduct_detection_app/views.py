@@ -52,8 +52,9 @@ def select_index(request):
     if os.path.exists(get_segments_path(request)):
         segment_files = os.listdir(get_segments_path(request))
         for segment_file in segment_files:
-            with open(os.path.join(get_segments_path(request), segment_file), 'r') as f:
-                segments[segment_file[:segment_file.find('.')]] = f.read()
+            if os.path.isfile(os.path.join(get_segments_path(request), segment_file)):
+                with open(os.path.join(get_segments_path(request), segment_file), 'r') as f:
+                    segments[segment_file[:segment_file.find('.')]] = f.read()
     file_to_compare_path_json_string = json.dumps(file_to_compare_path, cls=DjangoJSONEncoder)
     segment_json_string = json.dumps(segments, cls=DjangoJSONEncoder)
     context = {
@@ -72,12 +73,14 @@ def results_index(request):
     :return: render
     :rtype: render
     """
-    segment_dir = os.listdir(get_segments_path(request))
+    include_segments_path = os.path.join(get_segments_path(request), "include_segments_path")
+    segment_dir = os.listdir(include_segments_path)
     segment_files = {}
 
     for segment in segment_dir:
-        with open(get_segments_path(request) + "/" + segment, 'r') as f:
-            segment_files[segment[:segment.find(".")]] = f.read()
+        if os.path.isfile(include_segments_path + "/" + segment):
+            with open(include_segments_path + "/" + segment, 'r') as f:
+                segment_files[segment[:segment.find(".")]] = f.read()
 
     jplag_results, jplag_submission_number = DETECTION_LIBS["Jplag"].results_interpretation()
 
@@ -232,6 +235,20 @@ def select_code(request):
         return HttpResponse('Selection Failed')
 
 
+def select_check_box(request):
+    if not os.path.exists(get_configs_path(request)):
+        os.makedirs(get_configs_path(request))
+    if request.method == 'POST':
+        if len(request.POST) > 1:
+            for checked_box in request.POST.keys():
+                if checked_box != "csrfmiddlewaretoken":
+                    with open(get_configs_path(request) + "/" + "checked_boxes" + '.txt', 'w') as f:
+                        f.write(request.POST[checked_box])
+        return HttpResponse('Selection Succeeded')
+    else:
+        return HttpResponse('Selection Failed')
+
+
 # ------------------------------------Run the Jplag jar------------------------------------
 def run_detection(request):
     if os.path.exists(get_results_path(request)):
@@ -243,13 +260,26 @@ def run_detection_core(request):
     for selection in request.POST.keys():
         if selection == "detectionLibSelectionInput":
             detection_lib_selection = request.POST[selection]
+
+    with open(get_configs_path(request) + "/" + "checked_boxes" + '.txt', 'r') as f:
+        checked_segments = f.read()
+    include_segments_path = os.path.join(get_segments_path(request), "include_segments_path")
+    if os.path.exists(include_segments_path):
+        shutil.rmtree(include_segments_path)
+    if not os.path.exists(include_segments_path):
+        os.makedirs(include_segments_path)
+    checked_segments = checked_segments.split(",")
+    for checked_segment in checked_segments:
+        shutil.copy(os.path.join(get_segments_path(request), "Segment_" + checked_segment + ".c"),
+                    os.path.join(include_segments_path, "Segment_" + checked_segment + ".c"))
+
     name = "Jplag_default"
     results_path = get_results_path(request)
-    file_to_compare_path = get_segments_path(request)
+    segments_path = get_segments_path(request)
     folder_to_compare_path = get_folder_path(request)
     file_language = "c/c++"
     number_of_matches = "1%"
-    parameters = name, results_path, file_to_compare_path, folder_to_compare_path, file_language, number_of_matches
+    parameters = name, results_path, include_segments_path, folder_to_compare_path, file_language, number_of_matches
 
     detection_lib = detection_lib_selector(detection_lib_selection, parameters)
     detection_lib.run_without_getting_results(get_temp_working_path(request))

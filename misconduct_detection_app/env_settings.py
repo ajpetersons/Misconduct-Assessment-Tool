@@ -11,6 +11,7 @@ DEFAULT_FOLDER_PATH = os.path.join(APP_PATH, "uploads", "Default", "folders")
 DEFAULT_TEMP_WORKING_PATH = os.path.join(APP_PATH, "uploads", "Default", "temp")
 DEFAULT_RESULTS_PATH = os.path.join(APP_PATH, "results", "Default")
 DEFAULT_SEGMENTS_PATH = os.path.join(APP_PATH, "uploads", "Default", "segments")
+DEFAULT_CONFIGS_PATH = os.path.join(APP_PATH, "uploads", "Default", "configs")
 
 
 def get_user_ip(request):
@@ -97,6 +98,18 @@ def get_segments_path(request):
     return segments_path
 
 
+def get_configs_path(request):
+    """
+
+    :param request: request
+    :type request: HttpRequest
+    :return: path to save user selected segments
+    :rtype: str
+    """
+    configs_path = os.path.join(APP_PATH, "uploads", get_user_id(request), "configs")
+    return configs_path
+
+
 detection_libs_path = {
     "Jplag": os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar")
 }
@@ -111,12 +124,12 @@ def detection_lib_selector(selection, parameters):
     if selection not in detection_libs_path.keys():
         raise NotImplementedError("The library has not been registered")
     elif selection == "Jplag":
-            name, results_path, file_to_compare_path, folder_to_compare_path, file_language, number_of_matches =\
+            name, results_path, segments_path, folder_to_compare_path, file_language, number_of_matches =\
                 parameters
             return Jplag(name=selection,
                          lib_path=detection_libs_path[selection],
                          results_path=results_path,
-                         file_to_compare_path=file_to_compare_path,
+                         segments_path=segments_path,
                          folder_to_compare_path=folder_to_compare_path,
                          file_language=file_language,
                          number_of_matches=number_of_matches,

@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 class DetectionLib:
     """General detection library."""
 
-    def __init__(self, name, lib_path, results_path, file_to_compare_path, folder_to_compare_path):
+    def __init__(self, name, lib_path, results_path, segments_path, folder_to_compare_path):
         """Create a new detection library object.
         
         :param name: the name of this library
@@ -18,8 +18,8 @@ class DetectionLib:
         and file relations. And the submission_number should be the number of submissions rather
         than the number of files.
         :type results_path: str
-        :param file_to_compare_path: the path where stores the uploaded single file
-        :type file_to_compare_path: str
+        :param segments_path: the path where stores the uploaded single file
+        :type segments_path: str
         :param folder_to_compare_path: the path where sotres the uploaded folder
         :type folder_to_compare_path: str
         """
@@ -27,7 +27,7 @@ class DetectionLib:
         self.name = name
         self.lib_path = lib_path
         self.results_path = results_path
-        self.file_to_compare_path = file_to_compare_path
+        self.segments_path = segments_path
         self.folder_to_compare_path = folder_to_compare_path
         self.file_language_supported = []
 
@@ -114,11 +114,11 @@ class DetectionLib:
         self.__results_path = results_path
 
     @property
-    def file_to_compare_path(self):
+    def segments_path(self):
         return self.__file_to_compare_path
 
-    @file_to_compare_path.setter
-    def file_to_compare_path(self, file_to_compare_path):
+    @segments_path.setter
+    def segments_path(self, file_to_compare_path):
         if not os.path.exists(file_to_compare_path):
             os.makedirs(file_to_compare_path)
         self.__file_to_compare_path = file_to_compare_path
@@ -150,7 +150,7 @@ class Jplag(DetectionLib):
     :rtype: [type]
     """
 
-    def __init__(self, name, lib_path, results_path, file_to_compare_path, folder_to_compare_path, file_language,
+    def __init__(self, name, lib_path, results_path, segments_path, folder_to_compare_path, file_language,
                  number_of_matches):
         """[summary]
         
@@ -160,8 +160,8 @@ class Jplag(DetectionLib):
         :type lib_path: [type]
         :param results_path: [description]
         :type results_path: [type]
-        :param file_to_compare_path: [description]
-        :type file_to_compare_path: [type]
+        :param segments_path: [description]
+        :type segments_path: [type]
         :param folder_to_compare_path: [description]
         :type folder_to_compare_path: [type]
         :param file_language: [description]
@@ -170,7 +170,7 @@ class Jplag(DetectionLib):
         :type number_of_matches: [type]
         """
 
-        super().__init__(name, lib_path, results_path, file_to_compare_path, folder_to_compare_path)
+        super().__init__(name, lib_path, results_path, segments_path, folder_to_compare_path)
         self.file_language_supported = ["java17", "java15", "java15dm", "java12", "java11", "python3", "c/c++",
                                         "c#-1.2", "char", "text", "scheme"]
         self.file_language = file_language
@@ -189,8 +189,8 @@ class Jplag(DetectionLib):
         if not os.path.exists(temp_working_path):
             os.makedirs(temp_working_path)
 
-        for file_name in os.listdir(self.file_to_compare_path):
-            shutil.copy(os.path.join(self.file_to_compare_path, file_name), os.path.join(temp_working_path, file_name))
+        for file_name in os.listdir(self.segments_path):
+            shutil.copy(os.path.join(self.segments_path, file_name), os.path.join(temp_working_path, file_name))
 
         for (dir_path, dir_names, file_names) in os.walk(self.folder_to_compare_path):
             for file_name in file_names:
@@ -216,7 +216,7 @@ class Jplag(DetectionLib):
         with open(os.path.join(self.results_path, "index.html")) as fp:
             soup = BeautifulSoup(fp, 'html.parser')
 
-        search_files = os.listdir(self.file_to_compare_path)
+        search_files = os.listdir(self.segments_path)
         for i in range(len(search_files)):
             search_files[i] = search_files[i][:search_files[i].find(".")]
 

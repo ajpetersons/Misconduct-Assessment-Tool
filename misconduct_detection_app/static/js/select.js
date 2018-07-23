@@ -46,7 +46,7 @@ function drawOneSegment(selectText, segmentNumber) {
     // Create header
     // Header link
     let codeSegmentHeaderLink = $("<a></a>").attr({
-        "href": "#highLightedSegment" + segmentNumber
+        "href": "#highLightedSegment" + segmentNumber,
     }).text("Segment " + segmentNumber);
     // Buttons
     let appendHeaderButton = $("<button></button>").attr({
@@ -57,16 +57,24 @@ function drawOneSegment(selectText, segmentNumber) {
         "class": "btn btn-outline-secondary btn-sm delete-header-button",
         "id": "deleteHeaderButton" + segmentNumber,
     }).append("<i class='material-icons'>clear</i>");
-    let includeHeaderButton = $("<button></button>").attr({
+    let includeHeaderCheckbox = $("<label>Include:</label>").attr({
         "class": "btn btn-outline-secondary btn-sm include-header-button",
+        "style": "width: 100px;height: 39px;font-size: 18px;margin-top: 5%;",
         "id": "includeHeaderButton" + segmentNumber,
-    }).append("<i class='material-icons'>report_off</i>");
+    }).append($("<input>").attr({
+        "name": "includeHeaderCheckbox" + segmentNumber,
+        "id": "includeHeaderCheckbox" + segmentNumber,
+        "type": "checkbox",
+        "value": segmentNumber,
+        "required": "required",
+        "checked": "checked",
+    }));
     // Header button group
     let codeSegmentHeaderButtons = $("<div></div>").attr({
         "id": "highLightedSegmentHeaderButtons" + segmentNumber,
         "class": "highLightedSegmentHeaderButtons",
-        "style": "float: right;display: inline;",
-    }).append(appendHeaderButton, deleteHeaderButton, includeHeaderButton);
+        "style": "float: right;display: inline;margin-top: -2%;",
+    }).append(appendHeaderButton, deleteHeaderButton, includeHeaderCheckbox);
     // Header text
     let codeSegmentHeader = $("<div></div>").attr({
         "class": 'card-header',
@@ -86,18 +94,7 @@ function drawOneSegment(selectText, segmentNumber) {
     */
 }
 
-function highLightOriginalText(segmentNumber) {
-    let selectedText = window.getSelection().getRangeAt(0);
-    let highLighted = document.createElement("a");
-    highLighted.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
-    highLighted.setAttribute("id", "highLightedSegment" + (segmentNumber + 1));
-    highLighted.setAttribute("href", "#highLightedSegmentHeader" + segmentNumber);
-    selectedText.surroundContents(highLighted);
-}
-
-$("#nextButton").click(function(evt) {
-    evt.preventDefault();
-
+function sendCurrentSegmentsAndSelection() {
     let selectedCode = new FormData($('#selectCode_Form')[0]);
     $.ajax({
         url: "selectCode/",
@@ -114,6 +111,43 @@ $("#nextButton").click(function(evt) {
             uploading = false;
         }
     });
+
+    let checkedBoxesArray = $('input[type="checkbox"]:checked').map(function(){
+		return $(this).val();
+    }).get()
+    let checkedBoxes = new FormData();
+    checkedBoxes.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
+    checkedBoxes.append("checkedBox", checkedBoxesArray);
+    $.ajax({
+        url: "checkBoxStatus/",
+        type: 'POST',
+        cache: false,
+        data: checkedBoxes,
+        processData: false,
+        contentType: false,
+        dataType:"json",
+        beforeSend: function() {
+            uploading = true;
+        },
+        success : function(data) {
+            uploading = false;
+        }
+    });
+}
+
+function highLightOriginalText(segmentNumber) {
+    let selectedText = window.getSelection().getRangeAt(0);
+    let highLighted = document.createElement("a");
+    highLighted.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
+    highLighted.setAttribute("id", "highLightedSegment" + (segmentNumber + 1));
+    highLighted.setAttribute("href", "#highLightedSegmentHeader" + segmentNumber);
+    selectedText.surroundContents(highLighted);
+}
+
+$("#nextButton").click(function(evt) {
+    evt.preventDefault();
+
+    sendCurrentSegmentsAndSelection();
 
     $(document).ajaxStop(function() {
         window.location.replace('/select/runningWaitingPage/');
@@ -141,22 +175,7 @@ $("#saveSegmentButton").click(function(evt) {
     $("#saveSegmentButton").empty();
     $("#saveSegmentButton").append("<i class='fa fa-spinner fa-spin' style='font-size: 24px;'></i>");
     
-    let selectedCode = new FormData($('#selectCode_Form')[0]);
-    $.ajax({
-        url: "selectCode/",
-        type: 'POST',
-        cache: false,
-        data: selectedCode,
-        processData: false,
-        contentType: false,
-        dataType:"json",
-        beforeSend: function() {
-            uploading = true;
-        },
-        success : function(data) {
-            uploading = false;
-        }
-    });
+    sendCurrentSegmentsAndSelection();
 
     $(document).ajaxStop(function() {
         $("#saveSegmentButton").empty();
@@ -181,5 +200,6 @@ $(document).ready(function (){
     $("#codeDisplayText").empty().append("<code><pre id='codeDisplayTextPre' style='white-space:pre-wrap'></pre></code>");
     $("#codeDisplayTextPre").text(codeToCompare);
 
+    // Display selected segments if there is any
     redrawAccordingToBottomBar();
 });
