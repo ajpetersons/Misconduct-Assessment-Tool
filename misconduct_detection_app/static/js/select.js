@@ -160,7 +160,7 @@ $("#saveSegmentButton").click(function(evt) {
 
     $(document).ajaxStop(function() {
         $("#saveSegmentButton").empty();
-        $("#saveSegmentButton").append("<i class='material-icons'>save_alt</i>");
+        $("#saveSegmentButton").append("<i class='material-icons'>save</i>");
         redrawBottomBar();
     });
 });
