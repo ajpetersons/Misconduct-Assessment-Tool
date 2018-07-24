@@ -1,6 +1,13 @@
 // Set name and other global variables, Django variables for this page
 pageName = "Results";
 
+$("#segmentDetailsDisplayBox").on("click", ".showDetailsButton", function (evt){
+    jPlagResultsKey = evt.currentTarget.id;
+
+    $("#codeDetails" + jPlagResultsKey).toggle();
+    $(this).toggleClass("btn-outline-secondary");
+});
+
 $(document).ready(function (){
     /*
     Here I built the following structure by pure javascript rather than jQuery. This is because 
@@ -75,23 +82,32 @@ $(document).ready(function (){
         document.getElementById("segmentDetailsDisplayBox").appendChild(codeSegmentBody);
 
         // Print super link to original suspect code, if there is any.
-
         let suspectFilesKeys = Object.keys(jPlagResults[jPlagResultsKey]).filter(key => jPlagResults[jPlagResultsKey].hasOwnProperty(key) === true);
-
+        
         if (suspectFilesKeys.length != 0) {
+            $("#segmentDetailsDisplayBox").append($("<button></button>").attr({
+                "class": "btn btn-outline-primary btn-sm showDetailsButton",
+                "style": "width: 100px;margin-left: 1%;",
+                "id": jPlagResultsKey,
+            }).html("<i class='material-icons md-36'>info</i>"));
             $("#segmentDetailsDisplayBox").append("<hr>");
+
+            $("#segmentDetailsDisplayBox").append($("<div></div>").attr({
+                "id": "codeDetails" + jPlagResultsKey,
+                "style": "display: none",
+            }));
 
             suspectFilesKeys.map(suspectFilesKey => { 
                 const filePath = suspectFilesKey;
                 const fileLink = jPlagResults[jPlagResultsKey][suspectFilesKey][1];
-
+        
                 let linkToJPlagResult = document.createElement("a");
                 linkToJPlagResult.setAttribute("href", "details\\" + fileLink);
                 linkToJPlagResult.setAttribute("target", "_blank");
                 linkToJPlagResult.innerHTML = filePath;
                 linkToJPlagResult.appendChild(document.createElement("br"));
-
-                document.getElementById("segmentDetailsDisplayBox").appendChild(linkToJPlagResult);
+        
+                document.getElementById("codeDetails" + jPlagResultsKey).appendChild(linkToJPlagResult);
             });
         }
     })
