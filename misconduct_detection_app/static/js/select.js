@@ -185,7 +185,16 @@ $("#saveSegmentButton").click(function(evt) {
 });
 
 $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
-    alert(evt.currentTarget.id);
+    let currentSegmentNumber = evt.currentTarget.id.substring(evt.currentTarget.id.length - 1);
+
+    let selectText = window.getSelection(); 
+    if(selectText != "") {
+        highLightOriginalText(currentSegmentNumber - 1);
+    }
+    let originalText = $("#inputText" + currentSegmentNumber).text()
+    $("#inputText" + currentSegmentNumber).text(originalText
+                                                + "\n\n========================New Part========================\n\n" 
+                                                + selectText);
 });
 
 $("#segmentDisplayBox").on("click", ".delete-header-button", function (evt){
@@ -194,7 +203,7 @@ $("#segmentDisplayBox").on("click", ".delete-header-button", function (evt){
     $("#highLightedSegmentHeader" + currentSegmentNumber).remove();
 });
 
-$(document).ready(function (){
+$(document).ready(function () {
     // Set name and Django variables for this page
     pageName = "Selection";
     $("#codeDisplayText").empty().append("<code><pre id='codeDisplayTextPre' style='white-space:pre-wrap'></pre></code>");
