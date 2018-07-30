@@ -98,7 +98,7 @@ $(document).ready(function (){
             }));
 
             suspectFilesKeys.map(suspectFilesKey => { 
-                const filePath = suspectFilesKey;
+                const filePath = suspectFilesKey.substring(suspectFilesKey.indexOf("folder") + 8);
                 const fileLink = jPlagResults[jPlagResultsKey][suspectFilesKey][1];
         
                 let linkToJPlagResult = document.createElement("a");
