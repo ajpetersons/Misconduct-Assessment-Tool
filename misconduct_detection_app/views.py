@@ -145,7 +145,9 @@ def upload_folder(request):
     :return: HttpResponse
     :rtype: HttpResponse
     """
-
+    if os.path.exists(get_folder_path(request)):
+        # "ignore_errors=True" is used to delete read-only file
+        shutil.rmtree(get_folder_path(request), ignore_errors=True)
     if request.method == 'POST':
         files = request.FILES.getlist('file')
         for f in files:
@@ -175,9 +177,6 @@ def handle_upload_folder(request, file, file_name, file_extension, original_path
     :param original_path: the path of the file on client
     :type original_path: str
     """
-
-    if os.path.exists(get_folder_path(request)):
-        shutil.rmtree(get_folder_path(request))
     path = os.path.join(get_folder_path(request), original_path)
     if not os.path.exists(path):
         os.makedirs(path)
@@ -251,12 +250,28 @@ def select_check_box(request):
 
 # ------------------------------------Run the Jplag jar------------------------------------
 def run_detection(request):
+    """[summary]
+    
+    :param request: [description]
+    :type request: [type]
+    :return: [description]
+    :rtype: [type]
+    """
+
     if os.path.exists(get_results_path(request)):
         shutil.rmtree(get_results_path(request))
     return render(request, 'misconduct_detection_app/runningWaiting.html')
 
 
 def run_detection_core(request):
+    """[summary]
+    
+    :param request: [description]
+    :type request: [type]
+    :return: [description]
+    :rtype: [type]
+    """
+
     for selection in request.POST.keys():
         if selection == "detectionLibSelectionInput":
             detection_lib_selection = request.POST[selection]
@@ -289,6 +304,14 @@ def run_detection_core(request):
 
 
 def clean(request):
+    """[summary]
+    
+    :param request: [description]
+    :type request: [type]
+    :return: [description]
+    :rtype: [type]
+    """
+
     file_to_compare_path = get_file_to_compare_path(request)
     results_path = get_results_path(request)
     folder_path = get_folder_path(request)
