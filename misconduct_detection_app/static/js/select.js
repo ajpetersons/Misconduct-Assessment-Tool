@@ -9,6 +9,8 @@ function redrawAccordingToBottomBar() {
         
         let selectedSegmentsKeys = Object.keys(selectedSegments).filter(key => selectedSegments.hasOwnProperty(key) === true);
         selectedSegmentsKeys.map(selectedSegmentsKey => {
+            // let selectedTextRange = 0;
+            // highLightOriginalText(selectedTextRange, segmentNumber);
             segmentNumber++;
             drawOneSegment(selectedSegments[selectedSegmentsKey], segmentNumber);
         });
@@ -135,13 +137,12 @@ function sendCurrentSegmentsAndSelection() {
     });
 }
 
-function highLightOriginalText(segmentNumber) {
-    let selectedText = window.getSelection().getRangeAt(0);
+function highLightOriginalText(selectedTextRange, segmentNumber) {
     let highLighted = document.createElement("a");
     highLighted.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
     highLighted.setAttribute("id", "highLightedSegment" + (segmentNumber + 1));
     highLighted.setAttribute("href", "#highLightedSegmentHeader" + segmentNumber);
-    selectedText.surroundContents(highLighted);
+    selectedTextRange.surroundContents(highLighted);
 }
 
 $("#nextButton").click(function(evt) {
@@ -163,10 +164,10 @@ $("#addSegmentButton").click(function() {
 
     // Get the selected segment and add it
     let selectText = window.getSelection(); 
+    let selectedTextRange = window.getSelection().getRangeAt(0);
     if(selectText != "") {
-        highLightOriginalText(segmentNumber);
+        highLightOriginalText(selectedTextRange, segmentNumber);
         segmentNumber++;
-
         drawOneSegment(selectText, segmentNumber);
     }
 });
@@ -188,8 +189,9 @@ $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
     let currentSegmentNumber = evt.currentTarget.id.substring(evt.currentTarget.id.length - 1);
 
     let selectText = window.getSelection(); 
+    let selectedTextRange = window.getSelection().getRangeAt(0);
     if(selectText != "") {
-        highLightOriginalText(currentSegmentNumber - 1);
+        highLightOriginalText(selectedTextRange, currentSegmentNumber - 1);
     }
     let originalText = $("#inputText" + currentSegmentNumber).text()
     $("#inputText" + currentSegmentNumber).text(originalText
