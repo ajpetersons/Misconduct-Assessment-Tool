@@ -6,7 +6,7 @@
 misconduct_detection_app/uploads
 misconduct_detection_app/results
 .vs/
-
+.vscode/
 
 # Created by https://www.gitignore.io
 
