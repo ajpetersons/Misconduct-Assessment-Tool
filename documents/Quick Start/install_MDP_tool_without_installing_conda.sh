@@ -24,8 +24,13 @@ echo $conda_root
 echo "Your installation path is:"
 echo $install_pos
 
+mkdir -p $install_pos
+
 conda env create -f environment.yml
 source activate MDP
+rm environment.yml
+
+cd $install_pos
 
 git clone https://github.com/Weak-Chicken/misconduct_detection_project misconduct_detection_project/
 
@@ -41,9 +46,6 @@ echo 'unset MLP_DATA_DIR' >> ./etc/conda/deactivate.d/env_vars.sh
 
 source deactivate MDP
 source activate MDP
-
-cd $install_pos
-rm environment.yml
 
 cd $install_pos/misconduct_detection_project
 
