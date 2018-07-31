@@ -1,4 +1,21 @@
 #!/usr/bin/env bash
+echo "name: MDP" >> environment.yml
+echo "channels:" >> environment.yml
+echo "  - defaults" >> environment.yml
+echo "dependencies:" >> environment.yml
+echo "  - certifi=2018.4.16=py37_0" >> environment.yml
+echo "  - pip=10.0.1=py37_0" >> environment.yml
+echo "  - python=3.7.0" >> environment.yml
+echo "  - setuptools=39.2.0=py37_0" >> environment.yml
+echo "  - wheel=0.31.1=py37_0" >> environment.yml
+echo "  - git=2.17.0" >> environment.yml
+echo "  - pip:" >> environment.yml
+echo "    - beautifulsoup4==4.6.1" >> environment.yml
+echo "    - django==2.0.7" >> environment.yml
+echo "    - pytz==2018.5" >> environment.yml
+echo "prefix: C:\Users\YuchengXie\Anaconda3\envs\MDP" >> environment.yml
+echo "" >> environment.yml
+
 conda_root=${1:-~/miniconda3/envs/MDP}
 install_pos=${2:-$(pwd)}
 
