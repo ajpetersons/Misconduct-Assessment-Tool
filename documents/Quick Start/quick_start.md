@@ -26,3 +26,13 @@ chmod +x install_MDP_tool_with_installing_conda.sh
 ```
 
 If you see any error occurs, please create an issue on [this page](https://github.com/Weak-Chicken/misconduct_detection_project/issues). However, if you wish to solve it immediately, please refer the installation manual.
+
+## macOS
+### If you already installed JRE and conda
+
+### If you have not installed JRE *AND* conda
+
+## Windows
+### If you already installed JRE and conda
+
+### If you have not installed JRE *AND* conda
