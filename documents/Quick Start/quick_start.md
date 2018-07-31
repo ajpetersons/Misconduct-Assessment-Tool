@@ -44,7 +44,7 @@ chmod +x install_MDP_tool_with_installing_conda.sh
 ./install_MDP_tool_with_installing_conda.sh
 ```
 
-Specially, you might be asked to choose the install settings for the miniconda. Please *KEEP* the default setting! Or the script might get errors.
+Specially, you might be asked to choose the install settings for the miniconda. Please *KEEP* the default setting! Or the install script might fail.
 
 If you see any error occurs, please create an issue on [this page](https://github.com/Weak-Chicken/misconduct_detection_project/issues). However, if you wish to solve it immediately, please refer the installation manual.
 
