@@ -16,8 +16,15 @@ echo "    - pytz==2018.5" >> environment.yml
 echo "prefix: C:\Users\YuchengXie\Anaconda3\envs\MDP" >> environment.yml
 echo "" >> environment.yml
 
-conda_root=${1:-$HOME/miniconda3/envs/MDP}
-install_pos=${2:-$(pwd)}
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+
+rm Miniconda3-latest-Linux-x86_64.sh
+echo "export PATH=\""\$PATH":$HOME/miniconda3/bin\"" >> ~/.benv
+source ~/.benv
+
+conda_root="$HOME/miniconda3/envs/MDP"
+install_pos="$(pwd)"
 
 echo "Your conda root is:"
 echo $conda_root

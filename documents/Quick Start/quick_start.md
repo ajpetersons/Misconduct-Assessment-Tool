@@ -7,6 +7,7 @@ If you already installed JRE and conda, please download the [install_MDP_tool_wi
 Then, put the script at where you wish to install the tool, and run the script:
 ```bash
 chmod +x install_MDP_tool_without_installing_conda.sh
+
 ./install_MDP_tool_without_installing_conda.sh
 ```
 
