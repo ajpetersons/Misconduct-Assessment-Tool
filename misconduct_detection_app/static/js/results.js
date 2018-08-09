@@ -66,10 +66,10 @@ $(document).ready(function (){
         codeSegmentBody.setAttribute("class", "card-body text-secondary");
         let codeSegmentBodyIndi = document.createElement("p");
         codeSegmentBodyIndi.setAttribute("class", "card-text");
-        codeSegmentBodyIndi.innerHTML = "Individual Probabilities: " + individual_probabilities[jPlagResultsKey].toString();
+        codeSegmentBodyIndi.innerHTML = "Individual Probability: " + individual_probabilities[jPlagResultsKey].toString();
         let codeSegmentBodyJoin = document.createElement("p");
         codeSegmentBodyJoin.setAttribute("class", "card-text");
-        codeSegmentBodyJoin.innerHTML = "Joint Probabilities: " + joint_probability.toString();
+        codeSegmentBodyJoin.innerHTML = "Joint Probability: " + joint_probability.toString();
         let codeSegmentBodyExp = document.createElement("p");
         codeSegmentBodyExp.setAttribute("class", "card-text");
         codeSegmentBodyExp.innerHTML = "Joint Expectation: " + expectation.toString();
