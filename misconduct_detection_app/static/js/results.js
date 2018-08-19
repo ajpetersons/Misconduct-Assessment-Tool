@@ -49,7 +49,7 @@ $(document).ready(function (){
 
     //------------------------Calculation part------------------------
     jPlagResultsKeys.map(jPlagResultsKey => {
-        let temp_probability = Object.keys(jPlagResults[jPlagResultsKey]).length / (jPlagSubmissionNumber - 1)
+        let temp_probability = (Object.keys(jPlagResults[jPlagResultsKey]).length - 1) / (jPlagSubmissionNumber - 1);
         individual_probabilities[jPlagResultsKey] = temp_probability;
         joint_probability *= temp_probability;
     })
