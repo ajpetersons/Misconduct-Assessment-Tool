@@ -42,7 +42,6 @@ $(document).ready(function (){
 
     $("#segmentDetailsDisplayBox").empty();
 
-    jPlagSubmissionNumber -= segmentFilesKeys.length;
     let individual_probabilities = [];
     let joint_probability = 1;
     let expectation = 0;

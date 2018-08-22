@@ -1,6 +1,7 @@
 import os
 import shutil
 from bs4 import BeautifulSoup
+import bs4
 
 
 class DetectionLib:
@@ -47,10 +48,10 @@ class DetectionLib:
         return results
 
     def run_without_getting_results(self, temp_working_path):
-        """[summary]
+        """Run the detection by the current library on given temp_working_path without returning the results
         
-        :param temp_working_path: [description]
-        :type temp_working_path: [type]
+        :param temp_working_path: the path where to run the detection library
+        :type temp_working_path: str
         """
 
         assert (len(self.file_language_supported) != 0), "No support language defined for " + self.name
@@ -141,33 +142,32 @@ class DetectionLib:
 
 
 class Jplag(DetectionLib):
-    """[summary]
-    
-    :param DetectionLib: [description]
-    :type DetectionLib: [type]
-    :raises TypeError: [description]
-    :return: [description]
-    :rtype: [type]
-    """
+    """JPlag detection library."""
 
     def __init__(self, name, lib_path, results_path, segments_path, folder_to_compare_path, file_language,
                  number_of_matches):
-        """[summary]
-        
-        :param name: [description]
-        :type name: [type]
-        :param lib_path: [description]
-        :type lib_path: [type]
-        :param results_path: [description]
-        :type results_path: [type]
-        :param segments_path: [description]
-        :type segments_path: [type]
-        :param folder_to_compare_path: [description]
-        :type folder_to_compare_path: [type]
-        :param file_language: [description]
-        :type file_language: [type]
-        :param number_of_matches: [description]
-        :type number_of_matches: [type]
+        """Create a new JPlag detection package wrapper object.
+
+        :param name: the name of this library
+        :type name: str
+        :param lib_path: the path of the library on the server
+        :type lib_path: str
+        :param results_path: the path to store produced results. The results format should be:
+        (results, submission_number), where results should be a dict which contains the results
+        and file relations. And the submission_number should be the number of submissions rather
+        than the number of files.
+        :type results_path: str
+        :param segments_path: the path where stores the uploaded single file
+        :type segments_path: str
+        :param folder_to_compare_path: the path where sotres the uploaded folder
+        :type folder_to_compare_path: str
+        ----------------------Only for JPlag----------------------
+        :param file_language: which languages are supported by this detection package
+        :type file_language: list
+        :param number_of_matches: (Matches) Number of matches that will be saved. This can be
+        set with either a number or a percentage. I would suggest to set it with a percentage.
+        The JPlag will only show the results with similarity higher than this number.
+        :type number_of_matches: str
         """
 
         super().__init__(name, lib_path, results_path, segments_path, folder_to_compare_path)
@@ -222,9 +222,9 @@ class Jplag(DetectionLib):
 
         results = {}
 
-        for tag in soup.find_all('td'):
-            if 'Submissions:' in tag.contents:
-                submission_number = tag.next_sibling.contents[0]
+        # Change this to change how to define a "submission" in the source folder
+        # This line only list the sub-level folders in the source folder
+        submission_number = len(os.listdir(os.path.join(self.folder_to_compare_path,  os.listdir(self.folder_to_compare_path)[0])))
 
         for search_file in search_files:
             temp_similarities_for_searching_file = {}
@@ -240,6 +240,19 @@ class Jplag(DetectionLib):
                                 temp_similarities_for_searching_file[
                                     self.file_relation[original_file_name[:original_file_name.find("_")]]] = [
                                     similarity, original_result_link]
+
+                    for td_tag in tag.parent.find_all('td'):
+                        for element in td_tag.contents:
+                            if isinstance(element, bs4.element.Tag):
+                                if len(element.contents) > 0:
+                                    if search_file in element.contents[0]:
+                                        original_file_name = td_tag.parent.contents[0].contents[0]
+                                        original_result_link = td_tag.contents[0].get("href")
+                                        similarity = td_tag.contents[2].contents[0]
+                                        temp_similarities_for_searching_file[
+                                            self.file_relation[original_file_name[:original_file_name.find("_")]]] = [
+                                            similarity, original_result_link]
+
             results[search_file] = temp_similarities_for_searching_file
 
         return results, submission_number
