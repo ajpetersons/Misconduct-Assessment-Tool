@@ -48,7 +48,10 @@ $(document).ready(function (){
 
     //------------------------Calculation part------------------------
     jPlagResultsKeys.map(jPlagResultsKey => {
-        let temp_probability = (Object.keys(jPlagResults[jPlagResultsKey]).length - 1) / (jPlagSubmissionNumber - 1);
+        let temp_probability = 0;
+        if (Object.keys(jPlagResults[jPlagResultsKey]).length != 0) {
+            temp_probability = (Object.keys(jPlagResults[jPlagResultsKey]).length - 1) / (jPlagSubmissionNumber - 1);
+        }
         individual_probabilities[jPlagResultsKey] = temp_probability;
         joint_probability *= temp_probability;
     })
