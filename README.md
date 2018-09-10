@@ -1,4 +1,4 @@
-# Misconduct Detection Project(MDP) Tool
+# Misconduct Detection Project(MDP) Tool 	![license](https://badgen.now.sh/badge/license/GPL-3.0/blue)
 
 ## Introduction
 

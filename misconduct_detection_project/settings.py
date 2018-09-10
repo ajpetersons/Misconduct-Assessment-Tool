@@ -124,6 +124,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Using the customized file handlers.
 FILE_UPLOAD_HANDLERS = [
     'misconduct_detection_app.custom_file_handlers.MDPCustomMemoryFileUploadHandler',
     'misconduct_detection_app.custom_file_handlers.MDPCustomTemporaryFileUploadHandler',
