@@ -118,7 +118,7 @@ function loadDetectionLib() {
         $("#detectionLibSelection").append($("<div></div>").attr({
             "class": "btn btn-outline-secondary disabled",
             "role": "button",
-        }).text("No detection library"));
+        }).text("Detection library not selected"));
     } else {
         $("#detectionLibSelection").append($("<div></div>").attr({
             "class": "btn btn-outline-primary",
@@ -126,6 +126,68 @@ function loadDetectionLib() {
         }).text(detectionLibSelection));
     }
 
+    // Construct the modal dynamically
+    let detectionLibListKeys = Object.keys(detectionLibList).filter(key => detectionLibList.hasOwnProperty(key) === true);
+
+    detectionLibListKeys.map(detectionLib =>{
+        $("#programmingLanguageChoosingDetectionLibForm").append(
+            $("<input>").attr({
+                "type": "radio",
+                "name": "detectionLib",
+                "id": "programmingLanguageChoosingDetectionLibForm" + detectionLib,
+            }).val(detectionLib),
+            $("<h7></h7>").text(detectionLib),
+            $("<br>"),
+        );
+
+        let detectionLibSupportedLanguages = Object.keys(detectionLibList[detectionLib]).filter(key => detectionLibList[detectionLib].hasOwnProperty(key) === true);
+
+        // Adding supported languages for the detection lib. Hide them at first.
+        $("#programmingLanguageChoosingLanguageFormDiv").append(
+            $("<from></from>").attr({
+                "id": "programmingLanguageChoosingLanguageFormDiv" + detectionLib,
+                "class": "programmingLanguageChoosingLanguageFormDivs",
+                "style": "display: none" ,
+            })
+        );
+
+        detectionLibSupportedLanguages.map(detectionLibSupportedLanguage =>{
+            $("#programmingLanguageChoosingLanguageFormDiv" + detectionLib).append(
+                $("<input>").attr({
+                    "type": "radio",
+                    "name": detectionLib,
+                    "id": "programmingLanguageChoosingDetectionLibLanguageForm" + detectionLibSupportedLanguage,
+                }).val(detectionLibList[detectionLib][detectionLibSupportedLanguage]),
+                $("<h7></h7>").text(detectionLibList[detectionLib][detectionLibSupportedLanguage]),
+                $("<br>"),
+            );
+        });
+
+        $("#programmingLanguageChoosingDetectionLibForm" + detectionLib).on("click", function(){
+            $("#programmingLanguageChoosingLanguageFormGuide").empty();
+            $(".programmingLanguageChoosingLanguageFormDivs").css("display", "none");
+            $("#programmingLanguageChoosingLanguageFormDiv" + detectionLib).toggle();
+        });
+    });
+
+    $("#programmingLanguageChoosingModalSave").on("click", function(){
+        // Please notice here. Although we made all input radio buttion in a form,
+        // we don't want to send it to the back-end directly. We will let something
+        // else send the variables set here later.
+        detectionLanguage = $("input[type='radio']:checked", ".programmingLanguageChoosingLanguageFormDivs").val()
+        detectionLibSelection = $("input[name=detectionLib]:checked").val();
+        console.log(detectionLanguage, detectionLibSelection)
+
+        $("#detectionLibSelection").empty();
+        $("#detectionLibSelection").append($("<div></div>").attr({
+            "class": "btn btn-outline-primary",
+            "role": "button",
+        }).text(detectionLibSelection + " : " + detectionLanguage));
+
+        $("#programmingLanguageChoosingModal").modal('hide');
+    });
+
+    // Let the button listen click event
     $("#detectionLibSelection").on("click", function() {
         $("#programmingLanguageChoosingModal").modal();
     });

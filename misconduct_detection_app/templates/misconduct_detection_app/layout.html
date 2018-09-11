@@ -50,13 +50,14 @@
         ];
 
         // Django global variables defined here
+        // Global variables here must be provided by the back-end
         var fileToComparePathList = JSON.parse("{{ fileToComparePathList|escapejs }}");
         var resultsPathList = JSON.parse("{{ resultsPathList|escapejs }}");
         var folderPathList = JSON.parse("{{ folderPathList|escapejs }}");
         var segmentsPathList = JSON.parse("{{ segmentsPathList|escapejs }}");
-        var detectionLibList = "{{ detectionLibList|escapejs }}";
-        var detectionLibSelection = "JPlag";
-        var detectionLanguage = "";
+        var detectionLibList = JSON.parse("{{ detectionLibList|escapejs }}");
+        var detectionLibSelection;
+        var detectionLanguage;
     </script>
 
     <script src="{% static 'js/layout_load_before.js' %}" defer></script>
@@ -116,19 +117,31 @@
 
     <!--The programming language choosing pannle-->
     <div class="modal fade" id="programmingLanguageChoosingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="programmingLanguageChoosingModalTitle">Modal title</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              </button>
+                <h5 class="modal-title" id="programmingLanguageChoosingModalTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                </button>
             </div>
             <div class="modal-body">
-              This is my test body.
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6 ml-auto border-right">
+                            <h5>Select the detection package:</h5>
+                            <form id="programmingLanguageChoosingDetectionLibForm">
+                            </form>
+                        </div>
+                        <div class="col-md-6 ml-auto" id="programmingLanguageChoosingLanguageFormDiv">
+                            <h5>Select the programming language to detect:</h5>
+                            <h7 id="programmingLanguageChoosingLanguageFormGuide">Select a detection package to start.</h7>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" id="programmingLanguageChoosingModalSave">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="programmingLanguageChoosingModalSave">Save changes</button>
             </div>
           </div>
         </div>

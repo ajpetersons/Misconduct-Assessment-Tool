@@ -82,6 +82,6 @@ def return_supported_detection_lib(request):
         all_detection_lib_support_languages[detection_lib_name] = \
             null_detection_libs[detection_lib_name].file_language_supported
     context = {
-        "detectionLibList": all_detection_lib_support_languages
+        "detectionLibList": json.dumps(all_detection_lib_support_languages, cls=DjangoJSONEncoder),
     }
     return context
