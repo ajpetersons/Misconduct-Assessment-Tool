@@ -54,7 +54,7 @@ def select_index(request):
         for segment_file in segment_files:
             if os.path.isfile(os.path.join(get_segments_path(request), segment_file)):
                 with open(os.path.join(get_segments_path(request), segment_file), 'r') as f:
-                    segments[segment_file[:segment_file.find('.')]] = f.read()
+                    segments[segment_file] = f.read()
     file_to_compare_path_json_string = json.dumps(file_to_compare_path, cls=DjangoJSONEncoder)
     segment_json_string = json.dumps(segments, cls=DjangoJSONEncoder)
     context = {
@@ -80,7 +80,7 @@ def results_index(request):
     for segment in segment_dir:
         if os.path.isfile(include_segments_path + "/" + segment):
             with open(include_segments_path + "/" + segment, 'r') as f:
-                segment_files[segment[:segment.find(".")]] = f.read()
+                segment_files[segment] = f.read()
 
     jplag_results, jplag_submission_number = DETECTION_LIBS["Jplag"].results_interpretation()
 
@@ -147,13 +147,13 @@ def upload_folder(request):
     """
     if os.path.exists(get_folder_path(request)):
         # "ignore_errors=True" is used to delete read-only file
+        # On Windows, the system file manager will create some read-only file which cause a problem here.
         shutil.rmtree(get_folder_path(request), ignore_errors=True)
     if request.method == 'POST':
         files = request.FILES.getlist('file')
         for f in files:
             file_name, file_extension = os.path.splitext(str(f))
             original_path = f.original_path
-            # if file_extension == '.c':
             handle_upload_folder(request, f, file_name, file_extension, original_path)
         return HttpResponse('Upload Success')
     else:
@@ -185,7 +185,7 @@ def handle_upload_folder(request, file, file_name, file_extension, original_path
             destination.write(chunk)
 
 
-# ------------------------------------Examination Page------------------------------------
+# ------------------------------------Examination Code------------------------------------
 def examine_file(request, name):
     path = get_file_to_compare_path(request)
     f = open(os.path.join(path, name), 'r')
@@ -224,8 +224,8 @@ def select_code(request):
             os.makedirs(get_segments_path(request))
         if len(request.POST) > 1:
             for code_segment in request.POST.keys():
-                if code_segment != "csrfmiddlewaretoken":
-                    with open(get_segments_path(request) + "/" + code_segment + '.c', 'w', newline="\n") as f:
+                if code_segment != "csrfmiddlewaretoken":  # we don't want csrf token here
+                    with open(get_segments_path(request) + "/" + code_segment, 'w', newline="\n") as f:
                         f.write(request.POST[code_segment])
         else:
             shutil.rmtree(get_segments_path(request))
@@ -276,27 +276,7 @@ def run_detection_core(request):
         if selection == "detectionLibSelectionInput":
             detection_lib_selection = request.POST[selection]
 
-    with open(get_configs_path(request) + "/" + "checked_boxes" + '.txt', 'r') as f:
-        checked_segments = f.read()
-    include_segments_path = os.path.join(get_segments_path(request), "include_segments_path")
-    if os.path.exists(include_segments_path):
-        shutil.rmtree(include_segments_path)
-    if not os.path.exists(include_segments_path):
-        os.makedirs(include_segments_path)
-    checked_segments = checked_segments.split(",")
-    for checked_segment in checked_segments:
-        shutil.copy(os.path.join(get_segments_path(request), "Segment_" + checked_segment + ".c"),
-                    os.path.join(include_segments_path, "Segment_" + checked_segment + ".c"))
-
-    name = "Jplag_default"
-    results_path = get_results_path(request)
-    segments_path = get_segments_path(request)
-    folder_to_compare_path = get_folder_path(request)
-    file_language = "c/c++"
-    number_of_matches = "1%"
-    parameters = name, results_path, include_segments_path, folder_to_compare_path, file_language, number_of_matches
-
-    detection_lib = detection_lib_selector(detection_lib_selection, parameters)
+    detection_lib = detection_libs_configs[detection_lib_selection](request)
     detection_lib.run_without_getting_results(get_temp_working_path(request))
     DETECTION_LIBS["Jplag"] = detection_lib
 
@@ -317,6 +297,7 @@ def clean(request):
     folder_path = get_folder_path(request)
     segments_path = get_segments_path(request)
     temp_working_path = get_temp_working_path(request)
+    configs_path = get_configs_path(request)
 
     if os.path.exists(file_to_compare_path):
         shutil.rmtree(file_to_compare_path)
@@ -328,5 +309,7 @@ def clean(request):
         shutil.rmtree(segments_path)
     if os.path.exists(temp_working_path):
         shutil.rmtree(temp_working_path)
+    if os.path.exists(configs_path):
+        shutil.rmtree(configs_path)
 
     return HttpResponse("Clean Succeeded")

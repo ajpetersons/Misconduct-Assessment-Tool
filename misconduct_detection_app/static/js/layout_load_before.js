@@ -53,16 +53,16 @@ function loadUploadedFolder() {
         // These popover functions must be put after above part since our DOMs
         // are built dynamically.
         $(function () {
-            $('#folderPathListPopOver').popover({
+            $("#folderPathListPopOver").popover({
                 html: true,
                 content: function() {
-                    return $('#hiddenContentsDiv').html();
+                    return $("#hiddenContentsDiv").html();
                 },
             });
         });
 
-        $('.popover-dismiss').popover({
-            trigger: 'focus'
+        $(".popover-dismiss").popover({
+            trigger: "focus"
         });
     }
 }
@@ -80,7 +80,7 @@ function loadSelectedSegments() {
         }).text("No segments to show"));
     } else {
         let linkToRes = $("<a></a>").attr({
-            'href': '/select/',
+            "href": "/select/",
             "class": "btn btn-outline-primary",
             "role": "button",
         }).text("Check selected segments");
@@ -101,7 +101,7 @@ function loadResults() {
         }).text("No results to show"));
     } else if (resultsPathList === "RESULTSEXISTS"){
         let linkToRes = $("<a></a>").attr({
-            'href': '/results/',
+            "href": "/results/",
             "class": "btn btn-outline-primary",
             "role": "button",
         }).text("Check results from last detection");
@@ -125,6 +125,10 @@ function loadDetectionLib() {
             "role": "button",
         }).text(detectionLibSelection));
     }
+
+    $("#detectionLibSelection").on("click", function() {
+        $("#programmingLanguageChoosingModal").modal();
+    });
 }
 
 $(document).ready(function (){

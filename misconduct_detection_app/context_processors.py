@@ -11,7 +11,7 @@ from .env_settings import get_segments_path
 from .env_settings import get_folder_path
 from .env_settings import get_file_to_compare_path
 from .env_settings import get_results_path
-from .env_settings import detection_libs_support_language
+from .env_settings import null_detection_libs
 import os
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -77,7 +77,11 @@ def return_uploaded_files(request):
 
 
 def return_supported_detection_lib(request):
+    all_detection_lib_support_languages = {}
+    for detection_lib_name in null_detection_libs.keys():
+        all_detection_lib_support_languages[detection_lib_name] = \
+            null_detection_libs[detection_lib_name].file_language_supported
     context = {
-        "detectionLibList": detection_libs_support_language
+        "detectionLibList": all_detection_lib_support_languages
     }
     return context

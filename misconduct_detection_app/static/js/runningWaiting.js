@@ -1,5 +1,5 @@
 // Send selected file type and detection library
-$("#detectionLibSelectionInput").val("Jplag");
+$("#detectionLibSelectionInput").val(detectionLibSelection);
 let detectionLibSelectionSubmit = new FormData($('#detectionLibSelectionForm')[0]);
 $.ajax({
     url: "/select/running/",

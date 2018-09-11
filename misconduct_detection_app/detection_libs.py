@@ -120,8 +120,6 @@ class DetectionLib:
 
     @segments_path.setter
     def segments_path(self, file_to_compare_path):
-        if not os.path.exists(file_to_compare_path):
-            os.makedirs(file_to_compare_path)
         self.__file_to_compare_path = file_to_compare_path
 
     @property
@@ -163,7 +161,7 @@ class Jplag(DetectionLib):
         :type folder_to_compare_path: str
         ----------------------Only for JPlag----------------------
         :param file_language: which languages are supported by this detection package
-        :type file_language: list
+        :type file_language: str
         :param number_of_matches: (Matches) Number of matches that will be saved. This can be
         set with either a number or a percentage. I would suggest to set it with a percentage.
         The JPlag will only show the results with similarity higher than this number.
@@ -200,6 +198,9 @@ class Jplag(DetectionLib):
                                 temp_working_path + "/" + str(counter) + "_" + file_name)
                     counter += 1
 
+        # HACK: Please mind here, you shall never allow users to run code on your server directly.
+        # Try adding something before the users' commands, like I did here. DO NOT let users run
+        # their code directly, that would be very dangerous.
         os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
                                                                   self.number_of_matches,
                                                                   self.file_language,
@@ -232,8 +233,8 @@ class Jplag(DetectionLib):
                 if 'Matches sorted by maximum similarity (' in tag.contents:
                     for tr_tag in tag.parent.find_all('tr'):
                         if search_file in tr_tag.contents[0].contents[0]:
-                            only_similarities = tr_tag.contents[2:]
-                            for one_similarity in only_similarities:
+                            similarities = tr_tag.contents[2:]
+                            for one_similarity in similarities:
                                 original_file_name = one_similarity.contents[0].contents[0]
                                 original_result_link = one_similarity.contents[0].get("href")
                                 similarity = one_similarity.contents[2].contents[0]
@@ -284,3 +285,5 @@ class Jplag(DetectionLib):
     @number_of_matches.setter
     def number_of_matches(self, number_of_matches):
         self.__number_of_matches = number_of_matches
+
+

@@ -1,5 +1,8 @@
+import shutil
+
 from .detection_libs import Jplag
 import os
+
 
 # Global system parameters defined here.
 APP_PATH = "misconduct_detection_app"
@@ -33,11 +36,12 @@ def get_user_ip(request):
 """
 TODO: For later developer - When you finish the authentication part in Django, you can simply replace the user_id
 function to your user id getter. Here since the authentication part hasn't finished, I use ip to distinguish users.
-Which shall not be used when deployed on a server.
+Which shall not be used when this tool is deployed on a server.
 """
 get_user_id = get_user_ip
 
 
+# Dynamic file path getter.
 def get_file_to_compare_path(request):
     """
 
@@ -110,27 +114,51 @@ def get_configs_path(request):
     return configs_path
 
 
-detection_libs_path = {
-    "Jplag": os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar")
+def get_detection_lib_language(request):
+    return "c/c++"
+
+
+def jplag_default_creator(request):
+    # First generate the segments which are included
+    with open(get_configs_path(request) + "/" + "checked_boxes" + '.txt', 'r') as f:
+        checked_segments = f.read()
+    include_segments_path = os.path.join(get_segments_path(request), "include_segments_path")
+    if os.path.exists(include_segments_path):
+        shutil.rmtree(include_segments_path)
+    if not os.path.exists(include_segments_path):
+        os.makedirs(include_segments_path)
+    checked_segments = checked_segments.split(",")
+    for checked_segment in checked_segments:
+        shutil.copy(os.path.join(get_segments_path(request), "Segment_" + checked_segment),
+                    os.path.join(include_segments_path, "Segment_" + checked_segment + ".c"))
+
+    # Return the JPlag object dynamically
+    return Jplag(name="JPlag",
+                 lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
+                 results_path=get_results_path(request),
+                 segments_path=include_segments_path,
+                 folder_to_compare_path=get_folder_path(request),
+                 file_language=get_detection_lib_language(request),
+                 number_of_matches="1%",
+                 )
+
+
+detection_libs_configs = {
+    "JPlag": jplag_default_creator,
 }
 
-detection_libs_support_language = {
-    "Jplag": ["java17", "java15", "java15dm", "java12", "java11", "python3", "c/c++", "c#-1.2", "char", "text",
-              "scheme"]
+# This dict contains the null detection lib objects, which is used to provide
+# some basic information of the corresponding detection library(package). Such
+# as supported programming language type here.
+null_detection_libs = {
+    "JPlag": Jplag(
+        name="JPlag",
+        lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
+        results_path="",
+        segments_path="",
+        folder_to_compare_path="",
+        file_language="c/c++",
+        number_of_matches="1%",
+    )
 }
 
-
-def detection_lib_selector(selection, parameters):
-    if selection not in detection_libs_path.keys():
-        raise NotImplementedError("The library has not been registered")
-    elif selection == "Jplag":
-            name, results_path, segments_path, folder_to_compare_path, file_language, number_of_matches =\
-                parameters
-            return Jplag(name=selection,
-                         lib_path=detection_libs_path[selection],
-                         results_path=results_path,
-                         segments_path=segments_path,
-                         folder_to_compare_path=folder_to_compare_path,
-                         file_language=file_language,
-                         number_of_matches=number_of_matches,
-                         )
