@@ -11,6 +11,7 @@ from .env_settings import get_segments_path
 from .env_settings import get_folder_path
 from .env_settings import get_file_to_compare_path
 from .env_settings import get_results_path
+from .env_settings import get_configs_path
 from .env_settings import null_detection_libs
 import os
 import json
@@ -25,13 +26,14 @@ def generate_uploaded_file_list(request):
     :param request: request
     :type request: HttpRequest
     :return: file_to_compare_path_list(uploaded single file), results_path_list(results), folder_path_list(uploaded
-    folder), segments_path_list(selected segments from last time)
-    :rtype: (list, list, list, list)
+    folder), segments_path_list(selected segments from last time), configs_path_list (configs saved by the user)
+    :rtype: (list, list, list, list, str/dict)
     """
     file_to_compare_path = get_file_to_compare_path(request)
     results_path = get_results_path(request)
     folder_path = get_folder_path(request)
     segments_path = get_segments_path(request)
+    configs_path = os.path.join(get_configs_path(request), "configs.txt")
 
     if os.path.exists(file_to_compare_path):
         file_to_compare_path_list = os.listdir(file_to_compare_path)
@@ -46,6 +48,17 @@ def generate_uploaded_file_list(request):
     else:
         results_path_list = ["NOFOLDEREXISTS"]
 
+    if os.path.exists(configs_path):
+        configs_path_list = {}
+        with open(os.path.join(get_configs_path(request), "configs.txt")) as f:
+            file_lines = f.readlines()
+        for line in file_lines:
+            line = line.strip('\n')
+            paraname, paradata = line.split(",")
+            configs_path_list[paraname] = paradata
+    else:
+        configs_path_list = "NOFOLDEREXISTS"
+
     folder_path_list = []
     for (dir_path, dir_names, file_names) in os.walk(folder_path):
         for file_name in file_names:
@@ -53,7 +66,7 @@ def generate_uploaded_file_list(request):
     if len(folder_path_list) == 0:
         folder_path_list = ["NOFOLDEREXISTS"]
 
-    return file_to_compare_path_list, results_path_list, folder_path_list, segments_path_list
+    return file_to_compare_path_list, results_path_list, folder_path_list, segments_path_list, configs_path_list
 
 
 def return_uploaded_files(request):
@@ -63,15 +76,16 @@ def return_uploaded_files(request):
     :type request: HttpRequest
     :return: uploaded file information, file_to_compare_path_list, results_path_list, folder_path_list and
     segments_path_list
-    :rtype: (list, list, list, list)
+    :rtype: (list, list, list, list, dict)
     """
-    file_to_compare_path_list, results_path_list, folder_path_list, segments_path_list \
+    file_to_compare_path_list, results_path_list, folder_path_list, segments_path_list, configs_path_list \
         = generate_uploaded_file_list(request)
     context = {
         "fileToComparePathList": json.dumps(file_to_compare_path_list, cls=DjangoJSONEncoder),
         "resultsPathList": json.dumps(results_path_list, cls=DjangoJSONEncoder),
         "folderPathList": json.dumps(folder_path_list, cls=DjangoJSONEncoder),
         "segmentsPathList": json.dumps(segments_path_list, cls=DjangoJSONEncoder),
+        "configsList": json.dumps(configs_path_list, cls=DjangoJSONEncoder),
     }
     return context
 

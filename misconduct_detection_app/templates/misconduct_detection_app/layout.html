@@ -56,8 +56,9 @@
         var folderPathList = JSON.parse("{{ folderPathList|escapejs }}");
         var segmentsPathList = JSON.parse("{{ segmentsPathList|escapejs }}");
         var detectionLibList = JSON.parse("{{ detectionLibList|escapejs }}");
-        var detectionLibSelection;
-        var detectionLanguage;
+        var configsList = JSON.parse("{{ configsList|escapejs }}")
+        var detectionLibSelection = configsList["detectionLibSelection"];
+        var detectionLanguage = configsList["detectionLanguage"];
     </script>
 
     <script src="{% static 'js/layout_load_before.js' %}" defer></script>

@@ -313,3 +313,21 @@ def clean(request):
         shutil.rmtree(configs_path)
 
     return HttpResponse("Clean Succeeded")
+
+
+def saving_configs(request):
+    if not os.path.exists(get_configs_path(request)):
+        os.makedirs(get_configs_path(request))
+    if request.method == 'POST':
+        if len(request.POST) > 1:
+            for parameter in request.POST.keys():
+                if parameter == "detectionLibSelection":
+                    # Clean the config file first
+                    with open(os.path.join(get_configs_path(request), "configs.txt"), 'w') as f:
+                        f.write("detectionLibSelection," + request.POST[parameter])
+                if parameter == "detectionLanguage":
+                    with open(os.path.join(get_configs_path(request), "configs.txt"), 'a') as f:
+                        f.write("\ndetectionLanguage," + request.POST[parameter])
+        return HttpResponse('Selection Succeeded')
+    else:
+        return HttpResponse('Selection Failed')

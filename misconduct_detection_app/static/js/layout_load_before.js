@@ -114,7 +114,7 @@ function loadDetectionLib() {
     $("#bottomBar").append("<div id='detectionLibSelection'></div>");
 
     // If detection lib selected, show the lib name. If not, show hint
-    if (detectionLibSelection === "") {
+    if (configsList === "NOFOLDEREXISTS") {
         $("#detectionLibSelection").append($("<div></div>").attr({
             "class": "btn btn-outline-secondary disabled",
             "role": "button",
@@ -123,7 +123,7 @@ function loadDetectionLib() {
         $("#detectionLibSelection").append($("<div></div>").attr({
             "class": "btn btn-outline-primary",
             "role": "button",
-        }).text(detectionLibSelection));
+        }).text(detectionLibSelection + " : " + detectionLanguage));
     }
 
     // Construct the modal dynamically
@@ -184,7 +184,30 @@ function loadDetectionLib() {
             "role": "button",
         }).text(detectionLibSelection + " : " + detectionLanguage));
 
-        $("#programmingLanguageChoosingModal").modal('hide');
+        let programmingConfigs = new FormData();
+        programmingConfigs.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
+        programmingConfigs.append("detectionLibSelection", detectionLibSelection);
+        programmingConfigs.append("detectionLanguage", detectionLanguage);
+        $.ajax({
+            url: "/configs/savingConfigs/",
+            type: 'POST',
+            cache: false,
+            data: programmingConfigs,
+            processData: false,
+            contentType: false,
+            dataType:"json",
+            beforeSend: function() {
+                uploading = true;
+            },
+            success : function(data) {
+                uploading = false;
+            }
+        });
+
+        $(document).ajaxStop(function() {
+            $("#programmingLanguageChoosingModal").modal('hide');
+        });
+        
     });
 
     // Let the button listen click event
