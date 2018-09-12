@@ -73,6 +73,18 @@ def results_index(request):
     :return: render
     :rtype: render
     """
+    # If the detection failed and there is no result, return the "no results" error page
+    if not os.path.exists(get_results_path(request)):
+        return redirect('results_no_results_error')
+
+    configs_path_list = {}
+    with open(os.path.join(get_configs_path(request), "configs.txt")) as f:
+        file_lines = f.readlines()
+    for line in file_lines:
+        line = line.strip('\n')
+        paraname, paradata = line.split(",")
+        configs_path_list[paraname] = paradata
+
     include_segments_path = os.path.join(get_segments_path(request), "include_segments_path")
     segment_dir = os.listdir(include_segments_path)
     segment_files = {}
@@ -82,7 +94,7 @@ def results_index(request):
             with open(include_segments_path + "/" + segment, 'r') as f:
                 segment_files[segment] = f.read()
 
-    jplag_results, jplag_submission_number = DETECTION_LIBS["Jplag"].results_interpretation()
+    jplag_results, jplag_submission_number = DETECTION_LIBS[configs_path_list["detectionLibSelection"]].results_interpretation()
 
     segment_files_json_string = json.dumps(segment_files, cls=DjangoJSONEncoder)
     jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
@@ -94,6 +106,10 @@ def results_index(request):
     }
 
     return render(request, 'misconduct_detection_app/results.html', context)
+
+
+def results_no_results_error(request):
+    return render(request, 'misconduct_detection_app/results_no_results_error.html')
 
 
 # ------------------------------------File uploading functions------------------------------------
@@ -272,17 +288,23 @@ def run_detection_core(request):
     :rtype: [type]
     """
 
-    for selection in request.POST.keys():
-        if selection == "detectionLibSelectionInput":
-            detection_lib_selection = request.POST[selection]
+    configs_path_list = {}
+    with open(os.path.join(get_configs_path(request), "configs.txt")) as f:
+        file_lines = f.readlines()
+    for line in file_lines:
+        line = line.strip('\n')
+        paraname, paradata = line.split(",")
+        configs_path_list[paraname] = paradata
 
-    detection_lib = detection_libs_configs[detection_lib_selection](request)
+    extra_settings = configs_path_list["detectionLanguage"]
+    detection_lib = detection_libs_configs[configs_path_list["detectionLibSelection"]](request, extra_settings)
     detection_lib.run_without_getting_results(get_temp_working_path(request))
-    DETECTION_LIBS["Jplag"] = detection_lib
+    DETECTION_LIBS[configs_path_list["detectionLibSelection"]] = detection_lib
 
-    return HttpResponse("Detection Finished")
+    return redirect('results')
 
 
+# ------------------------------------Some global functions------------------------------------
 def clean(request):
     """[summary]
     

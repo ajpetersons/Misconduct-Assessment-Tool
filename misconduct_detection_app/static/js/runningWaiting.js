@@ -1,22 +1,3 @@
-// Send selected file type and detection library
-$("#detectionLibSelectionInput").val(detectionLibSelection);
-let detectionLibSelectionSubmit = new FormData($('#detectionLibSelectionForm')[0]);
-$.ajax({
-    url: "/select/running/",
-    type: 'POST',
-    cache: false,
-    data: detectionLibSelectionSubmit,
-    processData: false,
-    contentType: false,
-    dataType:"json",
-    beforeSend: function() {
-        uploading = true;
-    },
-    success : function(data) {
-        uploading = false;
-    }
-});
-
 $(document).ready(function () {
     // Set name and other global variables, Django variables for this page
     $("#title").text("Please Wait...");
@@ -37,7 +18,5 @@ $(document).ready(function () {
     $("body").append("<h1 style='text-align: center'><i class='fa fa-spinner fa-spin' style='font-size:68px'></i></h1>")
 
     // Redirect
-    $(document).ajaxStop(function() {
-        window.location.replace('/results/');
-    });
+        window.location.replace('/select/running/');
 });

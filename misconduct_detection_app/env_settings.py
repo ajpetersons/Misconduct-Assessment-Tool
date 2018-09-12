@@ -114,11 +114,8 @@ def get_configs_path(request):
     return configs_path
 
 
-def get_detection_lib_language(request):
-    return "c/c++"
-
-
-def jplag_default_creator(request):
+# Define each detection package creator as a function so that we can dynamically produce the paths
+def jplag_default_creator(request, extra_settings):
     # First generate the segments which are included
     with open(get_configs_path(request) + "/" + "checked_boxes" + '.txt', 'r') as f:
         checked_segments = f.read()
@@ -132,17 +129,21 @@ def jplag_default_creator(request):
         shutil.copy(os.path.join(get_segments_path(request), "Segment_" + checked_segment),
                     os.path.join(include_segments_path, "Segment_" + checked_segment + ".c"))
 
+    # Decompress the extra parameters
+    detection_language = extra_settings
+
     # Return the JPlag object dynamically
     return Jplag(name="JPlag",
                  lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
                  results_path=get_results_path(request),
                  segments_path=include_segments_path,
                  folder_to_compare_path=get_folder_path(request),
-                 file_language=get_detection_lib_language(request),
+                 file_language=detection_language,
                  number_of_matches="1%",
                  )
 
 
+# Register detection packages
 detection_libs_configs = {
     "JPlag": jplag_default_creator,
 }
