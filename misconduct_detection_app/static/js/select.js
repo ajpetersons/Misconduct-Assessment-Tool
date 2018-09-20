@@ -9,10 +9,8 @@ function redrawAccordingToBottomBar() {
         
         let selectedSegmentsKeys = Object.keys(selectedSegments).filter(key => selectedSegments.hasOwnProperty(key) === true);
         selectedSegmentsKeys.map(selectedSegmentsKey => {
-            // let selectedTextRange = 0;
-            // highLightOriginalText(selectedTextRange, segmentNumber);
-            segmentNumber++;
-            drawOneSegment(selectedSegments[selectedSegmentsKey], segmentNumber);
+            segmentNumber = selectedSegmentsKey.substring(8);
+            drawOneSegment(selectedSegments[selectedSegmentsKey], selectedSegmentsKey.substring(8));
         });
     }
 }
@@ -135,13 +133,33 @@ function sendCurrentSegmentsAndSelection() {
             uploading = false;
         }
     });
+
+    let codeDisplayHtml = $("#codeDisplayText").html()
+    let codeDisplayFrom = new FormData();
+    codeDisplayFrom.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
+    codeDisplayFrom.append("codeDisplayHtml", codeDisplayHtml);
+    $.ajax({
+        url: "saveHtml/",
+        type: 'POST',
+        cache: false,
+        data: codeDisplayFrom,
+        processData: false,
+        contentType: false,
+        dataType:"json",
+        beforeSend: function() {
+            uploading = true;
+        },
+        success : function(data) {
+            uploading = false;
+        }
+    });
 }
 
 function highLightOriginalText(selectedTextRange, segmentNumber) {
     let highLighted = document.createElement("a");
     highLighted.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
-    highLighted.setAttribute("id", "highLightedSegment" + (segmentNumber + 1));
     highLighted.setAttribute("href", "#highLightedSegmentHeader" + segmentNumber);
+    highLighted.setAttribute("id", "highLightedSegment" + (segmentNumber + 1));
     selectedTextRange.surroundContents(highLighted);
 }
 
@@ -185,6 +203,24 @@ function getAutoDetectionResults() {
     });
 }
 
+function setCodeDisplayText() {
+    $.ajax({
+        url: '/select/loadHtml/',
+        type: "GET",
+        dataType: "json",
+        success: function (loadedHtml) {
+            if (loadedHtml === "FILE_NOT_FOUND") {
+                $("#codeDisplayText").empty().append("<code><pre id='codeDisplayTextPre' style='white-space:pre-wrap'></pre></code>");
+                $("#codeDisplayTextPre").text(codeToCompare);
+            } else {
+                console.log(loadedHtml);
+                $("#codeDisplayText").empty();
+                $("#codeDisplayText").html(loadedHtml);
+            }
+        }
+    });
+}
+
 $("#nextButton").click(function(evt) {
     evt.preventDefault();
 
@@ -199,13 +235,31 @@ $("#addSegmentButton").click(function() {
         firstCall = false;
     }
 
+    // Find appropriate segment number
+    let i = 0;
+    for (i; i < segmentNumber; i++) {
+        let highLightedPart = document.getElementById("highLightedSegment" + (i + 1));
+        if (highLightedPart) {
+        } else {
+            break;
+        }
+    }
+
     // Get the selected segment and add it
     let selectText = window.getSelection(); 
     let selectedTextRange = window.getSelection().getRangeAt(0);
     if(selectText != "") {
-        highLightOriginalText(selectedTextRange, segmentNumber);
-        segmentNumber++;
-        drawOneSegment(selectText, segmentNumber);
+        segmentNumber = parseInt(segmentNumber);
+        if (i === segmentNumber) {
+            highLightOriginalText(selectedTextRange, segmentNumber);
+            segmentNumber++;
+            drawOneSegment(selectText, segmentNumber);
+        } else {
+            highLightOriginalText(selectedTextRange, i);
+            i++;
+            drawOneSegment(selectText, i);
+        }
+
     }
 });
 
@@ -240,13 +294,13 @@ $("#segmentDisplayBox").on("click", ".delete-header-button", function (evt){
     let currentSegmentNumber = evt.currentTarget.id.substring(evt.currentTarget.id.length - 1);
     $("#highLightedSegmentBody" + currentSegmentNumber).remove();
     $("#highLightedSegmentHeader" + currentSegmentNumber).remove();
+    document.getElementById("highLightedSegment" + currentSegmentNumber).outerHTML = document.getElementById("highLightedSegment" + currentSegmentNumber).innerHTML
 });
 
 $(document).ready(function () {
     // Set name and Django variables for this page
     pageName = "Selection";
-    $("#codeDisplayText").empty().append("<code><pre id='codeDisplayTextPre' style='white-space:pre-wrap'></pre></code>");
-    $("#codeDisplayTextPre").text(codeToCompare);
+    setCodeDisplayText();
 
     // Display selected segments if there is any
     redrawAccordingToBottomBar();

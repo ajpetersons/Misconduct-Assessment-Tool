@@ -290,7 +290,33 @@ def select_check_box(request):
         return HttpResponse('Selection Failed')
 
 
-# ------------------------------------Run the Jplag jar------------------------------------
+def select_save_html(request):
+    if request.method == 'POST':
+        if not os.path.exists(get_segments_path(request)):
+            os.makedirs(get_segments_path(request))
+        if len(request.POST) > 1:
+            try:
+                with open(os.path.join(get_configs_path(request), "code_select_html.html"), 'w') as f:
+                    f.write(request.POST["codeDisplayHtml"])
+            except KeyError:
+                pass
+        else:
+            shutil.rmtree(get_segments_path(request))
+        return HttpResponse('Selection Succeeded')
+    else:
+        return HttpResponse('Selection Failed')
+
+
+def select_load_html(request):
+    try:
+        with open(os.path.join(get_configs_path(request), "code_select_html.html"), 'r') as f:
+            file_content = f.read()
+            file_content_json_string = json.dumps(file_content, cls=DjangoJSONEncoder)
+            return HttpResponse(file_content_json_string)
+    except FileNotFoundError:
+        return HttpResponse(json.dumps("FILE_NOT_FOUND", cls=DjangoJSONEncoder))
+
+    # ------------------------------------Run the Jplag jar------------------------------------
 def run_detection(request):
     """[summary]
     

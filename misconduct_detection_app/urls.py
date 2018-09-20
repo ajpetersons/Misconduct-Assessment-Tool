@@ -31,6 +31,8 @@ urlpatterns = [
     path('select/runningWaitingPage/', views.run_detection, name='run_detection'),
     path('select/running/', views.run_detection_core, name='run_detection'),
     path('select/autoDetect/', views.auto_detect, name='auto_detect'),
+    path('select/saveHtml/', views.select_save_html, name='select_save_html'),
+    path('select/loadHtml/', views.select_load_html, name='select_load_html'),
     path('results/details/<path:name>', views.examine_file_in_result_page, name='examine_file_in_result'),
 
     path('clean/', views.clean, name='clean'),
