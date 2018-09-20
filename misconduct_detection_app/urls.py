@@ -38,6 +38,7 @@ urlpatterns = [
 
     path('errors/errorNoResults/', views.error_no_results_error, name='error_no_results_error'),
     path('errors/errorUnsupportedFile/', views.error_uploaded_unsupported_file, name='error_uploaded_unsupported_file'),
+    path('errors/errorResultsKeysNotExists/', views.error_results_keys_not_exists, name='error_results_keys_not_exists'),
 
     path('test/', views.test, name='test')
 ]

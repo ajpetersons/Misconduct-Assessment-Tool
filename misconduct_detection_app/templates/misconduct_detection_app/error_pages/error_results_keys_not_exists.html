@@ -2,7 +2,7 @@
 
 {% block head %}
     {% load staticfiles %}
-    <script src="{% static 'js/error_no_results_error.js' %}" defer></script>
+    <script src="{% static 'js/error_pages/error_results_keys_not_exists.js' %}" defer></script>
 {% endblock %}
 
 {% block sideButton %}
@@ -19,18 +19,17 @@
 
 {% block content %}
     <p>
-        Error: No results obtained
+        Error: Results not exists
     </p>
 
     <br>
 
     <p>
-        This might be caused by several reasons. For example, your settings are incorrect (for instance, you detect
-        c++ files with setting programming language to "java"). 
+        Due to some internal reasons, your results have been deleted. Please rerun the detection.
     </p>
 
     <p>
-        Try go back and correct your settings. If you keep coming across this error, please report it to 
+        If you keep coming across this error, please report it to 
         <a href="https://github.com/Weak-Chicken/misconduct_detection_project/issues">https://github.com/Weak-Chicken/misconduct_detection_project/issues</a>. 
     </p>
 

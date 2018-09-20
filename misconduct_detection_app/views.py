@@ -9,6 +9,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from .env_settings import *
 
+import pickle
+
 
 # Create your views here.
 # ------------------------------------Index------------------------------------
@@ -97,6 +99,13 @@ def results_index(request):
             with open(include_segments_path + "/" + segment, 'r') as f:
                 segment_files[segment] = f.read()
 
+    if not configs_path_list["detectionLibSelection"] in DETECTION_LIBS.keys():
+        try:
+            with open(os.path.join(get_results_path(request), "results_keys"), "rb") as f:
+                DETECTION_LIBS[configs_path_list["detectionLibSelection"]] = pickle.load(f)
+        except FileNotFoundError:
+            return redirect("error_results_keys_not_exists")
+
     jplag_results, jplag_submission_number = DETECTION_LIBS[configs_path_list["detectionLibSelection"]].results_interpretation()
 
     segment_files_json_string = json.dumps(segment_files, cls=DjangoJSONEncoder)
@@ -113,7 +122,7 @@ def results_index(request):
 
 # ------------------------------------Error Page Indexes------------------------------------
 def error_no_results_error(request):
-    return render(request, 'misconduct_detection_app/error_no_results_error.html')
+    return render(request, 'misconduct_detection_app/error_pages/error_no_results_error.html')
 
 
 def error_uploaded_unsupported_file(request):
@@ -121,7 +130,11 @@ def error_uploaded_unsupported_file(request):
         "supportedFileTypes": SUPPORTED_PROGRAMMING_LANGUAGE_EXTENSION
     }
 
-    return render(request, 'misconduct_detection_app/error_uploaded_unsupported_file.html', context)
+    return render(request, 'misconduct_detection_app/error_pages/error_uploaded_unsupported_file.html', context)
+
+
+def error_results_keys_not_exists(request):
+    return render(request, 'misconduct_detection_app/error_pages/error_results_keys_not_exists.html')
 
 
 # ------------------------------------File uploading functions------------------------------------
@@ -186,11 +199,6 @@ def upload_folder(request):
         return HttpResponse('Upload Success')
     else:
         return HttpResponse('Uploading Failed')
-
-
-"""
-TODO: merge these two file handler function.
-"""
 
 
 def handle_upload_folder(request, file, file_name, file_extension, original_path):
@@ -318,6 +326,9 @@ def run_detection_core(request):
     detection_lib = detection_libs_configs[configs_path_list["detectionLibSelection"]](request, extra_settings)
     detection_lib.run_without_getting_results(get_temp_working_path(request))
     DETECTION_LIBS[configs_path_list["detectionLibSelection"]] = detection_lib
+
+    with open(os.path.join(get_results_path(request), "results_keys"), "wb") as f:
+        pickle.dump(detection_lib, f)
 
     return redirect('results')
 

@@ -145,10 +145,6 @@ function highLightOriginalText(selectedTextRange, segmentNumber) {
     selectedTextRange.surroundContents(highLighted);
 }
 
-function settingNotSameToAuto() {
-
-}
-
 function getAutoDetectionResults() {
     $.ajax({
         url: '/select/autoDetect/',
@@ -170,7 +166,7 @@ function getAutoDetectionResults() {
                 $("#autoDetectionConfirmationModalBody").append(
                     `Your detection package settings are not optimal. 
                     Consider go back and modify your settings. <br>
-                    If you insist using current settings, it might cause errors. <br>
+                    If you insist using current settings, errors might be caused. <br>
                     Based on your uploaded file, we recommend you to use: <br> <br>`
                 )
                 $("#autoDetectionConfirmationModalBody").append($("<div></div>").attr({
