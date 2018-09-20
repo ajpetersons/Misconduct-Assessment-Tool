@@ -7,6 +7,9 @@ import os
 # Global system parameters defined here.
 APP_PATH = "misconduct_detection_app"
 DETECTION_LIBS = {}
+SUPPORTED_PROGRAMMING_LANGUAGE_EXTENSION = [
+    "java", "py", "c", "cpp", "cs", "txt"
+]  # the supported language of this tool
 
 # The following default path is used when user is unknown. Which is 'default' situation
 DEFAULT_FILE_TO_COMPARE_WITH_PATH = os.path.join(APP_PATH, "uploads", "Default", "singlefiles")
@@ -114,7 +117,7 @@ def get_configs_path(request):
     return configs_path
 
 
-# Define each detection package creator as a function so that we can dynamically produce the paths
+# Define each detection package creator as a function so that we can dynamically produce paths
 def jplag_default_creator(request, extra_settings):
     # First generate the segments which are included
     with open(get_configs_path(request) + "/" + "checked_boxes" + '.txt', 'r') as f:
@@ -125,9 +128,14 @@ def jplag_default_creator(request, extra_settings):
     if not os.path.exists(include_segments_path):
         os.makedirs(include_segments_path)
     checked_segments = checked_segments.split(",")
+
+    uploaded_file_name = get_file_to_compare_path(request)
+    extension_name = os.listdir(uploaded_file_name)[0]
+    extension_name = extension_name[extension_name.find("."):]
+
     for checked_segment in checked_segments:
         shutil.copy(os.path.join(get_segments_path(request), "Segment_" + checked_segment),
-                    os.path.join(include_segments_path, "Segment_" + checked_segment + ".c"))
+                    os.path.join(include_segments_path, "Segment_" + checked_segment + extension_name))
 
     # Decompress the extra parameters
     detection_language = extra_settings
@@ -160,6 +168,38 @@ null_detection_libs = {
         folder_to_compare_path="",
         file_language="c/c++",
         number_of_matches="1%",
-    )
+    ),
 }
+
+
+def auto_detect_programming_language(request):
+    # Selection dict which will be used to provide selection
+    selection_dict = {}
+    for language in SUPPORTED_PROGRAMMING_LANGUAGE_EXTENSION:
+        selection_dict[language] = language
+
+    # Allocate default detection packages for different programming languages.
+    # Here since we have only JPlag in this iteration, I allocated all programming languages to JPlag
+    selection_dict["java"] = ["JPlag", "java17"]
+    selection_dict["py"] = ["JPlag", "python3"]
+    selection_dict["c"] = ["JPlag", "c/c++"]
+    selection_dict["cpp"] = ["JPlag", "c/c++"]
+    selection_dict["cs"] = ["JPlag", "c#-1.2"]
+    selection_dict["txt"] = ["JPlag", "text"]
+
+    # Raise not implemented errors
+    for key in selection_dict.keys():
+        if selection_dict[key] == key:
+            raise NotImplementedError("Default detection package not allocated for " + key)
+
+    # Return results based on previous settings and local file
+    uploaded_file_name = get_file_to_compare_path(request)
+    extension_name = os.listdir(uploaded_file_name)[0]
+    extension_name = extension_name[extension_name.find(".") + 1:]
+
+    try:
+        return selection_dict[extension_name]
+    except KeyError:
+        print("Uploaded file not supported")
+        return "FILE_TYPE_NOT_SUPPORTED"
 

@@ -198,9 +198,9 @@ class Jplag(DetectionLib):
                                 temp_working_path + "/" + str(counter) + "_" + file_name)
                     counter += 1
 
-        # HACK: Please mind here, you shall never allow users to run code on your server directly.
-        # Try adding something before the users' commands, like I did here. DO NOT let users run
-        # their code directly, that would be very dangerous.
+        # HACK: Please notice here, you shall never allow users to run code on your server directly.
+        # Try only receive part parameters from users, such as what I did here. DO NOT let users run
+        # their command directly, that would be very dangerous.
         os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
                                                                   self.number_of_matches,
                                                                   self.file_language,

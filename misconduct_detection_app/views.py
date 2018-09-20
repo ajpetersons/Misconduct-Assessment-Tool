@@ -43,26 +43,29 @@ def select_index(request):
     :return: render
     :rtype: render
     """
-    file_to_be_compared_path = get_file_to_compare_path(request)
-    file_to_be_compared = os.listdir(file_to_be_compared_path)
-    segments = {}
+    try:
+        file_to_be_compared_path = get_file_to_compare_path(request)
+        file_to_be_compared = os.listdir(file_to_be_compared_path)
+        segments = {}
 
-    with open(os.path.join(file_to_be_compared_path, file_to_be_compared[0]), 'r') as f:
-        file_to_compare_path = f.read()
-    if os.path.exists(get_segments_path(request)):
-        segment_files = os.listdir(get_segments_path(request))
-        for segment_file in segment_files:
-            if os.path.isfile(os.path.join(get_segments_path(request), segment_file)):
-                with open(os.path.join(get_segments_path(request), segment_file), 'r') as f:
-                    segments[segment_file] = f.read()
-    file_to_compare_path_json_string = json.dumps(file_to_compare_path, cls=DjangoJSONEncoder)
-    segment_json_string = json.dumps(segments, cls=DjangoJSONEncoder)
-    context = {
-        "fileToComparePathJsonString": file_to_compare_path_json_string,
-        "segmentJsonString": segment_json_string,
-    }
+        with open(os.path.join(file_to_be_compared_path, file_to_be_compared[0]), 'r') as f:
+            file_to_compare_path = f.read()
+        if os.path.exists(get_segments_path(request)):
+            segment_files = os.listdir(get_segments_path(request))
+            for segment_file in segment_files:
+                if os.path.isfile(os.path.join(get_segments_path(request), segment_file)):
+                    with open(os.path.join(get_segments_path(request), segment_file), 'r') as f:
+                        segments[segment_file] = f.read()
+        file_to_compare_path_json_string = json.dumps(file_to_compare_path, cls=DjangoJSONEncoder)
+        segment_json_string = json.dumps(segments, cls=DjangoJSONEncoder)
+        context = {
+            "fileToComparePathJsonString": file_to_compare_path_json_string,
+            "segmentJsonString": segment_json_string,
+        }
 
-    return render(request, 'misconduct_detection_app/select.html', context)
+        return render(request, 'misconduct_detection_app/select.html', context)
+    except UnicodeDecodeError:
+        return redirect('error_uploaded_unsupported_file')
 
 
 def results_index(request):
@@ -75,7 +78,7 @@ def results_index(request):
     """
     # If the detection failed and there is no result, return the "no results" error page
     if not os.path.exists(get_results_path(request)):
-        return redirect('results_no_results_error')
+        return redirect('error_no_results_error')
 
     configs_path_list = {}
     with open(os.path.join(get_configs_path(request), "configs.txt")) as f:
@@ -108,8 +111,17 @@ def results_index(request):
     return render(request, 'misconduct_detection_app/results.html', context)
 
 
-def results_no_results_error(request):
-    return render(request, 'misconduct_detection_app/results_no_results_error.html')
+# ------------------------------------Error Page Indexes------------------------------------
+def error_no_results_error(request):
+    return render(request, 'misconduct_detection_app/error_no_results_error.html')
+
+
+def error_uploaded_unsupported_file(request):
+    context = {
+        "supportedFileTypes": SUPPORTED_PROGRAMMING_LANGUAGE_EXTENSION
+    }
+
+    return render(request, 'misconduct_detection_app/error_uploaded_unsupported_file.html', context)
 
 
 # ------------------------------------File uploading functions------------------------------------
@@ -203,19 +215,25 @@ def handle_upload_folder(request, file, file_name, file_extension, original_path
 
 # ------------------------------------Examination Code------------------------------------
 def examine_file(request, name):
-    path = get_file_to_compare_path(request)
-    f = open(os.path.join(path, name), 'r')
-    file_content = f.read()
-    f.close()
-    return HttpResponse(file_content, content_type="text/plain")
+    try:
+        path = get_file_to_compare_path(request)
+        f = open(os.path.join(path, name), 'r')
+        file_content = f.read()
+        f.close()
+        return HttpResponse(file_content, content_type="text/plain")
+    except UnicodeDecodeError:
+        return redirect('error_uploaded_unsupported_file')
 
 
 def examine_folder(request, name):
-    path = os.path.join(get_folder_path(request), name)
-    f = open(path, 'r')
-    file_content = f.read()
-    f.close()
-    return HttpResponse(file_content, content_type="text/plain")
+    try:
+        path = os.path.join(get_folder_path(request), name)
+        f = open(path, 'r')
+        file_content = f.read()
+        f.close()
+        return HttpResponse(file_content, content_type="text/plain")
+    except UnicodeDecodeError:
+        return redirect('error_uploaded_unsupported_file')
 
 
 def examine_file_in_result_page(request, name):
@@ -353,3 +371,16 @@ def saving_configs(request):
         return HttpResponse('Selection Succeeded')
     else:
         return HttpResponse('Selection Failed')
+
+
+def auto_detect(request):
+    auto_detection_results = auto_detect_programming_language(request)
+    auto_detection_results_json_string = json.dumps(auto_detection_results, cls=DjangoJSONEncoder)
+    return HttpResponse(auto_detection_results_json_string)
+
+
+def test(request):
+    tester = auto_detect_programming_language(request)
+
+    return HttpResponse("test finished")
+

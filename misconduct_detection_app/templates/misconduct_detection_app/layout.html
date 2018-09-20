@@ -56,7 +56,7 @@
         var folderPathList = JSON.parse("{{ folderPathList|escapejs }}");
         var segmentsPathList = JSON.parse("{{ segmentsPathList|escapejs }}");
         var detectionLibList = JSON.parse("{{ detectionLibList|escapejs }}");
-        var configsList = JSON.parse("{{ configsList|escapejs }}")
+        var configsList = JSON.parse("{{ configsList|escapejs }}");
         
         var detectionLibSelection = configsList["detectionLibSelection"];
         var detectionLanguage = configsList["detectionLanguage"];
@@ -118,7 +118,7 @@
     </nav>
 
     <!--The programming language choosing pannle-->
-    <div class="modal fade" id="programmingLanguageChoosingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="programmingLanguageChoosingModal" tabindex="-1" role="dialog" aria-labelledby="programmingLanguageChoosingModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">

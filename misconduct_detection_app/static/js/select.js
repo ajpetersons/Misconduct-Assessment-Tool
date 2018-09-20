@@ -1,6 +1,6 @@
 // Local sharing variables defined here
 let segmentNumber = 0;
-let firstCall = true;
+let firstCall = true; // print hint on selection box
 
 function redrawAccordingToBottomBar() {
     if (segmentsPathList != "NOFOLDEREXISTS") {
@@ -145,14 +145,55 @@ function highLightOriginalText(selectedTextRange, segmentNumber) {
     selectedTextRange.surroundContents(highLighted);
 }
 
+function settingNotSameToAuto() {
+
+}
+
+function getAutoDetectionResults() {
+    $.ajax({
+        url: '/select/autoDetect/',
+        type: "GET",
+        dataType: "json",
+        success: function (autoDetectResults) {
+            autoDetectionLibSelection = autoDetectResults[0]
+            autoDetectionLanguage = autoDetectResults[1]
+            if ((detectionLibSelection === undefined) || (detectionLanguage === undefined)) {
+                $("#autoDetectionConfirmationModalBody").empty()
+                $("#autoDetectionConfirmationModalConfirm").addClass("disabled")
+                $("#autoDetectionConfirmationModalBody").append(
+                    "You have not set your detection package and detecting proggramming language! <br> You have to go back and set one. <br>"
+                )
+                $('#autoDetectionConfirmationModal').modal('show');
+            } else if ((detectionLibSelection != autoDetectionLibSelection) || detectionLanguage != autoDetectionLanguage) {
+                $("#autoDetectionConfirmationModalBody").empty()
+                $("#autoDetectionConfirmationModalConfirm").removeClass("disabled")
+                $("#autoDetectionConfirmationModalBody").append(
+                    `Your detection package settings are not optimal. 
+                    Consider go back and modify your settings. <br>
+                    If you insist using current settings, it might cause errors. <br>
+                    Based on your uploaded file, we recommend you to use: <br> <br>`
+                )
+                $("#autoDetectionConfirmationModalBody").append($("<div></div>").attr({
+                    "style": "text-align: center",
+                }).text(autoDetectionLibSelection + " : " + autoDetectionLanguage));
+                $("#autoDetectionConfirmationModalConfirm").on("click", function(){
+                    window.location.replace('/select/runningWaitingPage/');
+                });
+                $('#autoDetectionConfirmationModal').modal('show');
+            } else {
+                $(document).ajaxStop(function() {
+                    window.location.replace('/select/runningWaitingPage/');
+                });
+            }
+        }
+    });
+}
+
 $("#nextButton").click(function(evt) {
     evt.preventDefault();
 
     sendCurrentSegmentsAndSelection();
-
-    $(document).ajaxStop(function() {
-        window.location.replace('/select/runningWaitingPage/');
-    });
+    getAutoDetectionResults();
 });
 
 $("#addSegmentButton").click(function() {

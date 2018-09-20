@@ -2,14 +2,14 @@
 
 {% block head %}
     {% load staticfiles %}
-    <script src="{% static 'js/results_no_results_error.js' %}" defer></script>
+    <script src="{% static 'js/error_uploaded_unsupported_file.js' %}" defer></script>
 {% endblock %}
 
 {% block sideButton %}
     <div class="offset-md-3">
         <a href="#"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size disabled">Next</button></a>
         <br><br>
-        <a href="\select\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
+        <a href="\upload\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
         <br><br>
         <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal" data-target="#cancelButton">Cancel</button>
         <br>
@@ -19,24 +19,28 @@
 
 {% block content %}
     <p>
-        Error: No results obtained
+        Error: Unsupported file
     </p>
 
     <br>
 
     <p>
-        This might be caused by several reasons. For example, your settings are incorrect (for instance, you detect
-        c++ files with setting programming language to "java"). 
+        You might have uploaded unsupported file(s) and cause this error. Please be noticed that this tool
+        currently only supports following file types: 
     </p>
 
     <p>
-        Try go back and correct your settings. If you keep coming across this error, please report it to 
+        {{supportedFileTypes}}
+    </p>
+
+    <p>
+        Try go back and reupload your files. If you keep coming across this error, please report it to 
         <a href="https://github.com/Weak-Chicken/misconduct_detection_project/issues">https://github.com/Weak-Chicken/misconduct_detection_project/issues</a>. 
     </p>
 
     <br>
 
     <p>
-        Click "Back" to go back to the "selection page".
+        Click "Back" to go back to the "uploading page".
     </p>
 {% endblock %}

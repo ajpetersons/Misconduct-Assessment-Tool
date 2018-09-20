@@ -30,8 +30,14 @@ urlpatterns = [
     path('select/checkBoxStatus/', views.select_check_box, name='select_check_box'),
     path('select/runningWaitingPage/', views.run_detection, name='run_detection'),
     path('select/running/', views.run_detection_core, name='run_detection'),
+    path('select/autoDetect/', views.auto_detect, name='auto_detect'),
     path('results/details/<path:name>', views.examine_file_in_result_page, name='examine_file_in_result'),
-    path('results/errorNO_RESULTS/', views.results_no_results_error, name='results_no_results_error'),
+
     path('clean/', views.clean, name='clean'),
     path('configs/savingConfigs/', views.saving_configs, name='saving_configs'),
+
+    path('errors/errorNoResults/', views.error_no_results_error, name='error_no_results_error'),
+    path('errors/errorUnsupportedFile/', views.error_uploaded_unsupported_file, name='error_uploaded_unsupported_file'),
+
+    path('test/', views.test, name='test')
 ]
