@@ -40,9 +40,9 @@ mkdir -p ./etc/conda/activate.d
 mkdir -p ./etc/conda/deactivate.d
 
 echo -e '#!/bin/sh\n' >> ./etc/conda/activate.d/env_vars.sh
-echo "export SECRET_KEY=#0@7rf_8hf#3__b=5m_1$q5u_hb+rjs4j!4hsnr-6kqdfwztfj" >> ./etc/conda/activate.d/env_vars.sh
+echo "export SECRET_KEY=changeThisIfYouNeedToDeploy" >> ./etc/conda/activate.d/env_vars.sh
 echo -e '#!/bin/sh\n' >> ./etc/conda/deactivate.d/env_vars.sh
-echo 'unset MLP_DATA_DIR' >> ./etc/conda/deactivate.d/env_vars.sh
+echo 'unset SECRET_KEY' >> ./etc/conda/deactivate.d/env_vars.sh
 
 source deactivate MDP
 source activate MDP

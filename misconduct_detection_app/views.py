@@ -353,6 +353,10 @@ def run_detection_core(request):
     detection_lib.run_without_getting_results(get_temp_working_path(request))
     DETECTION_LIBS[configs_path_list["detectionLibSelection"]] = detection_lib
 
+    # If the detection failed and there is no result, return the "no results" error page
+    if not os.path.exists(get_results_path(request)):
+        return redirect('error_no_results_error')
+
     with open(os.path.join(get_results_path(request), "results_keys"), "wb") as f:
         pickle.dump(detection_lib, f)
 
