@@ -6,3 +6,5 @@ This tool is used to detect code misconduction at user defined segment level. It
 ## Installation
 To install this tool, please follow the instructions in the [quick start guide](https://github.com/Weak-Chicken/misconduct_detection_project/blob/master/documents/Quick%20Start/quick_start.md)
 
+## Testing and Debugging Report
+Please find the testing and debugging report in the [Testing and Debugging Report](https://github.com/Weak-Chicken/misconduct_detection_project/tree/master/documents/Testing%20and%20Debugging%20Report) folder
