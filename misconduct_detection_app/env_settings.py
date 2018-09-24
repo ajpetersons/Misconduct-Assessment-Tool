@@ -46,7 +46,7 @@ get_user_id = get_user_ip
 
 # Dynamic file path getter.
 def get_file_to_compare_path(request):
-    """
+    """Dynamically get the "file" path
 
     :param request: request
     :type request: HttpRequest
@@ -58,7 +58,7 @@ def get_file_to_compare_path(request):
 
 
 def get_folder_path(request):
-    """
+    """Dynamically get the "folder" path
 
     :param request: request
     :type request: HttpRequest
@@ -70,7 +70,7 @@ def get_folder_path(request):
 
 
 def get_temp_working_path(request):
-    """
+    """Dynamically get the temp working folder path
 
     :param request: request
     :type request: HttpRequest
@@ -82,7 +82,7 @@ def get_temp_working_path(request):
 
 
 def get_results_path(request):
-    """
+    """Dynamically get the results folder path
 
     :param request: request
     :type request: HttpRequest
@@ -94,7 +94,7 @@ def get_results_path(request):
 
 
 def get_segments_path(request):
-    """
+    """Dynamically get the segment folder path
 
     :param request: request
     :type request: HttpRequest
@@ -106,7 +106,7 @@ def get_segments_path(request):
 
 
 def get_configs_path(request):
-    """
+    """Dynamically get the config folder path
 
     :param request: request
     :type request: HttpRequest

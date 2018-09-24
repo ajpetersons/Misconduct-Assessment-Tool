@@ -17,7 +17,6 @@ import pickle
 def index(request):
     """The index page
 
-    Provide the welcome page and store user's ip.
     :param request: request
     :type request: HttpRequest
     :return: render
@@ -82,6 +81,7 @@ def results_index(request):
     if not os.path.exists(get_results_path(request)):
         return redirect('error_no_results_error')
 
+    # Read configs from disk
     configs_path_list = {}
     with open(os.path.join(get_configs_path(request), "configs.txt")) as f:
         file_lines = f.readlines()
@@ -202,7 +202,7 @@ def upload_folder(request):
 
 
 def handle_upload_folder(request, file, file_name, file_extension, original_path):
-    """handle the folder uploading and store the files to disk
+    """Handle the folder uploading and store the files to disk
     
     :param file: one file 
     :type file: HttpRequest.FILES
@@ -223,6 +223,16 @@ def handle_upload_folder(request, file, file_name, file_extension, original_path
 
 # ------------------------------------Examination Code------------------------------------
 def examine_file(request, name):
+    """Read a file on disk and return it as plain text
+    
+    :param request: request
+    :type request: HttpRequest
+    :param name: The name of the file to show
+    :type name: str
+    :return: The file to show
+    :rtype: HttpResponse
+    """
+
     try:
         path = get_file_to_compare_path(request)
         f = open(os.path.join(path, name), 'r')
@@ -234,6 +244,16 @@ def examine_file(request, name):
 
 
 def examine_folder(request, name):
+    """Read a file on disk and return it as plain text (for checking files
+    in the uploaded folder)
+    
+    :param request: request
+    :type request: HttpRequest
+    :param name: The name of the file to show
+    :type name: str
+    :return: The file to show
+    :rtype: HttpResponse
+    """
     try:
         path = os.path.join(get_folder_path(request), name)
         f = open(path, 'r')
@@ -245,6 +265,17 @@ def examine_folder(request, name):
 
 
 def examine_file_in_result_page(request, name):
+    """Read detecting results pages produced by detection packages
+    to the user.
+    
+    :param request: request
+    :type request: HttpRequest
+    :param name: The name of the file to show
+    :type name: str
+    :return: The file to show
+    :rtype: HttpResponse
+    """
+
     path_file = os.path.join(get_results_path(request), name)
     # Here we need to deal with the possible picture files
     if ".gif" in path_file:
@@ -259,6 +290,14 @@ def examine_file_in_result_page(request, name):
 
 # ------------------------------------Select Code------------------------------------
 def select_code(request):
+    """Called to save selected segments on the server
+    
+    :param request: request
+    :type request: HttpRequest
+    :return: operation state
+    :rtype: HttpResponse
+    """
+
     if request.method == 'POST':
         if os.path.exists(get_segments_path(request)):
             shutil.rmtree(get_segments_path(request))
@@ -277,6 +316,14 @@ def select_code(request):
 
 
 def select_check_box(request):
+    """Called to save segments including checkboxe states on the server
+    
+    :param request: request
+    :type request: HttpRequest
+    :return: operation state
+    :rtype: HttpResponse
+    """
+
     if not os.path.exists(get_configs_path(request)):
         os.makedirs(get_configs_path(request))
     if request.method == 'POST':
@@ -291,6 +338,15 @@ def select_check_box(request):
 
 
 def select_save_html(request):
+    """Called to save segments selection page left part in HTML format
+    on the server
+    
+    :param request: request
+    :type request: HttpRequest
+    :return: operation state
+    :rtype: HttpResponse
+    """
+    
     if request.method == 'POST':
         if not os.path.exists(get_segments_path(request)):
             os.makedirs(get_segments_path(request))
@@ -308,6 +364,14 @@ def select_save_html(request):
 
 
 def select_load_html(request):
+    """Called to load segments selection page left part in HTML format
+    from the server
+    
+    :param request: request
+    :type request: HttpRequest
+    :return: the html file
+    :rtype: HttpResponse
+    """
     try:
         with open(os.path.join(get_configs_path(request), "code_select_html.html"), 'r') as f:
             file_content = f.read()
@@ -318,12 +382,12 @@ def select_load_html(request):
 
     # ------------------------------------Run the Jplag jar------------------------------------
 def run_detection(request):
-    """[summary]
+    """Perform detection preparation
     
-    :param request: [description]
-    :type request: [type]
-    :return: [description]
-    :rtype: [type]
+    :param request: request
+    :type request: HttpRequest
+    :return: render
+    :rtype: render
     """
 
     if os.path.exists(get_results_path(request)):
@@ -332,12 +396,13 @@ def run_detection(request):
 
 
 def run_detection_core(request):
-    """[summary]
+    """Run detection with settings
     
-    :param request: [description]
-    :type request: [type]
-    :return: [description]
-    :rtype: [type]
+    Jump to the results page after detection finished
+    :param request: request
+    :type request: HttpRequest
+    :return: render
+    :rtype: render
     """
 
     configs_path_list = {}
@@ -365,12 +430,12 @@ def run_detection_core(request):
 
 # ------------------------------------Some global functions------------------------------------
 def clean(request):
-    """[summary]
+    """Clean the working folder of the current user
     
-    :param request: [description]
-    :type request: [type]
-    :return: [description]
-    :rtype: [type]
+    :param request: request
+    :type request: HttpRequest
+    :return: operation state
+    :rtype: HttpResponse
     """
 
     file_to_compare_path = get_file_to_compare_path(request)
@@ -397,6 +462,14 @@ def clean(request):
 
 
 def saving_configs(request):
+    """Called to save current user's configs on the server
+    
+    :param request: request
+    :type request: HttpRequest
+    :return: operation state
+    :rtype: HttpResponse
+    """
+
     if not os.path.exists(get_configs_path(request)):
         os.makedirs(get_configs_path(request))
     if request.method == 'POST':
@@ -415,12 +488,24 @@ def saving_configs(request):
 
 
 def auto_detect(request):
+    """Perform auto detection. Return the results to the front-end
+    
+    :param request: request
+    :type request: HttpRequest
+    :return: operation state
+    :rtype: HttpResponse
+    """
+
     auto_detection_results = auto_detect_programming_language(request)
     auto_detection_results_json_string = json.dumps(auto_detection_results, cls=DjangoJSONEncoder)
     return HttpResponse(auto_detection_results_json_string)
 
 
 def test(request):
+    """Used for testing other functions. URL has been set accordingly.
+
+    """
+
     tester = auto_detect_programming_language(request)
 
     return HttpResponse("test finished")

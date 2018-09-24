@@ -59,29 +59,29 @@ class DetectionLib:
         self.clean_working_envs(temp_working_path=temp_working_path)
 
     def run_detection(self, temp_working_path):
-        """[summary]
+        """Virtual function. Run the misconduct detection.
         
-        :param temp_working_path: [description]
-        :type temp_working_path: [type]
-        :raises NotImplementedError: [description]
+        :param temp_working_path: the temp working folder path
+        :type temp_working_path: str
         """
 
         raise NotImplementedError
 
     def results_interpretation(self):
-        """[summary]
+        """Virtual function. Interpret the results produced by this detection 
+        package. It should return a tuple (results, submission_number). The 
+        results should be a dict which uses the segment file names as keys. Its
+        values should be the similarity and a list contains similar file links.
         
-        :raises NotImplementedError: [description]
         """
 
         raise NotImplementedError
 
     def clean_working_envs(self, temp_working_path):
-        """[summary]
+        """Virtual function. Clean the working folder.
         
-        :param temp_working_path: [description]
-        :type temp_working_path: [type]
-        :raises NotImplementedError: [description]
+        :param temp_working_path: the temp working folder path
+        :type temp_working_path: str
         """
 
         raise NotImplementedError
@@ -176,14 +176,15 @@ class Jplag(DetectionLib):
         self.file_relation = {}
 
     def run_detection(self, temp_working_path):
-        """[summary]
+        """Run the detection with given settings using OS command.
         
-        :param temp_working_path: [description]
-        :type temp_working_path: [type]
+        :param temp_working_path: the temp working folder path
+        :type temp_working_path: str
         """
 
         counter = 0
 
+        # Preparing files
         if not os.path.exists(temp_working_path):
             os.makedirs(temp_working_path)
 
@@ -208,10 +209,12 @@ class Jplag(DetectionLib):
                                                                   temp_working_path))
 
     def results_interpretation(self):
-        """[summary]
+        """Interpret the results produced by JPlag.
         
-        :return: [description]
-        :rtype: [type]
+        :return: (results, submission_number). The results should be a dict which
+        uses the segment file names as keys. Its values should be the similarity
+        and a list contains similar file links.
+        :rtype: (dict, int)
         """
 
         with open(os.path.join(self.results_path, "index.html")) as fp:
@@ -259,10 +262,10 @@ class Jplag(DetectionLib):
         return results, submission_number
 
     def clean_working_envs(self, temp_working_path):
-        """[summary]
+        """Delete temp working folder
         
-        :param temp_working_path: [description]
-        :type temp_working_path: [type]
+        :param temp_working_path: the temp working folder path
+        :type temp_working_path: str
         """
 
         shutil.rmtree(temp_working_path)
