@@ -171,12 +171,16 @@ function loadDetectionLib() {
     });
 
     $("#programmingLanguageChoosingModalSave").on("click", function(){
-        // Please notice here. Although we made all input radio buttion in a form,
+        // Please notice here. Although we made all input radio button in a form,
         // we don't want to send it to the back-end directly. We will let something
         // else send the variables set here later.
         detectionLanguage = $("input[type='radio']:checked", ".programmingLanguageChoosingLanguageFormDivs").val()
         detectionLibSelection = $("input[name=detectionLib]:checked").val();
-        console.log(detectionLanguage, detectionLibSelection)
+        if (detectionLanguage === undefined || detectionLibSelection === undefined) {
+            console.error("Detection Library not properly selected")
+            return;
+        }
+        console.warn(detectionLanguage, detectionLibSelection)
 
         $("#detectionLibSelection").empty();
         $("#detectionLibSelection").append($("<div></div>").attr({

@@ -1,16 +1,18 @@
 import shutil
 import os
+import pickle
+import json
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
-import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 from .env_settings import *
 
-import pickle
+import logging
 
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 # ------------------------------------Index------------------------------------
@@ -66,6 +68,7 @@ def select_index(request):
 
         return render(request, 'misconduct_detection_app/select.html', context)
     except UnicodeDecodeError:
+        logger.error("Uploaded unsupported file")
         return redirect('error_uploaded_unsupported_file')
 
 

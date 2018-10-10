@@ -36,6 +36,7 @@ def get_user_ip(request):
     return user_ip
 
 
+# TODO
 """
 TODO: For later developer - When you finish the authentication part in Django, you can simply replace the user_id
 function to your user id getter. Here since the authentication part hasn't finished, I use ip to distinguish users.
@@ -141,14 +142,10 @@ def jplag_default_creator(request, extra_settings):
     detection_language = extra_settings
 
     # Return the JPlag object dynamically
-    return Jplag(name="JPlag",
-                 lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
-                 results_path=get_results_path(request),
-                 segments_path=include_segments_path,
-                 folder_to_compare_path=get_folder_path(request),
-                 file_language=detection_language,
-                 number_of_matches="1%",
-                 )
+    return Jplag(lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
+                 results_path=get_results_path(request), segments_path=include_segments_path,
+                 folder_to_compare_path=get_folder_path(request), file_language=detection_language,
+                 number_of_matches="1%")
 
 
 # Register detection packages
@@ -160,15 +157,9 @@ detection_libs_configs = {
 # some basic information of the corresponding detection library(package). Such
 # as supported programming language type here.
 null_detection_libs = {
-    "JPlag": Jplag(
-        name="JPlag",
-        lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
-        results_path="",
-        segments_path="",
-        folder_to_compare_path="",
-        file_language="c/c++",
-        number_of_matches="1%",
-    ),
+    "JPlag": Jplag(lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
+                   results_path="", segments_path="", folder_to_compare_path="", file_language="c/c++",
+                   number_of_matches="1%"),
 }
 
 

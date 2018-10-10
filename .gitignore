@@ -5,8 +5,10 @@
 .idea/
 misconduct_detection_app/uploads
 misconduct_detection_app/results
+scratchpad/
 .vs/
 .vscode/
+.idea/
 
 # Created by https://www.gitignore.io
 

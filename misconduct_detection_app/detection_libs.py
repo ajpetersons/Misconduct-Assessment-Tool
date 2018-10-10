@@ -3,6 +3,10 @@ import shutil
 from bs4 import BeautifulSoup
 import bs4
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class DetectionLib:
     """General detection library."""
@@ -31,6 +35,10 @@ class DetectionLib:
         self.segments_path = segments_path
         self.folder_to_compare_path = folder_to_compare_path
         self.file_language_supported = []
+
+    def __str__(self):
+        """ String represantation """
+        return "<%s> DetectionLib".format(self.name)
 
     def get_results(self, temp_working_path):
         """Run the detection by the current library on given temp_working_path
@@ -142,8 +150,8 @@ class DetectionLib:
 class Jplag(DetectionLib):
     """JPlag detection library."""
 
-    def __init__(self, name, lib_path, results_path, segments_path, folder_to_compare_path, file_language,
-                 number_of_matches):
+    def __init__(self, lib_path, results_path, segments_path, folder_to_compare_path, file_language, number_of_matches,
+                 name="JPlag"):
         """Create a new JPlag detection package wrapper object.
 
         :param name: the name of this library
@@ -169,11 +177,14 @@ class Jplag(DetectionLib):
         """
 
         super().__init__(name, lib_path, results_path, segments_path, folder_to_compare_path)
-        self.file_language_supported = ["java17", "java15", "java15dm", "java12", "java11", "python3", "c/c++",
+        self.file_language_supported = ["java17", "python3", "c/c++",
                                         "c#-1.2", "char", "text", "scheme"]
+        assert (file_language in self.file_language_supported), "Language parameter {0} not supported by JPlag".format(
+            file_language)
         self.file_language = file_language
-        self.number_of_matches = number_of_matches
+        self.number_of_matches = number_of_matches  # TODO: Might get rid of it
         self.file_relation = {}
+        logger.debug('New instance of %s', self.name)
 
     def run_detection(self, temp_working_path):
         """Run the detection with given settings using OS command.
@@ -181,7 +192,7 @@ class Jplag(DetectionLib):
         :param temp_working_path: the temp working folder path
         :type temp_working_path: str
         """
-
+        logger.debug('Running detection on working environment %s', temp_working_path)
         counter = 0
 
         # Preparing files
@@ -228,7 +239,8 @@ class Jplag(DetectionLib):
 
         # Change this to change how to define a "submission" in the source folder
         # This line only list the sub-level folders in the source folder
-        submission_number = len(os.listdir(os.path.join(self.folder_to_compare_path,  os.listdir(self.folder_to_compare_path)[0])))
+        submission_number = len(os.listdir(
+            os.path.join(self.folder_to_compare_path, os.listdir(self.folder_to_compare_path)[0])))
 
         for search_file in search_files:
             temp_similarities_for_searching_file = {}
@@ -267,7 +279,7 @@ class Jplag(DetectionLib):
         :param temp_working_path: the temp working folder path
         :type temp_working_path: str
         """
-
+        logger.debug('Cleaning working environment %s', temp_working_path)
         shutil.rmtree(temp_working_path)
 
     # To improve the code readability, following getters setters will not contain comments.

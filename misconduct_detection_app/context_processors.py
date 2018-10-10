@@ -17,6 +17,10 @@ import os
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def generate_uploaded_file_list(request):
     """Read and fetch user files on the server and return to front end.
@@ -29,6 +33,7 @@ def generate_uploaded_file_list(request):
     folder), segments_path_list(selected segments from last time), configs_path_list (configs saved by the user)
     :rtype: (list, list, list, list, str/dict)
     """
+    logger.debug("Generating uploaded file list for request %s", request)
     file_to_compare_path = get_file_to_compare_path(request)
     results_path = get_results_path(request)
     folder_path = get_folder_path(request)
@@ -78,6 +83,7 @@ def return_uploaded_files(request):
     segments_path_list
     :rtype: (list, list, list, list, dict)
     """
+    logger.debug("Returning uploaded files list for request %s", request)
     file_to_compare_path_list, results_path_list, folder_path_list, segments_path_list, configs_path_list \
         = generate_uploaded_file_list(request)
     context = {
@@ -91,6 +97,7 @@ def return_uploaded_files(request):
 
 
 def return_supported_detection_lib(request):
+    logger.debug("Return supported detection libraries")
     all_detection_lib_support_languages = {}
     for detection_lib_name in null_detection_libs.keys():
         all_detection_lib_support_languages[detection_lib_name] = \
