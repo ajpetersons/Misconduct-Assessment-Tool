@@ -2,6 +2,7 @@ import os
 import shutil
 from bs4 import BeautifulSoup
 import bs4
+import pickle
 
 import logging
 
@@ -25,7 +26,7 @@ class DetectionLib:
         :type results_path: str
         :param segments_path: the path where stores the uploaded single file
         :type segments_path: str
-        :param folder_to_compare_path: the path where sotres the uploaded folder
+        :param folder_to_compare_path: the path where the uploaded folder is stored
         :type folder_to_compare_path: str
         """
 
@@ -35,6 +36,9 @@ class DetectionLib:
         self.segments_path = segments_path
         self.folder_to_compare_path = folder_to_compare_path
         self.file_language_supported = []
+
+        self.MINIMUM_SIZE_SEGMENT = 5
+        # Length of segment lower bound needed because of the sensitivity of Detection Libraries
 
     def __str__(self):
         """ String represantation """
@@ -147,6 +151,25 @@ class DetectionLib:
         self.__file_language_supported = file_language_supported
 
 
+def file_lines(file_path):
+    """Counts the non blank lines in a file that start with alpha characters (no comments)
+    (good enough estimate of token size for sensitivity parameter
+    assuming that a line contains at least one instruction)
+
+    :param file_path: Path of the segment
+    :return: number of non blank lines
+    """
+    line_count = 0
+
+    with open(file_path) as f:
+        for line in f:
+            line = line.strip()
+            if line and line[0].isalpha():
+                line_count += 1
+
+    return line_count
+
+
 class Jplag(DetectionLib):
     """JPlag detection library."""
 
@@ -184,6 +207,8 @@ class Jplag(DetectionLib):
         self.file_language = file_language
         self.number_of_matches = number_of_matches  # TODO: Might get rid of it
         self.file_relation = {}
+        self.NORMAL_SIZE_SEGMENT = 12
+        self.optimized = False
         logger.debug('New instance of %s', self.name)
 
     def run_detection(self, temp_working_path):
@@ -192,6 +217,9 @@ class Jplag(DetectionLib):
         :param temp_working_path: the temp working folder path
         :type temp_working_path: str
         """
+        self.run_detection_optimized(temp_working_path)  # TODO TEST AND SWITCH
+        return
+
         logger.debug('Running detection on working environment %s', temp_working_path)
         counter = 0
 
@@ -219,6 +247,85 @@ class Jplag(DetectionLib):
                                                                   self.results_path,
                                                                   temp_working_path))
 
+    def run_detection_optimized(self, temp_working_path):
+        """Run the detection with optimized sensitivity parameters
+
+        :param temp_working_path: the temp working folder path
+        :type temp_working_path: str
+        """
+        logger.debug('Running detection on working environment %s', temp_working_path)
+
+        small_counter = 0
+        normal_counter = 0
+
+        small_path = os.path.join(temp_working_path, "small")
+        normal_path = os.path.join(temp_working_path, "normal")
+
+        # Preparing files
+        if not os.path.exists(temp_working_path):
+            os.makedirs(temp_working_path)
+            os.makedirs(small_path)
+            os.makedirs(normal_path)
+        else:
+            logger.critical("Temp working path not empty! <{0}>".format(temp_working_path))
+
+        small_files = []
+        normal_files = []
+
+        for file_name in os.listdir(self.segments_path):
+            current_file = os.path.join(self.segments_path, file_name)
+            file_size = file_lines(current_file)
+            if file_size < self.NORMAL_SIZE_SEGMENT:
+                # Segment is small size
+                shutil.copy(current_file, os.path.join(small_path, file_name))
+                small_counter += 1
+                small_files.append(file_name)
+            else:
+                # Segment is normal size
+                shutil.copy(current_file, os.path.join(normal_path, file_name))
+                normal_counter += 1
+                normal_files.append(file_name)
+
+        counter = 0
+        for (dir_path, dir_names, file_names) in os.walk(self.folder_to_compare_path):
+            for file_name in file_names:
+                if not os.path.exists(temp_working_path + file_name):
+                    self.file_relation[str(counter)] = os.path.join(dir_path, file_name)
+                    shutil.copy(self.file_relation[str(counter)],
+                                temp_working_path + "/" + str(counter) + "_" + file_name)
+                    counter += 1
+
+        # HACK: Please notice here, you shall never allow users to run code on your server directly.
+        # Try only receive part parameters from users, such as what I did here. DO NOT let users run
+        # their command directly, that would be very dangerous.
+
+        if small_counter > 0:
+            self.optimized = True
+
+            with open('optimized_files.pkl', 'wb') as f:
+                pickle.dump([small_files, normal_files], f)
+
+            # First check the smaller segments
+            os.system("java -jar {0} -t 5 -l {1} -r {2} {3}".format(self.lib_path,
+                                                                    self.file_language,
+                                                                    os.path.join(self.results_path, "small"),
+                                                                    # small_path))
+                                                                    temp_working_path))
+
+            # Then check the normal segments
+            os.system("java -jar {0} -l {1} -r {2} {3}".format(self.lib_path,
+                                                               self.file_language,
+                                                               os.path.join(self.results_path, "normal"),
+                                                               # normal_path))
+                                                               temp_working_path))
+
+        else:
+            os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
+                                                                      self.number_of_matches,
+                                                                      self.file_language,
+                                                                      self.results_path,
+                                                                      temp_working_path))
+
     def results_interpretation(self):
         """Interpret the results produced by JPlag.
         
@@ -228,48 +335,71 @@ class Jplag(DetectionLib):
         :rtype: (dict, int)
         """
 
-        with open(os.path.join(self.results_path, "index.html")) as fp:
-            soup = BeautifulSoup(fp, 'html.parser')
+        def process_result_file(result_path, folder_to_compare_path, file_relation, search_files):
+            # Inner function that processes the html result file
+            with open(result_path) as fp:
+                soup = BeautifulSoup(fp, 'html.parser')
 
-        search_files = os.listdir(self.segments_path)
-        for i in range(len(search_files)):
-            search_files[i] = search_files[i][:search_files[i].find(".")]
+            # search_files = os.listdir(segments_path)
+            for i in range(len(search_files)):
+                search_files[i] = search_files[i][:search_files[i].find(".")]
 
-        results = {}
+            results_file = {}
+            # TODO NO IDEA WHAT THIS MEANS!
+            # Change this to change how to define a "submission" in the source folder
+            # This line only list the sub-level folders in the source folder
+            submission_number_file = len(os.listdir(
+                os.path.join(folder_to_compare_path, os.listdir(folder_to_compare_path)[0])))
+            logger.info("Submission number:", submission_number_file)
+            print("Submission number:", submission_number_file)
+            for search_file in search_files:
+                temp_similarities_for_searching_file = {}
+                for tag in soup.find_all('h4'):
+                    if 'Matches sorted by maximum similarity (' in tag.contents:
+                        for tr_tag in tag.parent.find_all('tr'):
+                            if search_file in tr_tag.contents[0].contents[0]:
+                                similarities = tr_tag.contents[2:]
+                                for one_similarity in similarities:
+                                    original_file_name = one_similarity.contents[0].contents[0]
+                                    original_result_link = one_similarity.contents[0].get("href")
+                                    similarity = one_similarity.contents[2].contents[0]
+                                    temp_similarities_for_searching_file[
+                                        file_relation[original_file_name[:original_file_name.find("_")]]] = [
+                                        similarity, original_result_link]
 
-        # Change this to change how to define a "submission" in the source folder
-        # This line only list the sub-level folders in the source folder
-        submission_number = len(os.listdir(
-            os.path.join(self.folder_to_compare_path, os.listdir(self.folder_to_compare_path)[0])))
+                        for td_tag in tag.parent.find_all('td'):
+                            for element in td_tag.contents:
+                                if isinstance(element, bs4.element.Tag):
+                                    if len(element.contents) > 0:
+                                        if search_file in element.contents[0]:
+                                            original_file_name = td_tag.parent.contents[0].contents[0]
+                                            original_result_link = td_tag.contents[0].get("href")
+                                            similarity = td_tag.contents[2].contents[0]
+                                            temp_similarities_for_searching_file[
+                                                file_relation[original_file_name[:original_file_name.find("_")]]] = [
+                                                similarity, original_result_link]
 
-        for search_file in search_files:
-            temp_similarities_for_searching_file = {}
-            for tag in soup.find_all('h4'):
-                if 'Matches sorted by maximum similarity (' in tag.contents:
-                    for tr_tag in tag.parent.find_all('tr'):
-                        if search_file in tr_tag.contents[0].contents[0]:
-                            similarities = tr_tag.contents[2:]
-                            for one_similarity in similarities:
-                                original_file_name = one_similarity.contents[0].contents[0]
-                                original_result_link = one_similarity.contents[0].get("href")
-                                similarity = one_similarity.contents[2].contents[0]
-                                temp_similarities_for_searching_file[
-                                    self.file_relation[original_file_name[:original_file_name.find("_")]]] = [
-                                    similarity, original_result_link]
+                results_file[search_file] = temp_similarities_for_searching_file
+            return results_file, submission_number_file
 
-                    for td_tag in tag.parent.find_all('td'):
-                        for element in td_tag.contents:
-                            if isinstance(element, bs4.element.Tag):
-                                if len(element.contents) > 0:
-                                    if search_file in element.contents[0]:
-                                        original_file_name = td_tag.parent.contents[0].contents[0]
-                                        original_result_link = td_tag.contents[0].get("href")
-                                        similarity = td_tag.contents[2].contents[0]
-                                        temp_similarities_for_searching_file[
-                                            self.file_relation[original_file_name[:original_file_name.find("_")]]] = [
-                                            similarity, original_result_link]
+        if self.optimized:
+            with open('optimized_files.pkl', 'rb') as f:
+                small_files, normal_files = pickle.load(f)
 
-            results[search_file] = temp_similarities_for_searching_file
+            results_small, submissions_small = process_result_file(
+                os.path.join(self.results_path, "small", "index.html"),
+                folder_to_compare_path=self.folder_to_compare_path,
+                file_relation=self.file_relation, search_files=small_files)
+            results_normal, submissions_normal = process_result_file(
+                os.path.join(self.results_path, "normal", "index.html"),
+                folder_to_compare_path=self.folder_to_compare_path,
+                file_relation=self.file_relation, search_files=normal_files)
+            results = {**results_small, **results_normal}
+            submission_number = submissions_small + submissions_normal
+
+        else:
+            results, submission_number = process_result_file(os.path.join(self.results_path, "index.html"),
+                                                             search_files=os.listdir(self.segments_path))
 
         return results, submission_number
 
@@ -300,5 +430,3 @@ class Jplag(DetectionLib):
     @number_of_matches.setter
     def number_of_matches(self, number_of_matches):
         self.__number_of_matches = number_of_matches
-
-

@@ -11,7 +11,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from .env_settings import *
 
 import logging
-
 logger = logging.getLogger(__name__)
 
 # Create your views here.
