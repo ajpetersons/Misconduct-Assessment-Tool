@@ -258,14 +258,14 @@ class Jplag(DetectionLib):
         small_counter = 0
         normal_counter = 0
 
-        small_path = os.path.join(temp_working_path, "small")
-        normal_path = os.path.join(temp_working_path, "normal")
+        # small_path = os.path.join(temp_working_path, "small")
+        # normal_path = os.path.join(temp_working_path, "normal")
 
         # Preparing files
         if not os.path.exists(temp_working_path):
             os.makedirs(temp_working_path)
-            os.makedirs(small_path)
-            os.makedirs(normal_path)
+            # os.makedirs(small_path)
+            #os.makedirs(normal_path)
         else:
             logger.critical("Temp working path not empty! <{0}>".format(temp_working_path))
 
@@ -277,14 +277,15 @@ class Jplag(DetectionLib):
             file_size = file_lines(current_file)
             if file_size < self.NORMAL_SIZE_SEGMENT:
                 # Segment is small size
-                shutil.copy(current_file, os.path.join(small_path, file_name))
+                #shutil.copy(current_file, os.path.join(small_path, file_name))
                 small_counter += 1
                 small_files.append(file_name)
             else:
                 # Segment is normal size
-                shutil.copy(current_file, os.path.join(normal_path, file_name))
+                #shutil.copy(current_file, os.path.join(normal_path, file_name))
                 normal_counter += 1
                 normal_files.append(file_name)
+            shutil.copy(current_file, os.path.join(temp_working_path, file_name))
 
         counter = 0
         for (dir_path, dir_names, file_names) in os.walk(self.folder_to_compare_path):
@@ -335,7 +336,7 @@ class Jplag(DetectionLib):
         :rtype: (dict, int)
         """
 
-        def process_result_file(result_path, folder_to_compare_path, file_relation, search_files):
+        def process_result_file(result_path, file_relation, search_files):
             # Inner function that processes the html result file
             with open(result_path) as fp:
                 soup = BeautifulSoup(fp, 'html.parser')
@@ -345,13 +346,7 @@ class Jplag(DetectionLib):
                 search_files[i] = search_files[i][:search_files[i].find(".")]
 
             results_file = {}
-            # TODO NO IDEA WHAT THIS MEANS!
-            # Change this to change how to define a "submission" in the source folder
-            # This line only list the sub-level folders in the source folder
-            submission_number_file = len(os.listdir(
-                os.path.join(folder_to_compare_path, os.listdir(folder_to_compare_path)[0])))
-            logger.info("Submission number:", submission_number_file)
-            print("Submission number:", submission_number_file)
+
             for search_file in search_files:
                 temp_similarities_for_searching_file = {}
                 for tag in soup.find_all('h4'):
@@ -380,28 +375,31 @@ class Jplag(DetectionLib):
                                                 similarity, original_result_link]
 
                 results_file[search_file] = temp_similarities_for_searching_file
-            return results_file, submission_number_file
+            return results_file
+
+        # Change this to change how to define a "submission" in the source folder
+        # This line only list the sub-level folders in the source folder
+        number_of_submissions = len(os.listdir(
+            os.path.join(self.folder_to_compare_path, os.listdir(self.folder_to_compare_path)[0])))
+        logger.info("Submission number:", number_of_submissions)
 
         if self.optimized:
             with open('optimized_files.pkl', 'rb') as f:
                 small_files, normal_files = pickle.load(f)
 
-            results_small, submissions_small = process_result_file(
+            results_small = process_result_file(
                 os.path.join(self.results_path, "small", "index.html"),
-                folder_to_compare_path=self.folder_to_compare_path,
                 file_relation=self.file_relation, search_files=small_files)
-            results_normal, submissions_normal = process_result_file(
+            results_normal = process_result_file(
                 os.path.join(self.results_path, "normal", "index.html"),
-                folder_to_compare_path=self.folder_to_compare_path,
                 file_relation=self.file_relation, search_files=normal_files)
             results = {**results_small, **results_normal}
-            submission_number = submissions_small + submissions_normal
-
         else:
-            results, submission_number = process_result_file(os.path.join(self.results_path, "index.html"),
-                                                             search_files=os.listdir(self.segments_path))
+            results = process_result_file(os.path.join(self.results_path, "index.html"),
+                                          file_relation=self.file_relation,
+                                          search_files=os.listdir(self.segments_path))
 
-        return results, submission_number
+        return results, number_of_submissions
 
     def clean_working_envs(self, temp_working_path):
         """Delete temp working folder
