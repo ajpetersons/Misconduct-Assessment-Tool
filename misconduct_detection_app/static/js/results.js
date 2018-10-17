@@ -93,7 +93,6 @@ $(document).ready(function (){
                 "id": jPlagResultsKey,
             }).html("<i class='material-icons md-36'>info</i>"));
             $("#segmentDetailsDisplayBox").append("<hr>");
-
             $("#segmentDetailsDisplayBox").append($("<div></div>").attr({
                 "id": "codeDetails" + jPlagResultsKey,
                 "style": "display: none",
@@ -102,7 +101,7 @@ $(document).ready(function (){
             suspectFilesKeys.map(suspectFilesKey => { 
                 const filePath = suspectFilesKey.substring(suspectFilesKey.indexOf("folder") + 8);
                 const fileLink = jPlagResults[jPlagResultsKey][suspectFilesKey][1];
-        
+                console.log(fileLink)
                 let linkToJPlagResult = document.createElement("a");
                 linkToJPlagResult.setAttribute("href", "details\\" + fileLink);
                 linkToJPlagResult.setAttribute("target", "_blank");

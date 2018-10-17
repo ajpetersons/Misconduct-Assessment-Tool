@@ -336,7 +336,7 @@ class Jplag(DetectionLib):
         :rtype: (dict, int)
         """
 
-        def process_result_file(result_path, file_relation, search_files):
+        def process_result_file(result_path, file_relation, search_files, path_folder=""):
             # Inner function that processes the html result file
             with open(result_path) as fp:
                 soup = BeautifulSoup(fp, 'html.parser')
@@ -360,7 +360,7 @@ class Jplag(DetectionLib):
                                     similarity = one_similarity.contents[2].contents[0]
                                     temp_similarities_for_searching_file[
                                         file_relation[original_file_name[:original_file_name.find("_")]]] = [
-                                        similarity, original_result_link]
+                                        similarity, path_folder + original_result_link]
 
                         for td_tag in tag.parent.find_all('td'):
                             for element in td_tag.contents:
@@ -372,7 +372,7 @@ class Jplag(DetectionLib):
                                             similarity = td_tag.contents[2].contents[0]
                                             temp_similarities_for_searching_file[
                                                 file_relation[original_file_name[:original_file_name.find("_")]]] = [
-                                                similarity, original_result_link]
+                                                similarity, path_folder + original_result_link]
 
                 results_file[search_file] = temp_similarities_for_searching_file
             return results_file
@@ -389,10 +389,10 @@ class Jplag(DetectionLib):
 
             results_small = process_result_file(
                 os.path.join(self.results_path, "small", "index.html"),
-                file_relation=self.file_relation, search_files=small_files)
+                file_relation=self.file_relation, search_files=small_files, path_folder="small/")
             results_normal = process_result_file(
                 os.path.join(self.results_path, "normal", "index.html"),
-                file_relation=self.file_relation, search_files=normal_files)
+                file_relation=self.file_relation, search_files=normal_files, path_folder="normal/")
             results = {**results_small, **results_normal}
         else:
             results = process_result_file(os.path.join(self.results_path, "index.html"),
