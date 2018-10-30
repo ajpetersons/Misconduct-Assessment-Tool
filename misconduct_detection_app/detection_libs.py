@@ -303,9 +303,6 @@ class Jplag(DetectionLib):
         if small_counter > 0:
             self.optimized = True
 
-            with open('optimized_files.pkl', 'wb') as f:
-                pickle.dump([small_files, normal_files], f)
-
             # First check the smaller segments
             os.system("java -jar {0} -t 5 -l {1} -r {2} {3}".format(self.lib_path,
                                                                     self.file_language,
@@ -319,6 +316,10 @@ class Jplag(DetectionLib):
                                                                os.path.join(self.results_path, "normal"),
                                                                # normal_path))
                                                                temp_working_path))
+
+            # Save which segments are small and which normal size
+            with open(os.path.join(self.results_path, 'optimized_files.pkl'), 'wb') as f:
+                pickle.dump([small_files, normal_files], f)
 
         else:
             os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
@@ -356,11 +357,15 @@ class Jplag(DetectionLib):
                                 similarities = tr_tag.contents[2:]
                                 for one_similarity in similarities:
                                     original_file_name = one_similarity.contents[0].contents[0]
+                                    if "Segment_" in original_file_name:
+                                        # matched with another segment edge case
+                                        continue
+                                    print('filename a full ', original_file_name)
                                     original_result_link = one_similarity.contents[0].get("href")
                                     similarity = one_similarity.contents[2].contents[0]
                                     temp_similarities_for_searching_file[
                                         file_relation[original_file_name[:original_file_name.find("_")]]] = [
-                                        similarity, path_folder + original_result_link]
+                                        similarity, os.path.join(path_folder, original_result_link)]
 
                         for td_tag in tag.parent.find_all('td'):
                             for element in td_tag.contents:
@@ -368,11 +373,16 @@ class Jplag(DetectionLib):
                                     if len(element.contents) > 0:
                                         if search_file in element.contents[0]:
                                             original_file_name = td_tag.parent.contents[0].contents[0]
+                                            if "Segment_" in original_file_name:
+                                                # matched with another segment edge case
+                                                continue
                                             original_result_link = td_tag.contents[0].get("href")
                                             similarity = td_tag.contents[2].contents[0]
+                                            print('path_folder = ', path_folder)
+                                            print('filename ', original_file_name[:original_file_name.find("_")])
                                             temp_similarities_for_searching_file[
                                                 file_relation[original_file_name[:original_file_name.find("_")]]] = [
-                                                similarity, path_folder + original_result_link]
+                                                similarity, os.path.join(path_folder, original_result_link)]
 
                 results_file[search_file] = temp_similarities_for_searching_file
             return results_file
@@ -384,15 +394,15 @@ class Jplag(DetectionLib):
         logger.info("Submission number:", number_of_submissions)
 
         if self.optimized:
-            with open('optimized_files.pkl', 'rb') as f:
+            with open(os.path.join(self.results_path, 'optimized_files.pkl'), 'rb') as f:
                 small_files, normal_files = pickle.load(f)
 
             results_small = process_result_file(
                 os.path.join(self.results_path, "small", "index.html"),
-                file_relation=self.file_relation, search_files=small_files, path_folder="small/")
+                file_relation=self.file_relation, search_files=small_files, path_folder="small")
             results_normal = process_result_file(
                 os.path.join(self.results_path, "normal", "index.html"),
-                file_relation=self.file_relation, search_files=normal_files, path_folder="normal/")
+                file_relation=self.file_relation, search_files=normal_files, path_folder="normal")
             results = {**results_small, **results_normal}
         else:
             results = process_result_file(os.path.join(self.results_path, "index.html"),
