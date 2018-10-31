@@ -163,11 +163,16 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': './mdp_debug.log',
         }
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'console_debug_false', 'mail_admins'],
+            'handlers': ['console', 'console_debug_false', 'mail_admins', 'file'],
             'level': 'INFO',
         },
         'django.server': {

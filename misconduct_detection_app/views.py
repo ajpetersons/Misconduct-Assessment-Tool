@@ -11,7 +11,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from .env_settings import *
 
 import logging
-
 logger = logging.getLogger(__name__)
 
 # Create your views here.
@@ -154,6 +153,14 @@ def upload_file(request):
 
     if request.method == 'POST':
         handle_upload_file(request, request.FILES['file'], str(request.FILES['file']))
+
+        # Remove the previous highlights, segments if they exist
+        if os.path.exists(get_segments_path(request)):
+            shutil.rmtree(get_segments_path(request))
+
+        if os.path.exists(get_configs_path(request)):
+            shutil.rmtree(get_configs_path(request))
+
         return HttpResponse('Uploading Success')
     else:
         return HttpResponse('Uploading Failed')
@@ -355,7 +362,7 @@ def select_save_html(request):
             os.makedirs(get_segments_path(request))
         if len(request.POST) > 1:
             try:
-                with open(os.path.join(get_configs_path(request), "code_select_html.html"), 'w') as f:
+                with open(os.path.join(get_configs_path(request), "code_select_html.html"), 'w', newline='') as f:
                     f.write(request.POST["codeDisplayHtml"])
             except KeyError:
                 pass
