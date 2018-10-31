@@ -354,7 +354,7 @@ def select_save_html(request):
             os.makedirs(get_segments_path(request))
         if len(request.POST) > 1:
             try:
-                with open(os.path.join(get_configs_path(request), "code_select_html.html"), 'w') as f:
+                with open(os.path.join(get_configs_path(request), "code_select_html.html"), 'w', newline='') as f:
                     f.write(request.POST["codeDisplayHtml"])
             except KeyError:
                 pass
