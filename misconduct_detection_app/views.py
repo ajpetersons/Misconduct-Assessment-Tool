@@ -153,6 +153,14 @@ def upload_file(request):
 
     if request.method == 'POST':
         handle_upload_file(request, request.FILES['file'], str(request.FILES['file']))
+
+        # Remove the previous highlights, segments if they exist
+        if os.path.exists(get_segments_path(request)):
+            shutil.rmtree(get_segments_path(request))
+
+        if os.path.exists(get_configs_path(request)):
+            shutil.rmtree(get_configs_path(request))
+
         return HttpResponse('Uploading Success')
     else:
         return HttpResponse('Uploading Failed')
