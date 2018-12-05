@@ -1,5 +1,5 @@
 // Set name and other global variables, Django variables for this page
-pageName = "Uploading";
+pageName = "Upload";
 
 let uploadFileFinish = false;
 let uploadFolderFinish = false;
@@ -42,6 +42,7 @@ function uploadFile() {
     $(document).ajaxStop(function() {
         $("#uploadFileCheck").empty();
         $("#uploadFileCheck").append("<i class='material-icons'>check</i>Selected file uploaded.");
+
     });
 }
 
@@ -100,4 +101,5 @@ $(document).ready(function () {
         $("#uploadFolderCheck").append("<i class='material-icons'>check</i>Folder uploaded.");
     }
     openNextButton();
+    console.log('document.ready()')
 });
