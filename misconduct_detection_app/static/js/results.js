@@ -21,17 +21,20 @@ $("#report-form").submit(function () {
     var courseName = $("#course-name").val();
     var coursework = $("#coursework").val();
     var reportNotes = $("#report-notes").val();
+    var segmentDetailed = $("#report-form input[name=segmentRadios]:checked").val()
 
-    if(studentMatriculation == ""){
+    var detailed = segmentDetailed === "detailed";
+
+    if(studentMatriculation === ""){
         return;
     }
 
     var doc = new jsPDF();
 
     var pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-    console.log(`Page Height: ${pageHeight}`)
+    console.log(`Page Height: ${pageHeight}`);
     var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-    console.log(`Page Width: ${pageWidth}`)
+    console.log(`Page Width: ${pageWidth}`);
     var v_margin = 20;
     var h_margin = 10;
     //Drawing coordinates
@@ -110,21 +113,21 @@ $("#report-form").submit(function () {
 
     // Form data in pdf
     change_font_size(section_size);
-    if (studentName != "" || studentSurname != "") {
-        if (studentMatriculation == "") {
+    if (studentName !== "" || studentSurname !== "") {
+        if (studentMatriculation === "") {
             print_text(`Student: ${studentName} ${studentSurname}`);
         } else {
             print_text(`Student: ${studentName} ${studentSurname} (${studentMatriculation})`);
         }
-    } else if (studentMatriculation != "") {
+    } else if (studentMatriculation !== "") {
         print_text(`Student Matriculation Number: ${studentMatriculation}`)
     }
 
-    if (courseName != "") {
+    if (courseName !== "") {
         print_text(`Course: ${courseName}`)
     }
 
-    if (coursework != "") {
+    if (coursework !== "") {
         print_text(`Coursework: ${coursework}`)
     }
 
@@ -145,8 +148,8 @@ $("#report-form").submit(function () {
 
     // Notes Section
     change_font_size(section_size);
-    if (reportNotes != "") {
-        orig_font_size = font_size;
+    if (reportNotes !== "") {
+        let orig_font_size = font_size;
         print_text(`Notes:`);
 
         change_font_size(text_size);
@@ -178,17 +181,21 @@ $("#report-form").submit(function () {
     // Segments section
     let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
     segmentFilesKeys.forEach(segmentFilesKey => {
-        change_font_size(section_size);
-        print_text(segmentFilesKey);
-        change_font_size(subsection_size);
         let segmentName = segmentFilesKey.split('.')[0];
+        change_font_size(section_size);
+        //print_text(segmentFilesKey);
+        print_text(segmentName);
+        change_font_size(subsection_size);
         print_text(`Individual probability:               ${individual_probabilities[segmentName]}`);
         change_font_size(subsection_size-1);
-        suspectFilesKeys = Object.keys(jPlagResults[segmentName]).filter(key => jPlagResults[segmentName].hasOwnProperty(key) === true);
+        let suspectFilesKeys = Object.keys(jPlagResults[segmentName]).filter(key => jPlagResults[segmentName].hasOwnProperty(key) === true);
         print_text(`Number of similar submissions:   ${suspectFilesKeys.length-1}`);
         y += 1;
         change_font_size(text_size);
-        print_long_text(segmentFiles[segmentFilesKey]);
+        if(detailed) {
+            // Detailed form adds segment code
+            print_long_text(segmentFiles[segmentFilesKey]);
+        }
         separate_sections();
         //y +=10;
     });
@@ -199,9 +206,9 @@ $("#report-form").submit(function () {
     doc.setProperties({
         title: 'Academic Misconduct Assessment Report',
         subject: '',
-        author: 'Miscoduct Detection Project',
-        keywords: 'miscoduct, academic, assement, report',
-        creator: 'Miscoduct Detection Project Report generation created by Stelios Milisavljevic s1509375'
+        author: 'Misconduct Detection Project',
+        keywords: 'misconduct, academic, assessment, report',
+        creator: 'Misconduct Detection Project Report generation created by Stelios Milisavljevic s1509375 (University of Edinburgh School of Informatics)'
     });
     doc.output('dataurlnewwindow');
 });
