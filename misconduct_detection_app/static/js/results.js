@@ -222,7 +222,7 @@ $(document).ready(function (){
 
     //------------------------Print original segments------------------------
     let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
-
+    // TODO: Change map to foreach?
     segmentFilesKeys.map(segmentFilesKey =>{ 
         let originalCodeSegmentHeader = document.createElement("div");
         originalCodeSegmentHeader.setAttribute("class", "card-header");
@@ -233,6 +233,7 @@ $(document).ready(function (){
         let originalCodeSegmentBodyPara = document.createElement("p");
         originalCodeSegmentBodyPara.setAttribute("class", "card-text");
         let originalCodeSegmentBodyParaPre = document.createElement("pre");
+        originalCodeSegmentBodyParaPre.setAttribute("class","prettyprint linenums lang-c lang-cpp lang-java");
         originalCodeSegmentBodyParaPre.innerHTML = segmentFiles[segmentFilesKey];
 
         originalCodeSegmentBodyPara.appendChild(originalCodeSegmentBodyParaPre);
@@ -246,10 +247,6 @@ $(document).ready(function (){
     let jPlagResultsKeys = Object.keys(jPlagResults).filter(key => jPlagResults.hasOwnProperty(key) === true);
 
     $("#segmentDetailsDisplayBox").empty();
-
-    //let individual_probabilities = [];
-    //let joint_probability = 1;
-    //let expectation = 0;
 
     //------------------------Calculation part------------------------
     jPlagResultsKeys.map(jPlagResultsKey => {
