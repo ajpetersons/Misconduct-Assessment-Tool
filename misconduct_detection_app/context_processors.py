@@ -39,7 +39,6 @@ def generate_uploaded_file_list(request):
     folder_path = get_folder_path(request)
     segments_path = get_segments_path(request)
     configs_path = os.path.join(get_configs_path(request), "configs.txt")
-
     if os.path.exists(file_to_compare_path):
         file_to_compare_path_list = os.listdir(file_to_compare_path)
     else:
@@ -70,7 +69,6 @@ def generate_uploaded_file_list(request):
             folder_path_list.append(os.path.join(dir_path, file_name))
     if len(folder_path_list) == 0:
         folder_path_list = ["NOFOLDEREXISTS"]
-
     return file_to_compare_path_list, results_path_list, folder_path_list, segments_path_list, configs_path_list
 
 

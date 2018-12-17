@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title id="title">MDP tool</title>
+    <title id="title">Misconduct Assessment Tool</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <meta name="author" content="Yucheng Xie & Stelios Milisavljevic">
-    <meta name="description" content="The MDP tool">
+    <meta name="description" content="Misconduct Assessment Tool">
 
     {% load staticfiles %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
@@ -26,7 +26,7 @@
 
     <!-- Global variables defined here -->
     <script>
-        var toolName = "MDA Tool";
+        var toolName = "MAT";
         var pageName = "";
 
         // Highlighter colors using in segments selection
@@ -78,7 +78,7 @@
 
 <body>
     <!--The top navbar-->
-    <nav class="navbar navbar-light bg-light border-bottom" id="topBar">
+    <nav class="navbar fixed-top navbar-light bg-light border-bottom" id="topBar">
         <!-- Name shown-->
         <a class="navbar-brand" href="/" id="layoutToolName">Tool-Name</a>
         <!-- Page Title-->
@@ -152,9 +152,9 @@
     <!-- Contents on rest of the page-->
     <div class="container-fluid">
         <br>
-        <div class="row flex-xl-nowrap">
+        <nav class="row flex-xl-nowrap">
             <!-- Left side button area-->
-            <div class="col-12 col-md-2 col-lg-2 bd-sidebar border-right">
+            <div class="col-12 col-xl-2 w-sidebar position-fixed bd-sidebar sidebar border-right align-middle">
                 {% block sideButton %}
                 {% endblock %}
 
@@ -182,7 +182,7 @@
             </div>
 
             <!-- Right side contents area-->
-            <div class="col-12 col-md-10 col-lg-10 bd-content">
+            <div class="col-12 bd-content contents">
                 {% block content %}
                 {% endblock %}
             </div>
@@ -190,7 +190,7 @@
             <!-- Hide contents area-->
             <div class="hiddenContentsDiv" id="hiddenContentsDiv" style="display: none">
             </div>
-        </div>
+        </nav>
     </div>
 
     <form method="post" id="cancelButtonFrom">

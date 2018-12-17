@@ -27,7 +27,7 @@ function redrawBottomBar() {
             'href': '/select/',
             "class": "btn btn-outline-primary",
             "role": "button",
-        }).text("Check selected segments");
+        }).text("Selected segments");
         $("#segmentsPathList").append(linkToRes);
     }
 }
@@ -135,6 +135,7 @@ function sendCurrentSegmentsAndSelection() {
     });
 
     let codeDisplayHtml = $("#codeDisplayText").html()
+    console.log('codeDisplayHtml '+codeDisplayHtml)
     let codeDisplayFrom = new FormData();
     codeDisplayFrom.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
     codeDisplayFrom.append("codeDisplayHtml", codeDisplayHtml);
@@ -299,7 +300,7 @@ $("#segmentDisplayBox").on("click", ".delete-header-button", function (evt){
 
 $(document).ready(function () {
     // Set name and Django variables for this page
-    pageName = "Selection";
+    pageName = "Select suspect segments";
     setCodeDisplayText();
 
     // Display selected segments if there is any

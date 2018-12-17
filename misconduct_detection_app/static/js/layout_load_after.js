@@ -1,3 +1,7 @@
+// Loaded in layout.html (every page)
+
+// Cancel button considered a form (hidden)
+
 $("#cancelButtonFinal").click(function () {
     csrfToken = new FormData($('#cancelButtonFrom')[0]);
     $.ajax({

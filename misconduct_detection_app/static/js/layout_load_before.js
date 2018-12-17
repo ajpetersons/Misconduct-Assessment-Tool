@@ -1,3 +1,5 @@
+//Loaded in layout.html (every page)
+
 function loadUploadedComparingFile() {
     // Format data
     fileToComparePathList = fileToComparePathList[0];
@@ -10,6 +12,7 @@ function loadUploadedComparingFile() {
             "role": "button",
         }).text("No uploaded file"));
     } else {
+        // console.log("DEBUG: FILE TO COMP "+ fileToComparePathList);
         let linkToFile = $("<a></a>").attr({
             "class": "btn btn-outline-primary",
             "role": "button",
@@ -83,7 +86,7 @@ function loadSelectedSegments() {
             "href": "/select/",
             "class": "btn btn-outline-primary",
             "role": "button",
-        }).text("Check selected segments");
+        }).text("Selected segments");
         $("#segmentsPathList").append(linkToRes);
     }
 }
@@ -104,7 +107,7 @@ function loadResults() {
             "href": "/results/",
             "class": "btn btn-outline-primary",
             "role": "button",
-        }).text("Check results from last detection");
+        }).text("Last detection results");
         $("#resultsPathList").append(linkToRes);
     }
 }
