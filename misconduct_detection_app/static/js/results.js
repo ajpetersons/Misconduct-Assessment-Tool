@@ -224,8 +224,12 @@ $(document).ready(function (){
     // Populate results page
 
     $("#segmentsContainer").before(
+        "<div class='results-summary'>" +
         `<h4>Number of total submissions: <i>${jPlagSubmissionNumber}</i></h4>` +
-        `<p>Joint Probability: <i>${joint_probability}</i><br/>Joint Expectation: <i>${expectation}</i></p>`);
+        `<p>Joint Probability: <i>${joint_probability}</i><br/>Joint Expectation: <i>${expectation}</i></p>` +
+        "</div>"
+    );
+
 
     let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
 
