@@ -6,8 +6,19 @@
 {% endblock %}
 
 {% block sideButton %}
-    <div class="offset-md-3">
-        <a href="upload"><button class="btn btn-outline-secondary btn-lg btn-custom-size">Next</button></a>
+    <div class="col-md-3">
+        <a href="upload">
+            <button class="btn btn-outline-secondary btn-lg btn-custom-size">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="material-icons">navigate_next</i>
+                    </div>
+                    <div class="col-8">
+                        Next
+                    </div>
+                </div>
+            </button>
+        </a>
     </div>
     <br>
 {% endblock %}

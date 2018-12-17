@@ -7,36 +7,92 @@
 {% endblock %}
 
 {% block sideButton %}
-    <div class="offset-md-3">
-        <a href="\select\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" onclick="submitAllFiles()" title="You have not uploaded any file yet" id="nextButton" disabled>Next</button></a>
-        <br><br>
-        <a href="\"><button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button></a>
-        <br><br>
-        <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal" data-target="#cancelButton">Cancel</button>
+    <div class="col-md-3">
+        <a href="\select\">
+            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" onclick="submitAllFiles()"
+                    title="You have not uploaded any file yet" id="nextButton" disabled>
+                <div class="row">
+                    <div class="col-2">
+                        <i class="material-icons">navigate_next</i>
+                    </div>
+                    <div class="col-8">
+                        Next
+                    </div>
+                </div>
+            </button>
+        </a>
+        <br>
+        <a href="\">
+            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="material-icons">navigate_before</i>
+                    </div>
+                    <div class="col-8">
+                        Back
+                    </div>
+                </div>
+            </button>
+        </a>
+        <br>
+        <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal"
+                data-target="#cancelButton">
+            <div class="row">
+                <div class="col-2">
+                    <i class="material-icons">cancel</i>
+                </div>
+                <div class="col-8">
+                    Cancel
+                </div>
+            </div>
+        </button>
         <br>
     </div>
     
     <hr>
+    <div class="col-md-3">
+        <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8"
+              id="uploadFileForm">
+            {% csrf_token %}
+            <input type="file" name="file" id="uploadFileInput">
+            <label for="uploadFileInput" class="btn btn-outline-primary btn-lg btn-custom-size">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="material-icons material-multiline">cloud_upload</i>
+                    </div>
+                    <div class="col-8">
+                        <div id="uploadFileLabel">
+                            Upload
+                        </div>
+                        File
+                    </div>
+                </div>
+            </label>
+        </form>
 
-    <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" id="uploadFileForm">
-        {% csrf_token %}
-        <input type="file" name="file" id="uploadFileInput"> 
-        <label for="uploadFileInput" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="uploadFileLabel">
-            Upload File
-        </label>
-    </form>
+        <br/>
 
+        <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8"
+              id="uploadFolderForm" value="value">
+            {% csrf_token %}
+            <input type="file" name="file" id="uploadFolderInput" directory multiple webkitdirectory mozdirectory>
+            <label for="uploadFolderInput" class="btn btn-outline-primary btn-lg btn-custom-size">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="material-icons material-multiline">cloud_upload</i>
+                    </div>
+                    <div class="col-8">
+                        <div id="uploadFolderLabel">
+                            Upload
+                        </div>
+                        Folder
+
+                    </div>
+                </div>
+            </label>
+        </form>
     <br>
-
-    <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8" id="uploadFolderForm" value="value">
-        {% csrf_token %}
-        <input type="file" name="file" id="uploadFolderInput" directory multiple webkitdirectory mozdirectory> 
-        <label for="uploadFolderInput" class="btn btn-outline-primary btn-lg btn-custom-size-for-upload label-for-upload" id="uploadFolderLabel">
-            Upload Folder
-        </label>
-    </form>
-
-    <br>
+    </div>
 
 {% endblock %}
 
@@ -51,8 +107,8 @@
     <br><hr><br>
 
     <div>
-        <h5 id="uploadFileCheck"><i class="material-icons">block</i>You haven't uploaded a file.</h4>
-        <h5 id="uploadFolderCheck"><i class="material-icons">block</i>You haven't uploaded a folder.</h4>
+        <h5 id="uploadFileCheck"><i class="material-icons">block</i>You haven't uploaded a file.</h5>
+        <h5 id="uploadFolderCheck"><i class="material-icons">block</i>You haven't uploaded a folder.</h5>
     </div>
 
 {% endblock %}

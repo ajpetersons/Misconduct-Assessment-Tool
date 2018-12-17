@@ -7,14 +7,14 @@ let uploadFolderFinish = false;
 function modifyDOMAfterUploadingFile() {
     uploadFileFinish = true;
     openNextButton();
-    $("#uploadFileLabel").text("Reupload File");
+    $("#uploadFileLabel").text("Reupload");
     $("#uploadFileCheck").empty();
 }
 
 function modifyDOMAfterUploadingFolder() {
     uploadFolderFinish = true;
     openNextButton();
-    $("#uploadFolderLabel").text("Reupload Folder");
+    $("#uploadFolderLabel").text("Reupload");
     $("#uploadFolderCheck").empty();
 }
 

@@ -1,19 +1,26 @@
 // Set name and other global variables, Django variables for this page
 pageName = "Results";
 
-$("#segmentDetailsDisplayBox").on("click", ".showDetailsButton", function (evt){
-    jPlagResultsKey = evt.currentTarget.id;
-
-    $("#codeDetails" + jPlagResultsKey).toggle();
-    $(this).toggleClass("btn-outline-secondary");
-});
-
 var individual_probabilities = [];
 var joint_probability = 1;
 var expectation = 0;
 
-$("#report-form").submit(function () {
+// Compute details
+var jPlagResultsKeys = Object.keys(jPlagResults).filter(key => jPlagResults.hasOwnProperty(key) === true);
+jPlagResultsKeys.forEach(jPlagResultsKey => {
+    let temp_probability = 0;
+    if (Object.keys(jPlagResults[jPlagResultsKey]).length !== 0) {
+        temp_probability = (Object.keys(jPlagResults[jPlagResultsKey]).length - 1) / (jPlagSubmissionNumber - 1);
+    }
+    individual_probabilities[jPlagResultsKey] = temp_probability;
+    joint_probability *= temp_probability;
+});
 
+expectation = joint_probability * (jPlagSubmissionNumber - 1);
+
+$("#report-form").submit(function (e) {
+    // Prevent page refresh
+    e.preventDefault();
     // Gather Form data
     var studentName = $("#student-name").val();
     var studentSurname = $("#student-surname").val();
@@ -164,7 +171,7 @@ $("#report-form").submit(function () {
     change_font_size(subsection_size+1);
     print_text(`Number of total submissions:   ${jPlagSubmissionNumber}`);
     y += 1;
-    print_text(`Student's questionable segments`)
+    print_text(`Student's questionable segments`);
     change_font_size(subsection_size);
     print_text(`Joint Probability:     ${joint_probability}`);
     print_text(`Joint Expectation:   ${expectation}`);
@@ -176,7 +183,6 @@ $("#report-form").submit(function () {
     }
 
 
-
     separate_sections();
     // Segments section
     let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
@@ -184,7 +190,7 @@ $("#report-form").submit(function () {
         let segmentName = segmentFilesKey.split('.')[0];
         change_font_size(section_size);
         //print_text(segmentFilesKey);
-        print_text(segmentName);
+        print_text(segmentName.replace("_", " "));
         change_font_size(subsection_size);
         print_text(`Individual probability:               ${individual_probabilities[segmentName]}`);
         change_font_size(subsection_size-1);
@@ -214,93 +220,70 @@ $("#report-form").submit(function () {
 });
 
 $(document).ready(function (){
-    /*
-    Here I built the following structure by pure javascript rather than jQuery. This is because 
-    jQuery is not easy to use under this situation. If later jQuery is updated and a new way is
-    provided by jQuery, please rewrite these following parts.
-    */
 
-    //------------------------Print original segments------------------------
+    // Populate results page
+
+    $("#segmentsContainer").before(
+        `<h4>Number of total submissions: <i>${jPlagSubmissionNumber}</i></h4>` +
+        `<p>Joint Probability: <i>${joint_probability}</i><br/>Joint Expectation: <i>${expectation}</i></p>`);
+
     let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
-    // TODO: Change map to foreach?
-    segmentFilesKeys.map(segmentFilesKey =>{ 
-        let originalCodeSegmentHeader = document.createElement("div");
-        originalCodeSegmentHeader.setAttribute("class", "card-header");
-        originalCodeSegmentHeader.innerHTML = segmentFilesKey;
 
-        let originalCodeSegmentBody = document.createElement("div");
-        originalCodeSegmentBody.setAttribute("class", "card-body text-secondary");
-        let originalCodeSegmentBodyPara = document.createElement("p");
-        originalCodeSegmentBodyPara.setAttribute("class", "card-text");
-        let originalCodeSegmentBodyParaPre = document.createElement("pre");
-        originalCodeSegmentBodyParaPre.setAttribute("class","prettyprint linenums lang-c lang-cpp lang-java");
-        originalCodeSegmentBodyParaPre.innerHTML = segmentFiles[segmentFilesKey];
+    segmentFilesKeys.forEach(segmentFilesKey => {
 
-        originalCodeSegmentBodyPara.appendChild(originalCodeSegmentBodyParaPre);
-        originalCodeSegmentBody.appendChild(originalCodeSegmentBodyPara);
+        let segmentName = segmentFilesKey.split('.')[0];
 
-        document.getElementById("segmentDisplayBox").appendChild(originalCodeSegmentHeader);
-        document.getElementById("segmentDisplayBox").appendChild(originalCodeSegmentBody);
-    });
+        let segmentStructure = `<row id='row${segmentName}'>` +
+            "<div class='card border-secondary'>" +
+            `<div class='card-header'><h2>${segmentName.replace("_", " ")}</h2></div>` +
+            "<div class='card-body text-secondary'>" +
+            "<div class='row'>" +
+            `<div class='col-12 col-xl-6' id='${segmentName}Code'></div>` +
+            `<div class='col-12 col-xl-6' id='${segmentName}Details'></div>` +
+            "</div> " +
+            "</div>" +
+            "</div>" +
+            "</row>";
+        $("#segmentsContainer").append(segmentStructure);
 
-    //------------------------Print segments details------------------------
-    let jPlagResultsKeys = Object.keys(jPlagResults).filter(key => jPlagResults.hasOwnProperty(key) === true);
+        // Add the segment code
+        let segmentCodeStructure = "<p class='card-text'>" +
+            "<pre class='prettyprint linenums lang-c lang-cpp lang-java'>" +
+            segmentFiles[segmentFilesKey] +
+            "</pre>" +
+            "</p>";
+        $(`#${segmentName}Code`).append(segmentCodeStructure);
 
-    $("#segmentDetailsDisplayBox").empty();
 
-    //------------------------Calculation part------------------------
-    jPlagResultsKeys.map(jPlagResultsKey => {
-        let temp_probability = 0;
-        if (Object.keys(jPlagResults[jPlagResultsKey]).length != 0) {
-            temp_probability = (Object.keys(jPlagResults[jPlagResultsKey]).length - 1) / (jPlagSubmissionNumber - 1);
-        }
-        individual_probabilities[jPlagResultsKey] = temp_probability;
-        joint_probability *= temp_probability;
-    })
+        // Add the segment details
+        let $segmentDetails = $(`#${segmentName}Details`);
+        let jPlagResultsKey = segmentName;
+        let segmentDetailsStructure = "<p class='card-text'>" +
+            "Individual Probability: " + individual_probabilities[jPlagResultsKey].toString() +
+            "</p>";
+        $segmentDetails.append(segmentDetailsStructure);
 
-    expectation = joint_probability * (jPlagSubmissionNumber - 1);
-
-    jPlagResultsKeys.map(jPlagResultsKey => { 
-        // Print individual probability, joint probability and joint expectation
-        let codeSegmentHeader = document.createElement("div");
-        codeSegmentHeader.setAttribute("class", "card-header");
-        codeSegmentHeader.innerHTML = jPlagResultsKey;
-
-        let codeSegmentBody = document.createElement("div");
-        codeSegmentBody.setAttribute("class", "card-body text-secondary");
-        let codeSegmentBodyIndi = document.createElement("p");
-        codeSegmentBodyIndi.setAttribute("class", "card-text");
-        codeSegmentBodyIndi.innerHTML = "Individual Probability: " + individual_probabilities[jPlagResultsKey].toString();
-        let codeSegmentBodyJoin = document.createElement("p");
-        codeSegmentBodyJoin.setAttribute("class", "card-text");
-        codeSegmentBodyJoin.innerHTML = "Joint Probability: " + joint_probability.toString();
-        let codeSegmentBodyExp = document.createElement("p");
-        codeSegmentBodyExp.setAttribute("class", "card-text");
-        codeSegmentBodyExp.innerHTML = "Joint Expectation: " + expectation.toString();
-
-        codeSegmentBody.appendChild(codeSegmentBodyIndi);
-        codeSegmentBody.appendChild(codeSegmentBodyJoin);
-        codeSegmentBody.appendChild(codeSegmentBodyExp);
-
-        document.getElementById("segmentDetailsDisplayBox").appendChild(codeSegmentHeader);
-        document.getElementById("segmentDetailsDisplayBox").appendChild(codeSegmentBody);
-
-        // Print super link to original suspect code, if there is any.
+        // Link to original suspect code, if there is any.
         let suspectFilesKeys = Object.keys(jPlagResults[jPlagResultsKey]).filter(key => jPlagResults[jPlagResultsKey].hasOwnProperty(key) === true);
-        
-        if (suspectFilesKeys.length != 0) {
-            $("#segmentDetailsDisplayBox").append($("<button></button>").attr({
+
+        if (suspectFilesKeys.length !== 0) {
+            $segmentDetails.append($("<button></button>").attr({
                 "class": "btn btn-outline-primary btn-sm showDetailsButton",
                 "style": "width: 100px;margin-left: 1%;",
-                "id": jPlagResultsKey,
-            }).html("<i class='material-icons md-36'>info</i>"));
-            $("#segmentDetailsDisplayBox").append("<hr>");
-            $("#segmentDetailsDisplayBox").append($("<div></div>").attr({
+                "id": jPlagResultsKey
+            }).click(
+                function () {
+                    $("#codeDetails" + jPlagResultsKey).toggle();
+                    $(this).toggleClass("btn-outline-secondary");
+                }
+            ).html("<i class='material-icons md-36'>info</i>"));
+            $segmentDetails.append("<hr>");
+            $segmentDetails.append($("<div></div>").attr({
                 "id": "codeDetails" + jPlagResultsKey,
                 "style": "display: none",
             }));
 
-            suspectFilesKeys.map(suspectFilesKey => { 
+            suspectFilesKeys.forEach(suspectFilesKey => {
                 const filePath = suspectFilesKey.substring(suspectFilesKey.indexOf("folder") + 8);
                 const fileLink = jPlagResults[jPlagResultsKey][suspectFilesKey][1];
                 //console.log(fileLink)
@@ -309,9 +292,10 @@ $(document).ready(function (){
                 linkToJPlagResult.setAttribute("target", "_blank");
                 linkToJPlagResult.innerHTML = filePath;
                 linkToJPlagResult.appendChild(document.createElement("br"));
-        
+
                 document.getElementById("codeDetails" + jPlagResultsKey).appendChild(linkToJPlagResult);
             });
         }
+
     })
 });

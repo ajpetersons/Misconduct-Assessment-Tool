@@ -4,7 +4,9 @@
 }
 
 .btn-custom-size {
-    width: 100px;
+    width: 140px;
+    min-width: 140px;
+    max-width: 140px;
 }
 
 p, ul {
@@ -30,3 +32,30 @@ p, ul {
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
 
 .material-icons.md-primary { color: rgba(0, 116, 217, 0.705); }
+
+.material-icons, .icon-text {
+    vertical-align: text-bottom;
+}
+
+.material-multiline {
+    font-size: 26px;
+    vertical-align: -75%;
+}
+
+body {
+    height: 100vh;
+    overflow-x: hidden;
+    padding-top: 65px;
+}
+
+/* set the sidebar width */
+.w-sidebar {
+    width: 200px;
+    max-width: 200px;
+    z-index: 1050;
+}
+
+/* pad the contents from the sidebar */
+.contents {
+    padding-left: 220px;
+}

@@ -16,10 +16,10 @@
     <!-- Beautify code snippets, source: https://github.com/google/code-prettify -->
     <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?lang=css&amp;"></script>
     <style>
-    li.L0, li.L1, li.L2, li.L3,
-    li.L5, li.L6, li.L7, li.L8 {
-      list-style-type: decimal !important;
-    }
+        li.L0, li.L1, li.L2, li.L3,
+        li.L5, li.L6, li.L7, li.L8 {
+            list-style-type: decimal !important;
+        }
     </style>
 
     <script>
@@ -45,26 +45,62 @@
 {% endblock %}
 
 {% block sideButton %}
-    <div class="offset-md-3">
+    <div class="col-md-3">
         <a href="#">
-            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size disabled">Next</button>
+            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size disabled">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="material-icons">navigate_next</i>
+                    </div>
+                    <div class="col-8">
+                        Next
+                    </div>
+                </div>
+
+            </button>
         </a>
-        <br><br>
+        <br>
         <a href="\select\">
-            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">Back</button>
+            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">
+                <div class="row">
+                    <div class="col-2">
+                        <i class="material-icons">navigate_before</i>
+                    </div>
+                    <div class="col-8">
+                        Back
+                    </div>
+                </div>
+            </button>
         </a>
-        <br><br>
+        <br>
         <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal"
-                data-target="#cancelButton">Cancel
+                data-target="#cancelButton">
+            <div class="row">
+                <div class="col-2">
+                    <i class="material-icons">cancel</i>
+                </div>
+                <div class="col-8">
+                    Cancel
+                </div>
+            </div>
         </button>
         <br>
     </div>
-
     <hr>
-    <button id="generateReport" type="button" class="btn btn-outline-primary btn-lg btn-block" data-toggle="modal"
-            data-target="#reportModal">
-        <i class="material-icons">assignment</i> Report
-    </button>
+    <div class="col-md-3">
+        <button id="generateReport" type="button" class="btn btn-outline-primary btn-lg btn-custom-size"
+                data-toggle="modal"
+                data-target="#reportModal">
+            <div class="row">
+                <div class="col-2">
+                    <i class="material-icons">assignment</i>
+                </div>
+                <div class="col-8">
+                    Report
+                </div>
+            </div>
+        </button>
+    </div>
 
     <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel"
          aria-hidden="true">
@@ -109,16 +145,18 @@
                         <label class="col-form-label font-weight-bold">Segments</label>
                         <div class="form-group">
                             <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="radio" name="segmentRadios" id="segmentsRadio1" value="brief" checked>
-                              <label class="form-check-label" for="segmentsRadio1">
-                                Brief
-                              </label>
+                                <input class="form-check-input" type="radio" name="segmentRadios" id="segmentsRadio1"
+                                       value="brief" checked>
+                                <label class="form-check-label" for="segmentsRadio1">
+                                    Brief
+                                </label>
                             </div>
                             <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="radio" name="segmentRadios" id="segmentsRadio2" value="detailed">
-                              <label class="form-check-label" for="segmentsRadio2">
-                                Detailed
-                              </label>
+                                <input class="form-check-input" type="radio" name="segmentRadios" id="segmentsRadio2"
+                                       value="detailed">
+                                <label class="form-check-label" for="segmentsRadio2">
+                                    Detailed
+                                </label>
                             </div>
                         </div>
                         <hr>
@@ -140,24 +178,5 @@
 {% endblock %}
 
 {% block content %}
-
-    <div class="container-fluid">
-        <div class="row flex-xl-nowrap">
-            <!-- Left side segments showing area-->
-            <div class="col-12 col-md-6 col-lg-6">
-                <div class="card border-secondary" style="width: 48rem;" id="segmentDisplayBox">
-                </div>
-            </div>
-
-            <!-- Right side details showing area-->
-            <div class="col-12 col-md-6 col-lg-6">
-                <div class="card border-secondary" style="width: 48rem;" id="segmentDetailsDisplayBox">
-                    <div class="card-body text-secondary text-center">
-                        <h5 class="card-title">Select one segment to examine details</h5>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
+    <div class="container-fluid" id="segmentsContainer"></div>
 {% endblock %}
