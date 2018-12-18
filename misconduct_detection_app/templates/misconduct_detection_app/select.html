@@ -9,6 +9,14 @@
         const selectedSegments = JSON.parse("{{ segmentJsonString|escapejs }}");
     </script>
     <script src="{% static 'js/select.js' %}" defer></script>
+    <!-- Beautify code snippets, source: https://github.com/google/code-prettify -->
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?lang=css&amp;"></script>
+    <style>
+        li.L0, li.L1, li.L2, li.L3,
+        li.L5, li.L6, li.L7, li.L8 {
+            list-style-type: decimal !important;
+        }
+    </style>
 {% endblock %}
 
 {% block sideButton %}
@@ -70,7 +78,7 @@
                 <!-- Left side code showing area-->
                 <div class="card border-secondary" style="width: 48rem;">
                     <div class="card-body text-secondary" id="codeDisplayText">
-                        <h5 class="card-title">#Code Here</h5>
+                        <h5 class="card-title"><!-- #Code Here --></h5>
                     </div>
                 </div>
             </div>
@@ -86,7 +94,7 @@
 
             <div class="input-group col-12 col-md-6 col-lg-6">
                 <!-- Right side segments showing area-->
-                <div class="card border-secondary" style="width: 48rem;" id="segmentDisplayBox">
+                <div class="card border-secondary col-12" id="segmentDisplayBox">
                     <div class="card-body text-secondary text-center">
                         <h5 class="card-title">You have not added any code segment yet.</h5>
                     </div>
