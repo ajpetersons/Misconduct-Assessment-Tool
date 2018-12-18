@@ -113,10 +113,6 @@
         </div>
     </nav>
 
-    <!--The bottom navbar-->
-    <nav class="navbar navbar-light bg-light fixed-bottom border-top" id="bottomBar">
-    </nav>
-
     <!--The programming language choosing panel-->
     <div class="modal fade" id="programmingLanguageChoosingModal" tabindex="-1" role="dialog" aria-labelledby="programmingLanguageChoosingModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -192,6 +188,13 @@
             </div>
         </nav>
     </div>
+
+    <!--The bottom navbar-->
+    <!-- hide in small screens -->
+    <footer class="footer d-sm-none d-md-block">
+        <nav class="navbar navbar-light bg-light fixed-bottom border-top" id="bottomBar">
+        </nav>
+    </footer>
 
     <form method="post" id="cancelButtonFrom">
         {% csrf_token %}
