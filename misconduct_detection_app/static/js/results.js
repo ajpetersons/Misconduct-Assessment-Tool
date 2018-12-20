@@ -195,7 +195,9 @@ $("#report-form").submit(function (e) {
         print_text(`Individual probability:               ${individual_probabilities[segmentName]}`);
         change_font_size(subsection_size-1);
         let suspectFilesKeys = Object.keys(jPlagResults[segmentName]).filter(key => jPlagResults[segmentName].hasOwnProperty(key) === true);
-        print_text(`Number of similar submissions:   ${suspectFilesKeys.length-1}`);
+        let similarSubmissionNumber = suspectFilesKeys.length - 1;
+        //if(similarSubmissionNumber<0) similarSubmissionNumber = 0;
+        print_text(`Number of similar submissions:   ${similarSubmissionNumber}`);
         y += 1;
         change_font_size(text_size);
         if(detailed) {
@@ -247,7 +249,8 @@ $(document).ready(function (){
             "</div>" +
             "</div>" +
             "</div>" +
-            "</row>";
+            "</row>" +
+            "<br/>";
         $("#segmentsContainer").append(segmentStructure);
 
         // Add the segment code
