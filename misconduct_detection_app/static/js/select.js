@@ -8,8 +8,8 @@ function redrawAccordingToBottomBar() {
         firstCall = false;
         
         let selectedSegmentsKeys = Object.keys(selectedSegments).filter(key => selectedSegments.hasOwnProperty(key) === true);
-        selectedSegmentsKeys.map(selectedSegmentsKey => {
-            segmentNumber = selectedSegmentsKey.substring(8);
+        selectedSegmentsKeys.forEach(selectedSegmentsKey => {
+            segmentNumber = selectedSegmentsKey.substring("Segment_".length);
             drawOneSegment(selectedSegments[selectedSegmentsKey], selectedSegmentsKey.substring(8));
         });
     }
@@ -41,8 +41,15 @@ function drawOneSegment(selectText, segmentNumber) {
         "form": "selectCode_Form",
         "readonly": "readonly",
         "name": "Segment_" + segmentNumber,
-    }).text(selectText)
-
+    }).text(selectText);
+    /* TODO: Experimental change with lines
+    let codeSegment = $("<pre></pre>").attr({
+        "class": "prettyprint linenums lang-c lang-cpp lang-java",
+        "id": "inputText" + segmentNumber,
+        "style": "white-space:pre-wrap",
+        "name": "Segment_" + segmentNumber
+    }).text(selectText);
+    */
     // Create header
     // Header link
     let codeSegmentHeaderLink = $("<a></a>").attr({
@@ -156,12 +163,35 @@ function sendCurrentSegmentsAndSelection() {
     });
 }
 
-function highLightOriginalText(selectedTextRange, segmentNumber) {
-    let highLighted = document.createElement("a");
-    highLighted.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
-    highLighted.setAttribute("href", "#highLightedSegmentHeader" + segmentNumber);
-    highLighted.setAttribute("id", "highLightedSegment" + (segmentNumber + 1));
-    selectedTextRange.surroundContents(highLighted);
+function getHighlightColour(segmentNumber) {
+    return highLighterColors[segmentNumber % highLighterColors.length];
+}
+
+function highlightNode(node, colour) {
+    node.find("span").css("color", "black");
+    node.find("span").css("background", colour);
+}
+
+function removeHighlight(masterNode) {
+    masterNode.find("span").css("color", "");
+    masterNode.find("span").css("background", "");
+}
+
+function highLightOriginalText(selectedTextRange, startNode, endNode, segmentNumber) {
+    // Set the link
+    let highlightLink = document.createElement("a");
+    //highlightLink.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
+    highlightLink.setAttribute("href", "#highLightedSegmentHeader" + segmentNumber);
+    highlightLink.setAttribute("id", "highLightedSegment" + (segmentNumber + 1));
+    selectedTextRange.surroundContents(highlightLink);
+    // Highlight the lines
+    let currentNode = $(startNode);
+    endNode = $(endNode);
+    while (currentNode[0] !== endNode[0]) {
+        highlightNode(currentNode, getHighlightColour(segmentNumber));
+        currentNode = currentNode.next();
+    }
+    highlightNode(endNode, getHighlightColour(segmentNumber));
 }
 
 function getAutoDetectionResults() {
@@ -204,6 +234,14 @@ function getAutoDetectionResults() {
     });
 }
 
+function setCodeText(code) {
+    $("#codeDisplayText").empty()
+        .append("<pre id='codeDisplayTextPre' class='prettyprint linenums lang-c lang-cpp lang-java' style='white-space:pre-wrap'>" +
+            code +
+            "</pre>");
+    PR.prettyPrint();
+}
+
 function setCodeDisplayText() {
     $.ajax({
         url: '/select/loadHtml/',
@@ -211,10 +249,13 @@ function setCodeDisplayText() {
         dataType: "json",
         success: function (loadedHtml) {
             if (loadedHtml === "FILE_NOT_FOUND") {
-                $("#codeDisplayText").empty().append("<code><pre id='codeDisplayTextPre' style='white-space:pre-wrap'></pre></code>");
-                $("#codeDisplayTextPre").text(codeToCompare);
+                $("#codeDisplayText").empty()
+                    .append("<pre id='codeDisplayTextPre' class='prettyprint linenums lang-c lang-cpp lang-java' style='white-space:pre-wrap'>" +
+                        codeToCompare +
+                        "</pre>");
+                setCodeText(codeToCompare);
             } else {
-                console.log(loadedHtml);
+                //console.log(loadedHtml);
                 $("#codeDisplayText").empty();
                 $("#codeDisplayText").html(loadedHtml);
             }
@@ -228,6 +269,22 @@ $("#nextButton").click(function(evt) {
     sendCurrentSegmentsAndSelection();
     getAutoDetectionResults();
 });
+
+// Find the selected range of lines from the prettified code
+function findSelectedRange(selectedText) {
+    let startNode = $(selectedText.anchorNode).closest("li")[0];
+    let endNode = $(selectedText.focusNode).closest("li")[0];
+    let range = document.createRange();
+    range.setStartBefore(startNode);
+    range.setEndAfter(endNode);
+    selectedText.setBaseAndExtent(startNode, 0, endNode, endNode.childElementCount);
+    return [range, startNode, endNode, selectedText];
+}
+
+function getSelectionRange() {
+    let selectTextSelection = window.getSelection();
+    return findSelectedRange(selectTextSelection);
+}
 
 $("#addSegmentButton").click(function() {
     // Remove the reminder
@@ -247,18 +304,22 @@ $("#addSegmentButton").click(function() {
     }
 
     // Get the selected segment and add it
-    let selectText = window.getSelection(); 
-    let selectedTextRange = window.getSelection().getRangeAt(0);
-    if(selectText != "") {
+    let selectionRange = getSelectionRange();
+    let selectedTextRange = selectionRange[0];
+    let startNode = selectionRange[1];
+    let endNode = selectionRange[2];
+    let selection = selectionRange[3];
+    let selectedText = selection.toString();
+    if (selectedText !== "") {
         segmentNumber = parseInt(segmentNumber);
         if (i === segmentNumber) {
-            highLightOriginalText(selectedTextRange, segmentNumber);
+            highLightOriginalText(selectedTextRange, startNode, endNode, segmentNumber);
             segmentNumber++;
-            drawOneSegment(selectText, segmentNumber);
+            drawOneSegment(selectedText, segmentNumber);
         } else {
-            highLightOriginalText(selectedTextRange, i);
+            highLightOriginalText(selectedTextRange, startNode, endNode, i);
             i++;
-            drawOneSegment(selectText, i);
+            drawOneSegment(selectedText, i);
         }
 
     }
@@ -278,23 +339,30 @@ $("#saveSegmentButton").click(function(evt) {
 });
 
 $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
-    let currentSegmentNumber = evt.currentTarget.id.substring(evt.currentTarget.id.length - 1);
+    let currentSegmentNumber = evt.currentTarget.id.substring("appendHeaderButton".length);
+    let selectionRange = getSelectionRange();
+    let selectedTextRange = selectionRange[0];
+    let startNode = selectionRange[1];
+    let endNode = selectionRange[2];
+    let selection = selectionRange[3];
+    let selectedText = selection.toString();
+    if (selectedText !== "") {
+        highLightOriginalText(selectedTextRange, startNode, endNode, currentSegmentNumber - 1);
 
-    let selectText = window.getSelection(); 
-    let selectedTextRange = window.getSelection().getRangeAt(0);
-    if(selectText != "") {
-        highLightOriginalText(selectedTextRange, currentSegmentNumber - 1);
+        let $inputText = $("#inputText" + currentSegmentNumber);
+        let originalText = $inputText.text();
+        $inputText.text(originalText
+            //+ "\n\n====== ADDITION ======\n\n"
+            + "\n\n\n" + selectedText);
     }
-    let originalText = $("#inputText" + currentSegmentNumber).text()
-    $("#inputText" + currentSegmentNumber).text(originalText
-                                                + "\n\n========================New Part========================\n\n" 
-                                                + selectText);
+
 });
 
 $("#segmentDisplayBox").on("click", ".delete-header-button", function (evt){
-    let currentSegmentNumber = evt.currentTarget.id.substring(evt.currentTarget.id.length - 1);
+    let currentSegmentNumber = evt.currentTarget.id.substring("deleteHeaderButton".length);
     $("#highLightedSegmentBody" + currentSegmentNumber).remove();
     $("#highLightedSegmentHeader" + currentSegmentNumber).remove();
+    removeHighlight($("#highLightedSegment" + currentSegmentNumber));
     document.getElementById("highLightedSegment" + currentSegmentNumber).outerHTML = document.getElementById("highLightedSegment" + currentSegmentNumber).innerHTML
 });
 
@@ -305,4 +373,7 @@ $(document).ready(function () {
 
     // Display selected segments if there is any
     redrawAccordingToBottomBar();
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
 });
