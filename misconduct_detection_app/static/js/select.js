@@ -2,6 +2,40 @@
 let segmentNumber = 0;
 let firstCall = true; // print hint on selection box
 
+let horizontalSpace = "&nbsp;";
+let verticalSpace = "<br/>";
+
+/**
+ * Used for lightening a color
+ * @param color (HEX)
+ * @param percent
+ * @returns light colour
+ */
+function shadeColor(color, percent) {
+
+    var R = parseInt(color.substring(1, 3), 16);
+    var G = parseInt(color.substring(3, 5), 16);
+    var B = parseInt(color.substring(5, 7), 16);
+
+    R = parseInt(R * (100 + percent) / 100);
+    G = parseInt(G * (100 + percent) / 100);
+    B = parseInt(B * (100 + percent) / 100);
+
+    R = (R < 255) ? R : 255;
+    G = (G < 255) ? G : 255;
+    B = (B < 255) ? B : 255;
+
+    var RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16));
+    var GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16));
+    var BB = ((B.toString(16).length === 1) ? "0" + B.toString(16) : B.toString(16));
+
+    return "#" + RR + GG + BB;
+}
+
+function getHighlightColour(segmentNumber) {
+    return highLighterColors[segmentNumber % highLighterColors.length];
+}
+
 function redrawAccordingToBottomBar() {
     if (segmentsPathList != "NOFOLDEREXISTS") {
         $("#segmentDisplayBox").empty();
@@ -10,7 +44,7 @@ function redrawAccordingToBottomBar() {
         let selectedSegmentsKeys = Object.keys(selectedSegments).filter(key => selectedSegments.hasOwnProperty(key) === true);
         selectedSegmentsKeys.forEach(selectedSegmentsKey => {
             segmentNumber = selectedSegmentsKey.substring("Segment_".length);
-            drawOneSegment(selectedSegments[selectedSegmentsKey], selectedSegmentsKey.substring(8));
+            drawOneSegment(selectedSegments[selectedSegmentsKey], segmentNumber);
         });
     }
 }
@@ -54,18 +88,19 @@ function drawOneSegment(selectText, segmentNumber) {
     // Header link
     let codeSegmentHeaderLink = $("<a></a>").attr({
         "href": "#highLightedSegment" + segmentNumber,
+        "class": "h3"
     }).text("Segment " + segmentNumber);
     // Buttons
     let appendHeaderButton = $("<button></button>").attr({
-        "class": "btn btn-outline-secondary btn-sm append-header-button",
+        "class": "btn btn-light border border-dark btn-sm append-header-button",
         "id": "appendHeaderButton" + segmentNumber,
     }).append("<i class='material-icons'>add</i>");
     let deleteHeaderButton = $("<button></button>").attr({
-        "class": "btn btn-outline-secondary btn-sm delete-header-button",
+        "class": "btn btn-light border border-dark btn-sm delete-header-button",
         "id": "deleteHeaderButton" + segmentNumber,
     }).append("<i class='material-icons'>clear</i>");
-    let includeHeaderCheckbox = $("<label>Include:</label>").attr({
-        "class": "btn btn-outline-secondary btn-sm include-header-button",
+    let includeHeaderCheckbox = $("<label>Include: </label>").attr({
+        "class": "btn btn-light border border-dark btn-sm include-header-button",
         "style": "width: 100px;height: 39px;font-size: 18px;margin-top: 5%;",
         "id": "includeHeaderButton" + segmentNumber,
     }).append($("<input>").attr({
@@ -76,25 +111,43 @@ function drawOneSegment(selectText, segmentNumber) {
         "required": "required",
         "checked": "checked",
     }));
+
     // Header button group
     let codeSegmentHeaderButtons = $("<div></div>").attr({
         "id": "highLightedSegmentHeaderButtons" + segmentNumber,
         "class": "highLightedSegmentHeaderButtons",
         "style": "float: right;display: inline;margin-top: -2%;",
-    }).append(appendHeaderButton, deleteHeaderButton, includeHeaderCheckbox);
+    }).append(appendHeaderButton, horizontalSpace,
+        deleteHeaderButton, horizontalSpace,
+        includeHeaderCheckbox);
+
     // Header text
     let codeSegmentHeader = $("<div></div>").attr({
         "class": 'card-header',
-        "style": 'background: ' + highLighterColors[(segmentNumber - 1) % highLighterColors.length],
+        "style": 'background: ' + getHighlightColour(segmentNumber),
         "id": "highLightedSegmentHeader" + segmentNumber,
     }).append(codeSegmentHeaderLink, codeSegmentHeaderButtons);
-            
-    // Wrapper
+
+    // Card body (segment code)
     let codeSegmentDiv = $("<div></div>").attr({
         "class": "card-body text-secondary",
+        "style": 'background: ' + shadeColor(getHighlightColour(segmentNumber), 20),
         "id": "highLightedSegmentBody" + segmentNumber,
     }).append(codeSegment);
-    $("#segmentDisplayBox").append(codeSegmentHeader, codeSegmentDiv);
+
+    // Card border
+    let segmentBorder = $("<div></div>").attr({
+        "class": 'card border-secondary',
+        "style": 'background: ' + getHighlightColour(segmentNumber),
+        "id": "highLightedSegmentBorder" + segmentNumber,
+    }).append(codeSegmentHeader, codeSegmentDiv);
+
+    // Card row
+    let segmentRow = $("<row></row>").attr({
+        "id": "rowSegment" + segmentNumber,
+    }).append(segmentBorder);
+
+    $("#segmentDisplayBox").append(segmentRow, verticalSpace);
     /*
     Here since our DOMs are created dynamically, the event handlers are slightly different
     from normal ones. You can find them below. 
@@ -163,10 +216,6 @@ function sendCurrentSegmentsAndSelection() {
     });
 }
 
-function getHighlightColour(segmentNumber) {
-    return highLighterColors[segmentNumber % highLighterColors.length];
-}
-
 function highlightNode(node, colour) {
     node.find("span").css("color", "black");
     node.find("span").css("background", colour);
@@ -182,7 +231,7 @@ function highLightOriginalText(selectedTextRange, startNode, endNode, segmentNum
     let highlightLink = document.createElement("a");
     //highlightLink.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
     highlightLink.setAttribute("href", "#highLightedSegmentHeader" + segmentNumber);
-    highlightLink.setAttribute("id", "highLightedSegment" + (segmentNumber + 1));
+    highlightLink.setAttribute("id", "highLightedSegment" + segmentNumber);
     selectedTextRange.surroundContents(highlightLink);
     // Highlight the lines
     let currentNode = $(startNode);
@@ -293,16 +342,18 @@ $("#addSegmentButton").click(function() {
         firstCall = false;
     }
 
+    segmentNumber++;
+    /*
     // Find appropriate segment number
     let i = 0;
     for (i; i < segmentNumber; i++) {
-        let highLightedPart = document.getElementById("highLightedSegment" + (i + 1));
+        let highLightedPart = document.getElementById("highLightedSegment" + i);
         if (highLightedPart) {
         } else {
             break;
         }
     }
-
+    */
     // Get the selected segment and add it
     let selectionRange = getSelectionRange();
     let selectedTextRange = selectionRange[0];
@@ -312,28 +363,21 @@ $("#addSegmentButton").click(function() {
     let selectedText = selection.toString();
     if (selectedText !== "") {
         segmentNumber = parseInt(segmentNumber);
-        if (i === segmentNumber) {
-            highLightOriginalText(selectedTextRange, startNode, endNode, segmentNumber);
-            segmentNumber++;
-            drawOneSegment(selectedText, segmentNumber);
-        } else {
-            highLightOriginalText(selectedTextRange, startNode, endNode, i);
-            i++;
-            drawOneSegment(selectedText, i);
-        }
-
+        highLightOriginalText(selectedTextRange, startNode, endNode, segmentNumber);
+        drawOneSegment(selectedText, segmentNumber);
     }
 });
 
 $("#saveSegmentButton").click(function(evt) {
+    let before = $("#saveSegmentButton").clone();
     $("#saveSegmentButton").empty();
-    $("#saveSegmentButton").append("<i class='fa fa-spinner fa-spin' style='font-size: 24px;'></i>");
-    
+    $("#saveSegmentButton").append("<br\><i class='fa fa-spinner fa-spin' style='font-size: 4vh;'></i><br><br>");
+
     sendCurrentSegmentsAndSelection();
 
     $(document).ajaxStop(function() {
         $("#saveSegmentButton").empty();
-        $("#saveSegmentButton").append("<i class='material-icons'>save</i>");
+        $("#saveSegmentButton").replaceWith(before);
         redrawBottomBar();
     });
 });
@@ -347,7 +391,7 @@ $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
     let selection = selectionRange[3];
     let selectedText = selection.toString();
     if (selectedText !== "") {
-        highLightOriginalText(selectedTextRange, startNode, endNode, currentSegmentNumber - 1);
+        highLightOriginalText(selectedTextRange, startNode, endNode, currentSegmentNumber);
 
         let $inputText = $("#inputText" + currentSegmentNumber);
         let originalText = $inputText.text();
@@ -360,8 +404,7 @@ $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
 
 $("#segmentDisplayBox").on("click", ".delete-header-button", function (evt){
     let currentSegmentNumber = evt.currentTarget.id.substring("deleteHeaderButton".length);
-    $("#highLightedSegmentBody" + currentSegmentNumber).remove();
-    $("#highLightedSegmentHeader" + currentSegmentNumber).remove();
+    $("#rowSegment" + currentSegmentNumber).remove();
     removeHighlight($("#highLightedSegment" + currentSegmentNumber));
     document.getElementById("highLightedSegment" + currentSegmentNumber).outerHTML = document.getElementById("highLightedSegment" + currentSegmentNumber).innerHTML
 });

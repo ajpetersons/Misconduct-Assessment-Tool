@@ -17,6 +17,9 @@ input[type="text"] {
     font-size: 26px;
 }
 
+#middleButtons > button > .material-icons {
+    font-size: 4vh;
+}
 #middleButtons{
     margin-left: -1%;
     margin-right: -1%;
