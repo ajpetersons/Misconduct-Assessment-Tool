@@ -21,7 +21,7 @@ function modifyDOMAfterUploadingFolder() {
 function uploadFile() {
     modifyDOMAfterUploadingFile();
     let singleFile = new FormData($('#uploadFileForm')[0]);
-    $("#uploadFileCheck").append("<i class='fa fa-spinner fa-spin'></i>Please wait while uploading...");
+    $("#uploadFileCheck").append("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
     
     $.ajax({
         url: "uploadFile/",
@@ -41,7 +41,7 @@ function uploadFile() {
 
     $(document).ajaxStop(function() {
         $("#uploadFileCheck").empty();
-        $("#uploadFileCheck").append("<i class='material-icons'>check</i>Selected file uploaded.");
+        $("#uploadFileCheck").append("<i class='material-icons'>check</i> Selected file uploaded.");
 
     });
 }
@@ -49,7 +49,7 @@ function uploadFile() {
 function uploadFolder() {
     modifyDOMAfterUploadingFolder();
     let folderFile = new FormData($('#uploadFolderForm')[0]);
-    $("#uploadFolderCheck").append("<i class='fa fa-spinner fa-spin'></i>Please wait while uploading...");
+    $("#uploadFolderCheck").append("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
 
     $.ajax({
         url: "uploadFolder/",
@@ -92,13 +92,13 @@ $(document).ready(function () {
     if (fileToComparePathList != "NOFOLDEREXISTS") {
         modifyDOMAfterUploadingFile();
         $("#uploadFileCheck").empty();
-        $("#uploadFileCheck").append("<i class='material-icons'>check</i>File uploaded.");
+        $("#uploadFileCheck").append("<i class='material-icons'>check</i> File uploaded.");
     }
 
     if (folderPathList[0] != "NOFOLDEREXISTS") {
         modifyDOMAfterUploadingFolder();
         $("#uploadFolderCheck").empty();
-        $("#uploadFolderCheck").append("<i class='material-icons'>check</i>Folder uploaded.");
+        $("#uploadFolderCheck").append("<i class='material-icons'>check</i> Folder uploaded.");
     }
     openNextButton();
     console.log('document.ready()')
