@@ -242,9 +242,9 @@ $(document).ready(function (){
             `<div class='card-header'><h2>${segmentName.replace("_", " ")}</h2></div>` +
             "<div class='card-body text-secondary'>" +
             "<div class='row'>" +
-            `<div class='col-12 col-xl-6' id='${segmentName}Code'></div>` +
-            `<div class='col-12 col-xl-6' id='${segmentName}Details'></div>` +
-            "</div> " +
+            `<div class='col-12 col-xl-8' id='${segmentName}Code'></div>` +
+            `<div class='col-12 col-xl-4' id='${segmentName}Details'></div>` +
+            "</div>" +
             "</div>" +
             "</div>" +
             "</row>";
@@ -252,12 +252,11 @@ $(document).ready(function (){
 
         // Add the segment code
         let segmentCodeStructure = "<p class='card-text'>" +
-            "<pre class='prettyprint linenums lang-c lang-cpp lang-java'>" +
+            "<pre class='prettyprint linenums lang-c lang-cpp lang-java' style='white-space:pre-wrap'>" +
             segmentFiles[segmentFilesKey] +
             "</pre>" +
             "</p>";
         $(`#${segmentName}Code`).append(segmentCodeStructure);
-
 
         // Add the segment details
         let $segmentDetails = $(`#${segmentName}Details`);
@@ -302,4 +301,5 @@ $(document).ready(function (){
         }
 
     })
+    PR.prettyPrint();
 });
