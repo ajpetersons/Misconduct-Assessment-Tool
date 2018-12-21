@@ -235,8 +235,21 @@ $(document).ready(function (){
 
     let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
 
-    segmentFilesKeys.forEach(segmentFilesKey => {
+    let maxSegment = 0;
+    let file_end = "";
+    segmentFilesKeys.forEach(segmentKey => {
+        let currentSegment = segmentKey.substring("Segment_".length).split('.')[0];
+        let currentNumber = parseInt(currentSegment);
+        if (maxSegment < currentNumber) maxSegment = currentNumber;
+        file_end = segmentKey.split('.')[1];
+    });
 
+    let i;
+    for (i = 1; i <= maxSegment; i++) {
+        let segmentFilesKey = "Segment_" + i + "." + file_end;
+        if (!(segmentFilesKey in segmentFiles)) {
+            continue;
+        }
         let segmentName = segmentFilesKey.split('.')[0];
 
         let segmentStructure = `<row id='row${segmentName}'>` +
@@ -303,6 +316,6 @@ $(document).ready(function (){
             });
         }
 
-    })
+    }
     PR.prettyPrint();
 });
