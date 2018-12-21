@@ -185,9 +185,9 @@ def auto_detect_programming_language(request):
 
     # Return results based on previous settings and local file
     uploaded_file_name = get_file_to_compare_path(request)
+    print(uploaded_file_name)
     extension_name = os.listdir(uploaded_file_name)[0]
-    extension_name = extension_name[extension_name.find(".") + 1:]
-
+    extension_name = extension_name[extension_name.rfind(".") + 1:]
     try:
         return selection_dict[extension_name]
     except KeyError:
