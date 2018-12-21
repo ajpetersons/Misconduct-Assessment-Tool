@@ -1,5 +1,5 @@
 // Local sharing variables defined here
-let segmentNumber = 0;
+let maxSegmentNumber = 0;
 let firstCall = true; // print hint on selection box
 
 let horizontalSpace = "&nbsp;";
@@ -32,6 +32,31 @@ function shadeColor(color, percent) {
     return "#" + RR + GG + BB;
 }
 
+/**
+ * Check whether an object is empty
+ * @param obj
+ * @returns {boolean}
+ */
+function areSegmentsEmpty() {
+    let i;
+    for (i = 1; i <= maxSegmentNumber; i++) {
+        if ($("#rowSegment" + i).length)
+            return false;
+    }
+    return true;
+}
+
+/**
+ * Disables next button if there are no segments
+ */
+function updateNextButtonStatus() {
+    if (areSegmentsEmpty()) {
+        $("#nextButton").addClass("disabled")
+    } else {
+        $("#nextButton").removeClass("disabled")
+    }
+}
+
 function getHighlightColour(segmentNumber) {
     return highLighterColors[segmentNumber % highLighterColors.length];
 }
@@ -42,16 +67,30 @@ function redrawAccordingToBottomBar() {
         firstCall = false;
         
         let selectedSegmentsKeys = Object.keys(selectedSegments).filter(key => selectedSegments.hasOwnProperty(key) === true);
+
+        // Find max so that the segments are going to be printed sorted
+        let maxSegment = 0;
         selectedSegmentsKeys.forEach(selectedSegmentsKey => {
-            segmentNumber = selectedSegmentsKey.substring("Segment_".length);
-            drawOneSegment(selectedSegments[selectedSegmentsKey], segmentNumber);
+            let currentSegment = selectedSegmentsKey.substring("Segment_".length);
+            let currentNumber = parseInt(currentSegment);
+            if (maxSegment < currentNumber) maxSegment = currentNumber;
         });
+
+        let i;
+        for (i = 1; i <= maxSegment; i++) {
+            let selectedSegmentsKey = "Segment_" + i;
+            if (selectedSegmentsKey in selectedSegments) {
+                drawOneSegment(selectedSegments[selectedSegmentsKey], i);
+            }
+        }
+        maxSegmentNumber = maxSegment;
+        updateNextButtonStatus();
     }
 }
 
 function redrawBottomBar() {
     $("#segmentsPathList").empty();
-    if (segmentNumber === 0) {
+    if (areSegmentsEmpty()) {
         $("#segmentsPathList").append($("<div></div>").attr({
             "class": "btn btn-outline-secondary disabled",
             "role": "button",
@@ -79,9 +118,9 @@ function drawOneSegment(selectText, segmentNumber) {
     /* TODO: Experimental change with lines
     let codeSegment = $("<pre></pre>").attr({
         "class": "prettyprint linenums lang-c lang-cpp lang-java",
-        "id": "inputText" + segmentNumber,
+        "id": "inputText" + maxSegmentNumber,
         "style": "white-space:pre-wrap",
-        "name": "Segment_" + segmentNumber
+        "name": "Segment_" + maxSegmentNumber
     }).text(selectText);
     */
     // Create header
@@ -174,7 +213,7 @@ function sendCurrentSegmentsAndSelection() {
 
     let checkedBoxesArray = $('input[type="checkbox"]:checked').map(function(){
 		return $(this).val();
-    }).get()
+    }).get();
     let checkedBoxes = new FormData();
     checkedBoxes.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
     checkedBoxes.append("checkedBox", checkedBoxesArray);
@@ -229,7 +268,7 @@ function removeHighlight(masterNode) {
 function highLightOriginalText(selectedTextRange, startNode, endNode, segmentNumber) {
     // Set the link
     let highlightLink = document.createElement("a");
-    //highlightLink.setAttribute("style", "color: black; background: " + highLighterColors[segmentNumber % highLighterColors.length]);
+    //highlightLink.setAttribute("style", "color: black; background: " + highLighterColors[maxSegmentNumber % highLighterColors.length]);
     highlightLink.setAttribute("href", "#highLightedSegmentHeader" + segmentNumber);
     highlightLink.setAttribute("id", "highLightedSegment" + segmentNumber);
     selectedTextRange.surroundContents(highlightLink);
@@ -315,9 +354,20 @@ function setCodeDisplayText() {
 $("#nextButton").click(function(evt) {
     evt.preventDefault();
 
-    sendCurrentSegmentsAndSelection();
-    getAutoDetectionResults();
+    if (!areSegmentsEmpty()) {
+        sendCurrentSegmentsAndSelection();
+        getAutoDetectionResults();
+    }
+
 });
+
+function saveChanges() {
+    // Save segment changes
+    sendCurrentSegmentsAndSelection();
+    $(document).ajaxStop(function () {
+        redrawBottomBar();
+    });
+}
 
 // Find the selected range of lines from the prettified code
 function findSelectedRange(selectedText) {
@@ -335,25 +385,15 @@ function getSelectionRange() {
     return findSelectedRange(selectTextSelection);
 }
 
-$("#addSegmentButton").click(function() {
+function addSelectedSegment() {
     // Remove the reminder
     if (firstCall) {
         $("#segmentDisplayBox").empty();
         firstCall = false;
     }
 
-    segmentNumber++;
-    /*
-    // Find appropriate segment number
-    let i = 0;
-    for (i; i < segmentNumber; i++) {
-        let highLightedPart = document.getElementById("highLightedSegment" + i);
-        if (highLightedPart) {
-        } else {
-            break;
-        }
-    }
-    */
+    maxSegmentNumber++;
+
     // Get the selected segment and add it
     let selectionRange = getSelectionRange();
     let selectedTextRange = selectionRange[0];
@@ -362,12 +402,19 @@ $("#addSegmentButton").click(function() {
     let selection = selectionRange[3];
     let selectedText = selection.toString();
     if (selectedText !== "") {
-        segmentNumber = parseInt(segmentNumber);
-        highLightOriginalText(selectedTextRange, startNode, endNode, segmentNumber);
-        drawOneSegment(selectedText, segmentNumber);
+        maxSegmentNumber = parseInt(maxSegmentNumber);
+        highLightOriginalText(selectedTextRange, startNode, endNode, maxSegmentNumber);
+        drawOneSegment(selectedText, maxSegmentNumber);
     }
-});
 
+    saveChanges();
+    updateNextButtonStatus();
+}
+
+$("#addSegmentButtonBig").click(addSelectedSegment);
+$("#addSegmentButtonSmall").click(addSelectedSegment);
+
+/*
 $("#saveSegmentButton").click(function(evt) {
     let before = $("#saveSegmentButton").clone();
     $("#saveSegmentButton").empty();
@@ -381,6 +428,7 @@ $("#saveSegmentButton").click(function(evt) {
         redrawBottomBar();
     });
 });
+*/
 
 $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
     let currentSegmentNumber = evt.currentTarget.id.substring("appendHeaderButton".length);
@@ -400,13 +448,23 @@ $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
             + "\n\n\n" + selectedText);
     }
 
+    saveChanges();
+
 });
 
 $("#segmentDisplayBox").on("click", ".delete-header-button", function (evt){
     let currentSegmentNumber = evt.currentTarget.id.substring("deleteHeaderButton".length);
-    $("#rowSegment" + currentSegmentNumber).remove();
+    let $row = $("#rowSegment" + currentSegmentNumber);
+    // Remove the line change
+    $row.next("br").remove();
+    // Remove the segment row
+    $row.remove();
     removeHighlight($("#highLightedSegment" + currentSegmentNumber));
-    document.getElementById("highLightedSegment" + currentSegmentNumber).outerHTML = document.getElementById("highLightedSegment" + currentSegmentNumber).innerHTML
+    document.getElementById("highLightedSegment" + currentSegmentNumber).outerHTML =
+        document.getElementById("highLightedSegment" + currentSegmentNumber).innerHTML;
+
+    saveChanges();
+    updateNextButtonStatus();
 });
 
 $(document).ready(function () {

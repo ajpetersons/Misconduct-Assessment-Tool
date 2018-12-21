@@ -89,8 +89,19 @@
             <div class="col-xl-1" id="middleButtons">
                 <br>
                 <br>
-                <button type="button" class="btn btn-light border border-dark btn-block" data-toggle="tooltip"
-                        data-placement="top" title="Add selected segment" id="addSegmentButton">
+                <!-- Big screen = Fixed button -->
+                <button type="button" class="btn btn-light border border-dark d-none d-xl-block position-fixed"
+                        data-toggle="tooltip"
+                        data-placement="top" title="Add selected segment" id="addSegmentButtonBig">
+                    <br>
+                    <i class="material-icons">keyboard_arrow_right</i>
+                    <br>
+                    <br>
+                </button>
+
+                <!--- Small screen = normal button -->
+                <button type="button" class="btn btn-light border border-dark btn-block d-xl-none" data-toggle="tooltip"
+                        data-placement="top" title="Add selected segment" id="addSegmentButtonSmall">
                     <br>
                     <i class="material-icons">keyboard_arrow_right</i>
                     <br>
@@ -100,7 +111,7 @@
                 <br>
                 <br>
 
-                <button type="button" class="btn btn-light border border-dark btn-block" data-toggle="tooltip"
+                <!--button type="button" class="btn btn-light border border-dark btn-block" data-toggle="tooltip"
                         data-placement="top" title="Save segments" id="saveSegmentButton">
                     <br>
                     <i class="material-icons">save</i>
@@ -109,7 +120,7 @@
                 </button>
 
                 <br>
-                <br>
+                <br-->
             </div>
 
             <div class="input-group col-12 col-xl-5">
