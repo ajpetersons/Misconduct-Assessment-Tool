@@ -62,7 +62,7 @@ function getHighlightColour(segmentNumber) {
 }
 
 function redrawAccordingToBottomBar() {
-    if (segmentsPathList != "NOFOLDEREXISTS") {
+    if (segmentsPathList !== "NOFOLDEREXISTS") {
         $("#segmentDisplayBox").empty();
         firstCall = false;
         
@@ -385,6 +385,46 @@ function getSelectionRange() {
     return findSelectedRange(selectTextSelection);
 }
 
+function isAlpha(ch) {
+    return /^[A-Z]$/i.test(ch);
+}
+
+/**
+ * Checks that the selected text is more than 4 lines of code
+ * @param selectedText
+ */
+function checkSelectedText(selectedText) {
+    // Lines that have code in them (don't start with a symbol of comment)
+    let lineCount = 0;
+    // Separate the segment into lines
+    let linesAll = selectedText.split("\n");
+    linesAll.forEach(line => {
+        line = line.trim();
+        if (line && isAlpha(line[0])) {
+            lineCount++;
+        }
+    });
+    return lineCount > 4;
+}
+
+// Popover for small segments (dismiss on next click)
+$('.popover-dismiss').popover({
+    trigger: 'focus'
+});
+
+function displayTooltip() {
+    let $codeDisplay = $("#codeDisplay");
+    $codeDisplay.tooltip('enable');
+    $codeDisplay.tooltip('show');
+    $codeDisplay.tooltip('disable');
+    // Color the border for 5 seconds
+    $codeDisplay.addClass('border border-danger');
+    let timer = setTimeout(function () {
+        // reset border
+        $codeDisplay.removeClass('border border-danger');
+    }, 5000); // time in miliseconds, so 5s = 5000ms
+}
+
 function addSelectedSegment() {
     // Remove the reminder
     if (firstCall) {
@@ -392,23 +432,32 @@ function addSelectedSegment() {
         firstCall = false;
     }
 
-    maxSegmentNumber++;
-
     // Get the selected segment and add it
-    let selectionRange = getSelectionRange();
+    let selectionRange;
+    try {
+        selectionRange = getSelectionRange();
+    } catch (e) {
+        // User didn't select anything
+        displayTooltip();
+        return;
+    }
     let selectedTextRange = selectionRange[0];
     let startNode = selectionRange[1];
     let endNode = selectionRange[2];
     let selection = selectionRange[3];
     let selectedText = selection.toString();
-    if (selectedText !== "") {
+    if (checkSelectedText(selectedText)) {
+        maxSegmentNumber++;
         maxSegmentNumber = parseInt(maxSegmentNumber);
         highLightOriginalText(selectedTextRange, startNode, endNode, maxSegmentNumber);
         drawOneSegment(selectedText, maxSegmentNumber);
+        saveChanges();
+        updateNextButtonStatus();
+    } else {
+        displayTooltip();
     }
 
-    saveChanges();
-    updateNextButtonStatus();
+
 }
 
 $("#addSegmentButtonBig").click(addSelectedSegment);
@@ -476,5 +525,8 @@ $(document).ready(function () {
     redrawAccordingToBottomBar();
     $(function () {
         $('[data-toggle="tooltip"]').tooltip()
-    })
+    });
+    $(function () {
+        $('[data-toggle="popover"]').popover()
+    });
 });

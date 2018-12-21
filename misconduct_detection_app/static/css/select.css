@@ -40,3 +40,7 @@ input[type="text"] {
     width: 6.5vw;
     height: 60%;
 }
+
+#codeDisplay.border {
+    border-width: 2px !important;
+}
