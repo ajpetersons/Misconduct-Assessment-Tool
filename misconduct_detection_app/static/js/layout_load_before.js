@@ -132,14 +132,14 @@ function loadDetectionLib() {
     // Construct the modal dynamically
     let detectionLibListKeys = Object.keys(detectionLibList).filter(key => detectionLibList.hasOwnProperty(key) === true);
 
-    detectionLibListKeys.map(detectionLib =>{
+    detectionLibListKeys.forEach(detectionLib => {
         $("#programmingLanguageChoosingDetectionLibForm").append(
             $("<input>").attr({
                 "type": "radio",
                 "name": "detectionLib",
                 "id": "programmingLanguageChoosingDetectionLibForm" + detectionLib,
             }).val(detectionLib),
-            $("<h7></h7>").text(detectionLib),
+            $("<h7></h7>").text(" " + detectionLib),
             $("<br>"),
         );
 
@@ -154,14 +154,14 @@ function loadDetectionLib() {
             })
         );
 
-        detectionLibSupportedLanguages.map(detectionLibSupportedLanguage =>{
+        detectionLibSupportedLanguages.forEach(detectionLibSupportedLanguage => {
             $("#programmingLanguageChoosingLanguageFormDiv" + detectionLib).append(
                 $("<input>").attr({
                     "type": "radio",
                     "name": detectionLib,
                     "id": "programmingLanguageChoosingDetectionLibLanguageForm" + detectionLibSupportedLanguage,
                 }).val(detectionLibList[detectionLib][detectionLibSupportedLanguage]),
-                $("<h7></h7>").text(detectionLibList[detectionLib][detectionLibSupportedLanguage]),
+                $("<h7></h7>").text(" " + detectionLibList[detectionLib][detectionLibSupportedLanguage]),
                 $("<br>"),
             );
         });

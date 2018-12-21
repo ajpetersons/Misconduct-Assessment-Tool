@@ -9,7 +9,8 @@
 {% block sideButton %}
     <div class="col-md-3">
         <a href="\select\">
-            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" onclick="submitAllFiles()"
+            <button type="button" class="btn btn-light border border-dark btn-lg btn-custom-size"
+                    onclick="submitAllFiles()"
                     title="You have not uploaded any file yet" id="nextButton" disabled>
                 <div class="row">
                     <div class="col-2">
@@ -23,7 +24,7 @@
         </a>
         <br>
         <a href="\">
-            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">
+            <button type="button" class="btn btn-light border border-dark btn-lg btn-custom-size">
                 <div class="row">
                     <div class="col-2">
                         <i class="material-icons">navigate_before</i>
@@ -35,7 +36,7 @@
             </button>
         </a>
         <br>
-        <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal"
+        <button type="button" class="btn btn-light border border-dark btn-lg btn-custom-size" data-toggle="modal"
                 data-target="#cancelButton">
             <div class="row">
                 <div class="col-2">
@@ -48,7 +49,7 @@
         </button>
         <br>
     </div>
-    
+
     <hr>
     <div class="col-md-3">
         <form class="form-inline" role="form" method="post" enctype="multipart/form-data" accept-charset="utf-8"
@@ -91,7 +92,7 @@
                 </div>
             </label>
         </form>
-    <br>
+        <br>
     </div>
 
     <!-- Modal -->
@@ -122,13 +123,15 @@
 
 {% block content %}
     <p id="uploadContent">
-       Upload the file (suspect submission) to be checked and the folder which contains all of the submissions to be compared. <br> <br>
+        Upload the file (suspect submission) to be checked and the folder which contains all of the submissions to be
+        compared. <br> <br>
         When the files are uploaded, click "Next" to continue. <br>
         "Back": return to the previous page while keeping the progress made so far.<br>
         "Cancel": cancel all progress made and return to home page.<br>
     </p>
 
-    <br><hr><br>
+    <br>
+    <hr><br>
 
     <div>
         <h5 id="uploadFileCheck"><i class="material-icons">block</i> You haven't uploaded a file.</h5>
