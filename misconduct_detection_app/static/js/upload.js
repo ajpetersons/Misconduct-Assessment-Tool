@@ -4,6 +4,55 @@ pageName = "Upload";
 let uploadFileFinish = false;
 let uploadFolderFinish = false;
 
+function setFileDetectionPackage() {
+    $.ajax({
+        url: '/select/autoDetect/',
+        type: "GET",
+        dataType: "json",
+        success: function (autoDetectResults) {
+            let autoDetectionLibSelection = autoDetectResults[0];
+            let autoDetectionLanguage = autoDetectResults[1];
+            if (autoDetectResults === "FILE_TYPE_NOT_SUPPORTED") {
+                $("#languageSelectionModal").modal("show");
+                autoDetectionLibSelection = "JPlag";
+                autoDetectionLanguage = "text";
+            }
+
+            let programmingConfigs = new FormData();
+            programmingConfigs.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
+            programmingConfigs.append("detectionLibSelection", autoDetectionLibSelection);
+            programmingConfigs.append("detectionLanguage", autoDetectionLanguage);
+            $.ajax({
+                url: "/configs/savingConfigs/",
+                type: 'POST',
+                cache: false,
+                data: programmingConfigs,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+                beforeSend: function () {
+                    uploading = true;
+                },
+                success: function (data) {
+                    uploading = false;
+                }
+            });
+            let $detectionLibSelection = $("#detectionLibSelection");
+            $detectionLibSelection.empty();
+            $detectionLibSelection.append($("<div></div>").attr({
+                "class": "btn btn-outline-primary",
+                "role": "button",
+            }).text(autoDetectionLibSelection + " : " + autoDetectionLanguage));
+
+        }
+    });
+}
+
+$("#changeDetectionLib").on("click", function () {
+    $("#languageSelectionModal").modal("hide");
+    $("#programmingLanguageChoosingModal").modal("show");
+});
+
 function modifyDOMAfterUploadingFile() {
     uploadFileFinish = true;
     openNextButton();
@@ -22,7 +71,7 @@ function uploadFile() {
     modifyDOMAfterUploadingFile();
     let singleFile = new FormData($('#uploadFileForm')[0]);
     $("#uploadFileCheck").append("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
-    
+
     $.ajax({
         url: "uploadFile/",
         type: 'POST',
@@ -30,19 +79,23 @@ function uploadFile() {
         data: singleFile,
         processData: false,
         contentType: false,
-        dataType:"json",
         beforeSend: function(){
             uploading = true;
         },
-        success : function(data) {
+        success: function (data) {
             uploading = false;
+            setFileDetectionPackage();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.warn("Error sending the file");
+            //alert(xhr.status);
+            //alert(thrownError);
         }
     });
 
     $(document).ajaxStop(function() {
         $("#uploadFileCheck").empty();
         $("#uploadFileCheck").append("<i class='material-icons'>check</i> Selected file uploaded.");
-
     });
 }
 
@@ -81,11 +134,11 @@ function openNextButton() {
 }
 
 $("#uploadFileForm").change(function (){
-    uploadFile(); 
+    uploadFile();
  });
 
 $("#uploadFolderForm").change(function (){
-   uploadFolder(); 
+    uploadFolder();
 });
 
 $(document).ready(function () {
