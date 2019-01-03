@@ -133,15 +133,24 @@ function drawOneSegment(selectText, segmentNumber) {
     let appendHeaderButton = $("<button></button>").attr({
         "class": "btn btn-light border border-dark btn-sm append-header-button",
         "id": "appendHeaderButton" + segmentNumber,
+        "data-toggle": "tooltip",
+        "data-placement": "top",
+        "title": "Append selection",
     }).append("<i class='material-icons'>add</i>");
     let deleteHeaderButton = $("<button></button>").attr({
         "class": "btn btn-light border border-dark btn-sm delete-header-button",
         "id": "deleteHeaderButton" + segmentNumber,
+        "data-toggle": "tooltip",
+        "data-placement": "top",
+        "title": "Delete segment",
     }).append("<i class='material-icons'>clear</i>");
     let includeHeaderCheckbox = $("<label>Include: </label>").attr({
         "class": "btn btn-light border border-dark btn-sm include-header-button",
         "style": "width: 100px;height: 39px;font-size: 18px;margin-top: 5%;",
         "id": "includeHeaderButton" + segmentNumber,
+        "data-toggle": "tooltip",
+        "data-placement": "top",
+        "title": "Include segment in estimation"
     }).append($("<input>").attr({
         "name": "includeHeaderCheckbox" + segmentNumber,
         "id": "includeHeaderCheckbox" + segmentNumber,
@@ -187,10 +196,11 @@ function drawOneSegment(selectText, segmentNumber) {
     }).append(segmentBorder);
 
     $("#segmentDisplayBox").append(segmentRow, verticalSpace);
-    /*
-    Here since our DOMs are created dynamically, the event handlers are slightly different
-    from normal ones. You can find them below. 
-    */
+
+    // Activate the tooltips
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    });
 }
 
 function sendCurrentSegmentsAndSelection() {
@@ -294,17 +304,16 @@ function getAutoDetectionResults() {
                 $("#autoDetectionConfirmationModalBody").empty()
                 $("#autoDetectionConfirmationModalConfirm").addClass("disabled")
                 $("#autoDetectionConfirmationModalBody").append(
-                    "You have not set your detection package and detecting proggramming language! <br> You have to go back and set one. <br>"
+                    "You have not set the detection package and programming language!"
                 )
                 $('#autoDetectionConfirmationModal').modal('show');
             } else if ((detectionLibSelection != autoDetectionLibSelection) || detectionLanguage != autoDetectionLanguage) {
                 $("#autoDetectionConfirmationModalBody").empty()
                 $("#autoDetectionConfirmationModalConfirm").removeClass("disabled")
                 $("#autoDetectionConfirmationModalBody").append(
-                    `Your detection package settings are not optimal. 
-                    Consider go back and modify your settings. <br>
-                    If you insist using current settings, errors might be caused. <br>
-                    Based on your uploaded file, we recommend you to use: <br> <br>`
+                    `The selected programming language used for detection is not the one 
+                    usually associated with the file extension of the uploaded file.
+                    Recommended setting: <br> <br>`
                 )
                 $("#autoDetectionConfirmationModalBody").append($("<div></div>").attr({
                     "style": "text-align: center",
