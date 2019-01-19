@@ -67,6 +67,16 @@ function modifyDOMAfterUploadingFolder() {
     $("#uploadFolderCheck").empty();
 }
 
+function fileUploaded() {
+    $("#uploadFileCheck").empty();
+    $("#uploadFileCheck").append("<i class='material-icons'>check</i> File uploaded.");
+}
+
+function folderUploaded() {
+    $("#uploadFolderCheck").empty();
+    $("#uploadFolderCheck").append("<i class='material-icons'>check</i> Folder uploaded. <i>" + numberOfSubmissions + " submissions</i>");
+}
+
 function uploadFile() {
     modifyDOMAfterUploadingFile();
     let singleFile = new FormData($('#uploadFileForm')[0]);
@@ -94,8 +104,7 @@ function uploadFile() {
     });
 
     $(document).ajaxStop(function() {
-        $("#uploadFileCheck").empty();
-        $("#uploadFileCheck").append("<i class='material-icons'>check</i> Selected file uploaded.");
+        fileUploaded();
     });
 }
 
@@ -117,17 +126,17 @@ function uploadFolder() {
         },
         success : function(data) {
             uploading = false;
+            numberOfSubmissions = data;
         }
     });
 
     $(document).ajaxStop(function() {
-        $("#uploadFolderCheck").empty();
-        $("#uploadFolderCheck").append("<i class='material-icons'>check</i>Selected folder uploaded.");
+        folderUploaded();
     });
 }
 
 function openNextButton() {
-    if (uploadFileFinish == true && uploadFolderFinish == true) {
+    if (uploadFileFinish && uploadFolderFinish) {
         document.getElementById("nextButton").removeAttribute("disabled");
         document.getElementById("nextButton").removeAttribute("title");
     }
@@ -144,14 +153,12 @@ $("#uploadFolderForm").change(function (){
 $(document).ready(function () {
     if (fileToComparePathList != "NOFOLDEREXISTS") {
         modifyDOMAfterUploadingFile();
-        $("#uploadFileCheck").empty();
-        $("#uploadFileCheck").append("<i class='material-icons'>check</i> File uploaded.");
+        fileUploaded();
     }
 
     if (folderPathList[0] != "NOFOLDEREXISTS") {
         modifyDOMAfterUploadingFolder();
-        $("#uploadFolderCheck").empty();
-        $("#uploadFolderCheck").append("<i class='material-icons'>check</i> Folder uploaded.");
+        folderUploaded();
     }
     openNextButton();
     console.log('document.ready()')

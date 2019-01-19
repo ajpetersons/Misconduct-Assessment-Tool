@@ -26,6 +26,18 @@ def index(request):
     return render(request, 'misconduct_detection_app/welcome.html')
 
 
+def number_of_submissions(request):
+    """
+    Helper function to find the number of submissions of an uploaded folder
+    :param request:
+    :return:
+    """
+    number_of_submissions = 0
+    if os.path.exists(get_folder_path(request)):
+        number_of_submissions = len(os.listdir(
+            os.path.join(get_folder_path(request), os.listdir(get_folder_path(request))[0])))
+    return number_of_submissions
+
 def upload_index(request):
     """The upload page
 
@@ -34,7 +46,12 @@ def upload_index(request):
     :return: render
     :rtype: render
     """
-    return render(request, 'misconduct_detection_app/upload.html')
+
+    context = {
+        "numberOfSubmissions": number_of_submissions(request),
+    }
+    return render(request, 'misconduct_detection_app/upload.html', context)
+
 
 
 def select_index(request):
@@ -103,7 +120,7 @@ def results_index(request):
 
     if not configs_path_list["detectionLibSelection"] in DETECTION_LIBS.keys():
         try:
-            with open(os.path.join(get_results_path(request), "results_keys"), "rb") as f:
+            with open(os.path.join(get_results_path(request), "results_keys.pkl"), "rb") as f:
                 DETECTION_LIBS[configs_path_list["detectionLibSelection"]] = pickle.load(f)
         except FileNotFoundError:
             return redirect("error_results_keys_not_exists")
@@ -206,7 +223,7 @@ def upload_folder(request):
             file_name, file_extension = os.path.splitext(str(f))
             original_path = f.original_path
             handle_upload_folder(request, f, file_name, file_extension, original_path)
-        return HttpResponse('Upload Success')
+        return HttpResponse(number_of_submissions(request))
     else:
         return HttpResponse('Uploading Failed')
 
@@ -432,7 +449,7 @@ def run_detection_core(request):
     if not os.path.exists(get_results_path(request)):
         return redirect('error_no_results_error')
 
-    with open(os.path.join(get_results_path(request), "results_keys"), "wb") as f:
+    with open(os.path.join(get_results_path(request), "results_keys.pkl"), "wb") as f:
         pickle.dump(detection_lib, f)
 
     return redirect('results')

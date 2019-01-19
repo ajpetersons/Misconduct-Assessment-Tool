@@ -4,6 +4,10 @@
     {% load staticfiles %}
     <link rel="stylesheet" href="{% static 'css/upload.css' %}">
     <script src="{% static 'js/upload.js' %}" defer></script>
+
+    <script>
+        let numberOfSubmissions = "{{ numberOfSubmissions }}";
+    </script>
 {% endblock %}
 
 {% block sideButton %}
@@ -123,15 +127,15 @@
 
 {% block content %}
     <p id="uploadContent">
-        Upload the file (suspect submission) to be checked and the folder which contains all of the submissions to be
-        compared. <br> <br>
-        When the files are uploaded, click "Next" to continue. <br>
-        "Back": return to the previous page while keeping the progress made so far.<br>
-        "Cancel": cancel all progress made and return to home page.<br>
+        Upload the <b>file</b> (i.e. <i>suspect submission</i>) to be checked.<br>
+        Upload the <b>folder</b> which <i>contains all of the submissions</i> to be
+        compared. <br>
+        When the files are uploaded, click <i>Next</i> to select the suspect segments. <br>
+        <i>Back</i>: return to the previous page while keeping the progress made so far.<br>
+        <i>Cancel</i>: cancel all progress made and return to home page.<br>
     </p>
 
-    <br>
-    <hr><br>
+    <hr>
 
     <div>
         <h5 id="uploadFileCheck"><i class="material-icons">block</i> You haven't uploaded a file.</h5>
