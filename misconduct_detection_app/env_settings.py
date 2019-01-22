@@ -70,6 +70,18 @@ def get_folder_path(request):
     return folder_path
 
 
+def number_of_submissions(request):
+    """
+    Helper function to find the number of submissions of an uploaded folder
+    :param request:
+    :return:
+    """
+    number_of_submissions = 0
+    if os.path.exists(get_folder_path(request)):
+        number_of_submissions = len(os.listdir(
+            os.path.join(get_folder_path(request), os.listdir(get_folder_path(request))[0])))
+    return number_of_submissions
+
 def get_temp_working_path(request):
     """Dynamically get the temp working folder path
 

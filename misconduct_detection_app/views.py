@@ -25,19 +25,6 @@ def index(request):
     """
     return render(request, 'misconduct_detection_app/welcome.html')
 
-
-def number_of_submissions(request):
-    """
-    Helper function to find the number of submissions of an uploaded folder
-    :param request:
-    :return:
-    """
-    number_of_submissions = 0
-    if os.path.exists(get_folder_path(request)):
-        number_of_submissions = len(os.listdir(
-            os.path.join(get_folder_path(request), os.listdir(get_folder_path(request))[0])))
-    return number_of_submissions
-
 def upload_index(request):
     """The upload page
 
