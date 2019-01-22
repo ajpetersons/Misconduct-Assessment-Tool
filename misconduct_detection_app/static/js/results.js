@@ -46,7 +46,7 @@ $("#report-form").submit(function (e) {
     var h_margin = 10;
     //Drawing coordinates
     var y = v_margin;
-    const x = h_margin;
+    var x = h_margin;
     const line_width = pageWidth - (h_margin * 2);
     var vspace = 10;
     var line_height = 12; // mm
@@ -145,9 +145,18 @@ $("#report-form").submit(function (e) {
     change_font_size(text_size);
     print_long_text("This report is produced by the Misconduct Assessment Tool produced within the School of Informatics, University of Edinburgh.")
     y +=2;
-    print_long_text("The aim of this tool is to test student submissions that are not obvious cases, but suspected of misconduct due to multiple small segments being similar to other submissions. With a large number of submissions, it is fairly likely that some segments will similar by chance. This tool is used to help in such situations, by estimating the expected number of submissions with that exact combination of segments. It is built to assist the decision making process, it does not replace it.")
+    print_long_text("The aim of this tool is to test student submissions that are not obvious cases, but suspected of misconduct due to multiple small segments being similar to other submissions. With a large number of submissions, it is fairly likely that some segments will similar by chance. This tool is used to help in such situations, by estimating the expected number of submissions with that exact combination of segments. It is built to assist the decision making process,")
+
+    //Print the italics
+    doc.setFontType("italic");
+    x = 49;
+    y -= font_size / 2;
+    print_long_text(" it does not replace it.");
+    x = h_margin;
+    doc.setFontType("normal");
+
     y +=2;
-    print_long_text("For each suspect segment, the individual probability of that segment is calculated by taking the number of submissions that have a similar segment over the number of all the submissions. Segments that are present in a lot of submissions have a higher individual probability. The joint probability is then calculated by taking the product of all the segments' individual probabilities. Finally, to calculate the estimated number of submissions we take the joint probability and multiply it with the number of all the submissions. The resulting number should be the number of students anticipated to have the exact combination of the suspected segments. If the expected number is lower than one, a case of misconduct is suggested. Please note that the results are not conclusive.");
+    print_long_text("For each suspect segment, the individual probability of that segment is calculated by taking the number of submissions that have a similar segment over the number of all the submissions. Segments that are present in a lot of submissions have a higher individual probability. The joint probability is then calculated by assuming that each segment is independent and taking the product of all the segments' individual probabilities. Finally, to calculate the estimated number of submissions we take the joint probability and multiply it with the number of all the submissions. The resulting number should be the number of students anticipated to have the exact combination of the suspected segments. If the expected number is lower than one, a case of misconduct is suggested. Please note that the results are not conclusive.");
     //y +=3;
     //print_long_text("The Misconduct Assessment Tool has been created by Stelios Milisavljevic & Yuechen Xie under the supervision of Prof. Kyriakos Kalorkoti.")
     //print_text("School of Informatics, The University of Edinburgh");
