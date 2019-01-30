@@ -304,7 +304,7 @@ class Jplag(DetectionLib):
             self.optimized = True
 
             # First check the smaller segments
-            os.system("java -jar {0} -t 5 -l {1} -r {2} {3}".format(self.lib_path,
+            os.system("java -jar {0} -t 3 -l {1} -r {2} {3}".format(self.lib_path,
                                                                     self.file_language,
                                                                     os.path.join(self.results_path, "small"),
                                                                     # small_path))

@@ -18,6 +18,19 @@ jPlagResultsKeys.forEach(jPlagResultsKey => {
 
 expectation = joint_probability * (jPlagSubmissionNumber - 1);
 
+
+var segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
+// Find the max segment
+var maxSegment = 0;
+var file_end = "";
+segmentFilesKeys.forEach(segmentKey => {
+    let currentSegment = segmentKey.substring("Segment_".length).split('.').slice(0, -1).join('.');
+    let currentNumber = parseInt(currentSegment);
+    if (maxSegment < currentNumber) maxSegment = currentNumber;
+    file_end = segmentKey.split('.').slice(-1).join('.');
+});
+
+
 $("#report-form").submit(function (e) {
     // Prevent page refresh
     e.preventDefault();
@@ -145,7 +158,7 @@ $("#report-form").submit(function (e) {
     change_font_size(text_size);
     print_long_text("This report is produced by the Misconduct Assessment Tool produced within the School of Informatics, University of Edinburgh.")
     y +=2;
-    print_long_text("The aim of this tool is to test student submissions that are not obvious cases, but suspected of misconduct due to multiple small segments being similar to other submissions. With a large number of submissions, it is fairly likely that some segments will similar by chance. This tool is used to help in such situations, by estimating the expected number of submissions with that exact combination of segments. It is built to assist the decision making process,")
+    print_long_text("The aim of this tool is to test student submissions that are not obvious cases, but suspected of misconduct due to multiple small segments being similar to other submissions. With a large number of submissions, it is fairly likely that some segments will be similar by chance. This tool is used to help in such situations, by estimating the expected number of submissions with that exact combination of segments. It is built to assist the decision making process,")
 
     //Print the italics
     doc.setFontType("italic");
@@ -193,10 +206,16 @@ $("#report-form").submit(function (e) {
 
 
     separate_sections();
-    // Segments section
-    let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
-    segmentFilesKeys.forEach(segmentFilesKey => {
-        let segmentName = segmentFilesKey.split('.')[0];
+    // Segments section creation
+    let i;
+    for (i = 1; i <= maxSegment; i++) {
+        let segmentFilesKey = "Segment_" + i + "." + file_end;
+        if (!(segmentFilesKey in segmentFiles)) {
+            continue;
+        }
+        // Get rid of the file extension (Segment name)
+        let segmentName = segmentFilesKey.split('.').slice(0, -1).join('.');
+
         change_font_size(section_size);
         //print_text(segmentFilesKey);
         print_text(segmentName.replace("_", " "));
@@ -205,7 +224,7 @@ $("#report-form").submit(function (e) {
         change_font_size(subsection_size-1);
         let suspectFilesKeys = Object.keys(jPlagResults[segmentName]).filter(key => jPlagResults[segmentName].hasOwnProperty(key) === true);
         let similarSubmissionNumber = suspectFilesKeys.length - 1;
-        //if(similarSubmissionNumber<0) similarSubmissionNumber = 0;
+        if (similarSubmissionNumber < 0) similarSubmissionNumber = 0;
         print_text(`Number of similar submissions:   ${similarSubmissionNumber}`);
         y += 1;
         change_font_size(text_size);
@@ -215,7 +234,8 @@ $("#report-form").submit(function (e) {
         }
         separate_sections();
         //y +=10;
-    });
+    }
+
     // Add final page footer
     add_footer();
 
@@ -241,25 +261,14 @@ $(document).ready(function (){
         "</div>"
     );
 
-
-    let segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
-
-    let maxSegment = 0;
-    let file_end = "";
-    segmentFilesKeys.forEach(segmentKey => {
-        let currentSegment = segmentKey.substring("Segment_".length).split('.')[0];
-        let currentNumber = parseInt(currentSegment);
-        if (maxSegment < currentNumber) maxSegment = currentNumber;
-        file_end = segmentKey.split('.')[1];
-    });
-
     let i;
     for (i = 1; i <= maxSegment; i++) {
         let segmentFilesKey = "Segment_" + i + "." + file_end;
         if (!(segmentFilesKey in segmentFiles)) {
             continue;
         }
-        let segmentName = segmentFilesKey.split('.')[0];
+        // Get rid of the file extension (Segment name)
+        let segmentName = segmentFilesKey.split('.').slice(0, -1).join('.');
 
         let segmentStructure = `<row id='row${segmentName}'>` +
             "<div class='card border-secondary'>" +

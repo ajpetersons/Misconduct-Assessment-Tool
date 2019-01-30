@@ -46,7 +46,7 @@ function loadUploadedFolder() {
         // Create the up arrow
         $("#folderPathListPopOver").append("Uploaded Folder<i class='material-icons' style='position: relative;top: 4px;left: 0px;font-size: 18px;'>arrow_drop_up</i>");
 
-        folderPathList.map(filePath => {
+        folderPathList.forEach(filePath => {
             $("#hiddenContentsDiv").append($("<a></a>").attr({
                 "href": "/examine/folders/" + filePath.substring(filePath.indexOf("folder") + 8),
                 "target": "_blank",
