@@ -64,3 +64,9 @@ body {
 body > .container-fluid {
     padding-bottom: 60px;
 }
+
+#login-dp {
+    min-width: 300px;
+    padding: 14px;
+    overflow: hidden;
+}
