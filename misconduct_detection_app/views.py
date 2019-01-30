@@ -207,6 +207,9 @@ def upload_folder(request):
     if request.method == 'POST':
         files = request.FILES.getlist('file')
         for f in files:
+            if str(f)[0] == '.':
+                # Skip UNIX/Mac hidden files
+                continue
             file_name, file_extension = os.path.splitext(str(f))
             original_path = f.original_path
             handle_upload_folder(request, f, file_name, file_extension, original_path)

@@ -98,8 +98,7 @@ function uploadFile() {
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.warn("Error sending the file");
-            //alert(xhr.status);
-            //alert(thrownError);
+            alert("Error: file not uploaded");
         }
     });
 
@@ -127,6 +126,10 @@ function uploadFolder() {
         success : function(data) {
             uploading = false;
             numberOfSubmissions = data;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.warn("Error sending the file");
+            alert("Error: folder not uploaded");
         }
     });
 
