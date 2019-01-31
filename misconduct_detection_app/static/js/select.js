@@ -333,9 +333,8 @@ function getAutoDetectionResults() {
 
 function setCodeText(code) {
     $("#codeDisplayText").empty()
-        .append("<pre id='codeDisplayTextPre' class='prettyprint linenums lang-c lang-cpp lang-java' style='white-space:pre-wrap'>" +
-            code +
-            "</pre>");
+        .append("<pre id='codeDisplayTextPre' class='prettyprint linenums lang-c lang-cpp lang-java' style='white-space:pre-wrap'></pre>");
+    $("#codeDisplayTextPre").text(code);
     PR.prettyPrint();
 }
 
@@ -346,10 +345,6 @@ function setCodeDisplayText() {
         dataType: "json",
         success: function (loadedHtml) {
             if (loadedHtml === "FILE_NOT_FOUND") {
-                $("#codeDisplayText").empty()
-                    .append("<pre id='codeDisplayTextPre' class='prettyprint linenums lang-c lang-cpp lang-java' style='white-space:pre-wrap'>" +
-                        codeToCompare +
-                        "</pre>");
                 setCodeText(codeToCompare);
             } else {
                 //console.log(loadedHtml);
@@ -471,22 +466,6 @@ function addSelectedSegment() {
 
 $("#addSegmentButtonBig").click(addSelectedSegment);
 $("#addSegmentButtonSmall").click(addSelectedSegment);
-
-/*
-$("#saveSegmentButton").click(function(evt) {
-    let before = $("#saveSegmentButton").clone();
-    $("#saveSegmentButton").empty();
-    $("#saveSegmentButton").append("<br\><i class='fa fa-spinner fa-spin' style='font-size: 4vh;'></i><br><br>");
-
-    sendCurrentSegmentsAndSelection();
-
-    $(document).ajaxStop(function() {
-        $("#saveSegmentButton").empty();
-        $("#saveSegmentButton").replaceWith(before);
-        redrawBottomBar();
-    });
-});
-*/
 
 $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
     let currentSegmentNumber = evt.currentTarget.id.substring("appendHeaderButton".length);
