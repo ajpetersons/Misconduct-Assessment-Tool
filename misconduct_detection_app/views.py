@@ -116,11 +116,17 @@ def results_index(request):
 
     segment_files_json_string = json.dumps(segment_files, cls=DjangoJSONEncoder)
     jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
+    # Check if uploaded file is in uploaded folder
+    is_file_included = "No"
+    if is_file_included_in_folder(request):
+        is_file_included = "Yes"
 
     context = {
         "jPlagResultsJsonString": jplag_results_json_string,
-        "jPlagSubmissionNumber": jplag_submission_number,
+        # "jPlagSubmissionNumber": jplag_submission_number, # Deprecated
+        "jPlagSubmissionNumber": number_of_submissions(request),
         "segmentFilesJsonString": segment_files_json_string,
+        "isFileIncluded": is_file_included
     }
 
     return render(request, 'misconduct_detection_app/results.html', context)
@@ -236,6 +242,23 @@ def handle_upload_folder(request, file, file_name, file_extension, original_path
     with open(os.path.join(path, file_name + file_extension), 'wb') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
+
+
+def upload_check_included(request):
+    """
+    Check if the uploaded folder has the uploaded file included
+
+    :param request:
+    :return: Yes/No/NA
+    """
+    if os.path.exists(get_folder_path(request)) and os.path.exists(get_file_to_compare_path(request)):
+        if is_file_included_in_folder(request):
+            return HttpResponse("Yes")
+        else:
+            return HttpResponse("No")
+    else:
+        return HttpResponse("NA")
+
 
 
 # ------------------------------------Examination Code------------------------------------

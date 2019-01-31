@@ -14,7 +14,6 @@
     <div class="col-md-3">
         <a href="\select\">
             <button type="button" class="btn btn-light border border-dark btn-lg btn-custom-size"
-                    onclick="submitAllFiles()"
                     title="You have not uploaded any file yet" id="nextButton" disabled>
                 <div class="row">
                     <div class="col-2">
@@ -130,7 +129,8 @@
         Upload the <b>file</b> (i.e. <i>suspect submission</i>) to be checked.<br>
         Upload the <b>folder</b> which <i>contains all of the submissions</i> to be
         compared. <br>
-        The <b>folder</b> should have each submission in <i>separate folder</i> in the parent directory<br>
+        The <b>folder</b> should have <i>each submission in separate folder</i> in the parent directory.<br>
+        <br>
         When the files are uploaded, click <i>Next</i> to select the suspect segments. <br>
         <i>Back</i>: return to the previous page while keeping the progress made so far.<br>
         <i>Cancel</i>: cancel all progress made and return to home page.<br>
@@ -140,7 +140,8 @@
 
     <div>
         <h5 id="uploadFileCheck"><i class="material-icons">block</i> You haven't uploaded a file.</h5>
-        <h5 id="uploadFolderCheck"><i class="material-icons">block</i> You haven't uploaded a folder.</h5>
+        <h5><span id="uploadFolderCheck"><i class="material-icons">block</i> You haven't uploaded a folder.</span> <span
+                id="fileIncludedCheck"></span></h5>
     </div>
 
 {% endblock %}

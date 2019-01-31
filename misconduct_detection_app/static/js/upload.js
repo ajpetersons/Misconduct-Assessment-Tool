@@ -57,30 +57,57 @@ function modifyDOMAfterUploadingFile() {
     uploadFileFinish = true;
     openNextButton();
     $("#uploadFileLabel").text("Reupload");
-    $("#uploadFileCheck").empty();
 }
 
 function modifyDOMAfterUploadingFolder() {
     uploadFolderFinish = true;
     openNextButton();
     $("#uploadFolderLabel").text("Reupload");
-    $("#uploadFolderCheck").empty();
+}
+
+var isFileIncluded;
+
+function checkFileIncluded() {
+    // Check if the uploaded file is included in the uploaded folder
+    $.ajax({
+        url: "checkIncluded/",
+        type: 'GET',
+        cache: false,
+        success: function (data) {
+            isFileIncluded = data;
+            updateSubmissionsCount();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.warn("Error checking if file included in folder");
+        }
+    });
+}
+
+function updateSubmissionsCount() {
+    if (isFileIncluded === "Yes") {
+        $("#fileIncludedCheck").html("(Uploaded file <i>included</i> in the folder)")
+    } else if (isFileIncluded === "No") {
+        $("#fileIncludedCheck").html("(Uploaded file <i>not included</i> in the folder)")
+    }
 }
 
 function fileUploaded() {
+    modifyDOMAfterUploadingFile();
     $("#uploadFileCheck").empty();
     $("#uploadFileCheck").append("<i class='material-icons'>check</i> File uploaded.");
+    checkFileIncluded();
 }
 
 function folderUploaded() {
+    modifyDOMAfterUploadingFolder();
     $("#uploadFolderCheck").empty();
     $("#uploadFolderCheck").append("<i class='material-icons'>check</i> Folder uploaded. <i>" + numberOfSubmissions + " submissions</i>");
+    checkFileIncluded();
 }
 
 function uploadFile() {
-    modifyDOMAfterUploadingFile();
     let singleFile = new FormData($('#uploadFileForm')[0]);
-    $("#uploadFileCheck").append("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
+    $("#uploadFileCheck").html("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
 
     $.ajax({
         url: "uploadFile/",
@@ -95,22 +122,24 @@ function uploadFile() {
         success: function (data) {
             uploading = false;
             setFileDetectionPackage();
+            fileUploaded();
+
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.warn("Error sending the file");
             alert("Error: file not uploaded");
+            //alert(xhr.status);
+            //alert(thrownError);
+            $("#uploadFileCheck").html('<i class="material-icons">block</i>There was an error while uploading the file');
         }
     });
 
-    $(document).ajaxStop(function() {
-        fileUploaded();
-    });
 }
 
 function uploadFolder() {
-    modifyDOMAfterUploadingFolder();
     let folderFile = new FormData($('#uploadFolderForm')[0]);
-    $("#uploadFolderCheck").append("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
+    $("#fileIncludedCheck").empty();
+    $("#uploadFolderCheck").html("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
 
     $.ajax({
         url: "uploadFolder/",
@@ -126,16 +155,15 @@ function uploadFolder() {
         success : function(data) {
             uploading = false;
             numberOfSubmissions = data;
+            folderUploaded();
         },
         error: function (xhr, ajaxOptions, thrownError) {
             console.warn("Error sending the file");
             alert("Error: folder not uploaded");
+            $("#uploadFolderCheck").html('<i class="material-icons">block</i>There was an error while uploading the folder');
         }
     });
 
-    $(document).ajaxStop(function() {
-        folderUploaded();
-    });
 }
 
 function openNextButton() {

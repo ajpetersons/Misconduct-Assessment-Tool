@@ -5,18 +5,34 @@ var individual_probabilities = [];
 var joint_probability = 1;
 var expectation = 0;
 
+var correctedSubmissionNumber;
+
+isFileIncluded = isFileIncluded === "Yes";
+
+if (isFileIncluded) {
+    correctedSubmissionNumber = jPlagSubmissionNumber - 1;
+} else {
+    correctedSubmissionNumber = jPlagSubmissionNumber;
+}
+
 // Compute details
 var jPlagResultsKeys = Object.keys(jPlagResults).filter(key => jPlagResults.hasOwnProperty(key) === true);
 jPlagResultsKeys.forEach(jPlagResultsKey => {
     let temp_probability = 0;
     if (Object.keys(jPlagResults[jPlagResultsKey]).length !== 0) {
-        temp_probability = (Object.keys(jPlagResults[jPlagResultsKey]).length - 1) / (jPlagSubmissionNumber - 1);
+        let number_of_similar;
+        if (isFileIncluded) {
+            number_of_similar = Object.keys(jPlagResults[jPlagResultsKey]).length - 1;
+        } else {
+            number_of_similar = Object.keys(jPlagResults[jPlagResultsKey]).length;
+        }
+        temp_probability = number_of_similar / correctedSubmissionNumber;
     }
     individual_probabilities[jPlagResultsKey] = temp_probability;
     joint_probability *= temp_probability;
 });
 
-expectation = joint_probability * (jPlagSubmissionNumber - 1);
+expectation = joint_probability * correctedSubmissionNumber;
 
 
 var segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
@@ -192,7 +208,14 @@ $("#report-form").submit(function (e) {
     print_text("General Evaluation");
     change_font_size(subsection_size+1);
     print_text(`Number of total submissions:   ${jPlagSubmissionNumber}`);
+    change_font_size(text_size);
+
+    y -= 2;
+    print_text(`Including the suspect submission: ${isFileIncluded}`);
+    y += 3;
+
     y += 1;
+    change_font_size(subsection_size + 1);
     print_text(`Student's questionable segments`);
     change_font_size(subsection_size);
     print_text(`Joint Probability:     ${joint_probability}`);
@@ -256,7 +279,7 @@ $(document).ready(function (){
 
     $("#segmentsContainer").before(
         "<div class='results-summary'>" +
-        `<h4>Number of total submissions: <i>${jPlagSubmissionNumber}</i></h4>` +
+        `<h4>Number of total submissions: <i>${jPlagSubmissionNumber}</i></h4>Including the suspect submission: ${isFileIncluded}` +
         `<p>Joint Probability: <i>${joint_probability}</i><br/>Joint Expectation: <i>${expectation}</i></p>` +
         "</div>"
     );

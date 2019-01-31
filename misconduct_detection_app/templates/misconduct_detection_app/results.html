@@ -8,6 +8,7 @@
         const jPlagResults = JSON.parse("{{ jPlagResultsJsonString|escapejs }}");
         const segmentFiles = JSON.parse("{{ segmentFilesJsonString|escapejs }}");
         let jPlagSubmissionNumber = "{{ jPlagSubmissionNumber }}";
+        let isFileIncluded = "{{ isFileIncluded }}";
     </script>
     <script src="{% static 'js/results.js' %}" defer></script>
     <!-- Report generation script source: https://rawgit.com/MrRio/jsPDF/master/docs/ -->
