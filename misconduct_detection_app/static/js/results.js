@@ -7,9 +7,9 @@ var expectation = 0;
 
 var correctedSubmissionNumber;
 
-isFileIncluded = isFileIncluded === "Yes";
+isFileIncludedBool = isFileIncluded === "Yes";
 
-if (isFileIncluded) {
+if (isFileIncludedBool) {
     correctedSubmissionNumber = jPlagSubmissionNumber - 1;
 } else {
     correctedSubmissionNumber = jPlagSubmissionNumber;
@@ -21,7 +21,7 @@ jPlagResultsKeys.forEach(jPlagResultsKey => {
     let temp_probability = 0;
     if (Object.keys(jPlagResults[jPlagResultsKey]).length !== 0) {
         let number_of_similar;
-        if (isFileIncluded) {
+        if (isFileIncludedBool) {
             number_of_similar = Object.keys(jPlagResults[jPlagResultsKey]).length - 1;
         } else {
             number_of_similar = Object.keys(jPlagResults[jPlagResultsKey]).length;
