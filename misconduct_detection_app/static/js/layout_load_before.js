@@ -1,9 +1,21 @@
 //Loaded in layout.html (every page)
 
+// NOTE: This patchy implementation from Xin is recommended to be refactored
+
 function loadUploadedComparingFile() {
     // Format data
     fileToComparePathList = fileToComparePathList[0];
-    $("#bottomBar").append("<div id='fileToComparePathList'></div>");
+
+    if ($("#fileToComparePathList").length) {
+        // Reset if existing
+        $("#fileToComparePathList").empty();
+    } else {
+        // Add the File section to add the button
+        // NOTE: this method was implemented by Xin
+        // I suggest refactoring it to the HTML and being a consistent element
+        $("#bottomBar").append("<div id='fileToComparePathList'></div>");
+    }
+
 
     // If file exists, show the file. If not, show hint
     if (fileToComparePathList === "NOFOLDEREXISTS") {
@@ -24,8 +36,15 @@ function loadUploadedComparingFile() {
 }
 
 function loadUploadedFolder() {
-    // No need for formating
-    $("#bottomBar").append("<div id='folderPathList'></div>");
+    if ($("#folderPathList").length) {
+        // Reset if existing
+        $("#folderPathList").empty();
+    } else {
+        // Add the File section to add the button
+        // NOTE: this method was implemented by Xin
+        // I suggest refactoring it to the HTML and being a consistent element
+        $("#bottomBar").append("<div id='folderPathList'></div>");
+    }
 
     // If folder exists, show the folder. If not, show hint
     if (folderPathList[0] === "NOFOLDEREXISTS") {
@@ -46,6 +65,7 @@ function loadUploadedFolder() {
         // Create the up arrow
         $("#folderPathListPopOver").append("Uploaded Folder<i class='material-icons' style='position: relative;top: 4px;left: 0px;font-size: 18px;'>arrow_drop_up</i>");
 
+        $("#hiddenContentsDiv").empty();
         folderPathList.forEach(filePath => {
             $("#hiddenContentsDiv").append($("<a></a>").attr({
                 "href": "/examine/folders/" + filePath.substring(filePath.indexOf("folder") + 8),

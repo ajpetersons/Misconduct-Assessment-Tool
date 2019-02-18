@@ -53,16 +53,44 @@ $("#changeDetectionLib").on("click", function () {
     $("#programmingLanguageChoosingModal").modal("show");
 });
 
+// Update the bottom bar from the context processor
+// (Xin implemented the bottom bar to be updated using the context processor and used to not update until selecting next)
+function updateBottomBar() {
+    $.ajax({
+        url: "/upload/updateContext/",
+        type: 'GET',
+        cache: false,
+        success: function (data) {
+            console.log(data);
+            let context = data;
+            fileToComparePathList = context["fileToComparePathList"];
+            resultsPathList = context["resultsPathList"];
+            folderPathList = context["folderPathList"];
+            segmentsPathList = context["segmentsPathList"];
+            detectionLibList = context["detectionLibList"];
+            configsList = context["configsList"];
+
+            loadUploadedComparingFile();
+            loadUploadedFolder();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.warn("Error updating bottom bar");
+        }
+    });
+}
+
 function modifyDOMAfterUploadingFile() {
     uploadFileFinish = true;
     openNextButton();
     $("#uploadFileLabel").text("Reupload");
+    updateBottomBar();
 }
 
 function modifyDOMAfterUploadingFolder() {
     uploadFolderFinish = true;
     openNextButton();
     $("#uploadFolderLabel").text("Reupload");
+    updateBottomBar();
 }
 
 var isFileIncluded;
@@ -167,9 +195,11 @@ function uploadFolder() {
 }
 
 function openNextButton() {
-    if (uploadFileFinish && uploadFolderFinish) {
+    if (uploadFileFinish && uploadFolderFinish && numberOfSubmissions > 0) {
         document.getElementById("nextButton").removeAttribute("disabled");
-        document.getElementById("nextButton").removeAttribute("title");
+    } else {
+        // Disable the next button
+        document.getElementById("nextButton").setAttribute("disabled", "");
     }
 }
 

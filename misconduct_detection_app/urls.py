@@ -25,6 +25,7 @@ urlpatterns = [
     path('upload/uploadFile/', views.upload_file, name='upload_file'),
     path('upload/uploadFolder/', views.upload_folder, name='upload_folder'),
     path('upload/checkIncluded/', views.upload_check_included, name='upload_check_included'),
+    path('upload/updateContext/', views.upload_update_context, name="upload_update_context"),
     path('examine/singlefiles/<str:name>', views.examine_file, name='examine_file'),
     path('examine/folders/<path:name>', views.examine_folder, name='examine_folder'),
     path('select/selectCode/', views.select_code, name='select_code'),

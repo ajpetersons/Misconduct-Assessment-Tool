@@ -4,11 +4,12 @@ import pickle
 import json
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from django.core.serializers.json import DjangoJSONEncoder
 
 from .env_settings import *
+from . import context_processors
 
 import logging
 logger = logging.getLogger(__name__)
@@ -260,6 +261,13 @@ def upload_check_included(request):
         return HttpResponse("NA")
 
 
+def upload_update_context(request):
+    """
+    Update the context of the bottom bar
+    :param request:
+    :return: Json formatted context
+    """
+    return JsonResponse(context_processors.update_bottom_bar(request))
 
 # ------------------------------------Examination Code------------------------------------
 def examine_file(request, name):
