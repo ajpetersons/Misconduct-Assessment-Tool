@@ -41,6 +41,19 @@ def upload_index(request):
     return render(request, 'misconduct_detection_app/upload.html', context)
 
 
+def uploaded_folder_index(request):
+    """ The uploaded folder page
+
+        :param request: request
+        :type request: HttpRequest
+        :return: render
+        :rtype: render
+    """
+
+    context = {
+        "numberOfSubmissions": number_of_submissions(request),
+    }
+    return render(request, 'misconduct_detection_app/uploadedFolder.html', context)
 
 def select_index(request):
     """The select page

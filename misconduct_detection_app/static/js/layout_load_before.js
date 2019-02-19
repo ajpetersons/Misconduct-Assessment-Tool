@@ -53,6 +53,15 @@ function loadUploadedFolder() {
             "role": "button",
         }).text("No uploaded folder"));
     } else {
+
+        $("#folderPathList").append($("<a></a>").attr({
+            "class": "btn btn-outline-primary",
+            "role": "button",
+            "href": "/upload/uploadedFolder/",
+            "target": "_blank",
+        }).text("Uploaded Folder"));
+
+        /* // Xin implementation as a popup
         $("#folderPathList").append($("<a></a>").attr({
             "tabindex": "0",
             "class": "btn btn-outline-primary",
@@ -87,6 +96,7 @@ function loadUploadedFolder() {
         $(".popover-dismiss").popover({
             trigger: "focus"
         });
+        */
     }
 }
 

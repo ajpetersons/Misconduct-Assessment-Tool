@@ -61,7 +61,7 @@ function updateBottomBar() {
         type: 'GET',
         cache: false,
         success: function (data) {
-            console.log(data);
+            //console.log(data);
             let context = data;
             fileToComparePathList = context["fileToComparePathList"];
             resultsPathList = context["resultsPathList"];
