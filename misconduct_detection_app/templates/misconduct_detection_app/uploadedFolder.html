@@ -37,7 +37,9 @@
 
     <script>
         let numberOfSubmissions = "{{ numberOfSubmissions }}";
-        var folderPathList = JSON.parse("{{ folderPathList|escapejs }}");
+        let folderPathList = JSON.parse("{{ folderPathList|escapejs }}");
+        let fileToComparePathList = JSON.parse("{{ fileToComparePathList|escapejs }}");
+        let isFileIncluded = "{{ isFileIncluded }}";
     </script>
 
 </head>
@@ -54,18 +56,33 @@
     </div>
 </nav>
 
-<div class="container h-100">
-    <div class="row h-100">
-        <div class="col-12 p-0 h-100">
+<div class="container">
+    <div class="row">
+        <div class="col-12">
             <div class="h-100 text-center justify-content-center">
                 <br>
                 <br>
                 <h2>Number of submissions: {{ numberOfSubmissions }}</h2>
+                <h4>Including the suspect submission: {{ isFileIncluded }}</h4>
                 <br>
-                <div id="filesList" class="pl-3">
-                </div>
             </div>
 
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="text-center justify-content-center">
+                <h2>All files uploaded</h2>
+                <br>
+                <div id="filesList"></div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="text-center justify-content-center">
+                <h2>Submissions to be compared</h2>
+                <br>
+                <div id="filesToBeComparedList"></div>
+            </div>
         </div>
     </div>
 </div>

@@ -49,9 +49,13 @@ def uploaded_folder_index(request):
         :return: render
         :rtype: render
     """
-
+    # Check if uploaded file is in uploaded folder
+    is_file_included = "No"
+    if is_file_included_in_folder(request):
+        is_file_included = "Yes"
     context = {
         "numberOfSubmissions": number_of_submissions(request),
+        "isFileIncluded": is_file_included
     }
     return render(request, 'misconduct_detection_app/uploadedFolder.html', context)
 
