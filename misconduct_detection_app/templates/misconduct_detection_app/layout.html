@@ -101,7 +101,10 @@
             </button>
             <div id="login-dp" class="dropdown-menu pull-right dropdown-menu-right px-4 py-3">
                 {% if user.is_authenticated %}
+                    <!-- Commented lines: Go to previous page next -->
                     <a class="btn btn-secondary btn-block" href="{% url 'logout' %}?next={{ request.path }}">Logout</a>
+                    <!-- Go to home page -->
+                    <a class="btn btn-secondary btn-block" href="{% url 'logout' %}?next={{ views.index }}">Logout</a>
                 {% else %}
                     <form class="" method="post" action="{% url 'login' %}">
                         {% csrf_token %}
