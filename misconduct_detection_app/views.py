@@ -478,7 +478,9 @@ def run_detection_core(request):
         paraname, paradata = line.split(",")
         configs_path_list[paraname] = paradata
 
-    extra_settings = configs_path_list["detectionLanguage"]
+    extra_settings = {}
+    extra_settings["detectionLanguage"] = configs_path_list["detectionLanguage"]
+    extra_settings["detectionThreshold"] = configs_path_list["detectionThreshold"]
     detection_lib = detection_libs_configs[configs_path_list["detectionLibSelection"]](request, extra_settings)
     detection_lib.run_without_getting_results(get_temp_working_path(request))
     DETECTION_LIBS[configs_path_list["detectionLibSelection"]] = detection_lib
@@ -544,9 +546,9 @@ def saving_configs(request):
                     # Clean the config file first
                     with open(os.path.join(get_configs_path(request), "configs.txt"), 'w') as f:
                         f.write("detectionLibSelection," + request.POST[parameter])
-                if parameter == "detectionLanguage":
+                else:
                     with open(os.path.join(get_configs_path(request), "configs.txt"), 'a') as f:
-                        f.write("\ndetectionLanguage," + request.POST[parameter])
+                        f.write("\n"+parameter+"," + request.POST[parameter])
         return HttpResponse('Selection Succeeded')
     else:
         return HttpResponse('Selection Failed')

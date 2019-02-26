@@ -173,7 +173,7 @@ def file_lines(file_path):
 class Jplag(DetectionLib):
     """JPlag detection library."""
 
-    def __init__(self, lib_path, results_path, segments_path, folder_to_compare_path, file_language, number_of_matches,
+    def __init__(self, lib_path, results_path, segments_path, folder_to_compare_path, file_language, threshold,
                  name="JPlag"):
         """Create a new JPlag detection package wrapper object.
 
@@ -205,7 +205,7 @@ class Jplag(DetectionLib):
         assert (file_language in self.file_language_supported), "Language parameter {0} not supported by JPlag".format(
             file_language)
         self.file_language = file_language
-        self.number_of_matches = number_of_matches  # TODO: Might get rid of it
+        self.threshold = threshold
         self.file_relation = {}
         self.NORMAL_SIZE_SEGMENT = 12
         self.optimized = False
@@ -304,29 +304,29 @@ class Jplag(DetectionLib):
             self.optimized = True
 
             # First check the smaller segments
-            os.system("java -jar {0} -t 3 -l {1} -r {2} {3}".format(self.lib_path,
+            os.system("java -jar {0} -t 3 -l {1} -m {2}% -r {3} {4}".format(self.lib_path,
                                                                     self.file_language,
+                                                                    self.threshold,
                                                                     os.path.join(self.results_path, "small"),
-                                                                    # small_path))
                                                                     temp_working_path))
 
             # Then check the normal segments
-            os.system("java -jar {0} -l {1} -r {2} {3}".format(self.lib_path,
-                                                               self.file_language,
-                                                               os.path.join(self.results_path, "normal"),
-                                                               # normal_path))
-                                                               temp_working_path))
+            os.system("java -jar {0} -l {1} -m {2}% -r {3} {4}".format(self.lib_path,
+                                                                self.file_language,
+                                                                self.threshold,
+                                                                os.path.join(self.results_path, "normal"),
+                                                                temp_working_path))
 
             # Save which segments are small and which normal size
             with open(os.path.join(self.results_path, 'optimized_files.pkl'), 'wb') as f:
                 pickle.dump([small_files, normal_files], f)
 
         else:
-            os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
-                                                                      self.number_of_matches,
-                                                                      self.file_language,
-                                                                      self.results_path,
-                                                                      temp_working_path))
+            os.system("java -jar {0} -l {1} -m {2}% -r {3} {4}".format(self.lib_path,
+                                                                       self.file_language,
+                                                                       self.threshold,
+                                                                       self.results_path,
+                                                                       temp_working_path))
 
     def results_interpretation(self):
         """Interpret the results produced by JPlag.

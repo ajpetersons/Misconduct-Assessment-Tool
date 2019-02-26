@@ -192,13 +192,14 @@ def jplag_default_creator(request, extra_settings):
                     os.path.join(include_segments_path, "Segment_" + checked_segment + extension_name))
 
     # Decompress the extra parameters
-    detection_language = extra_settings
+    detection_language = extra_settings["detectionLanguage"]
+    threshold = extra_settings["detectionThreshold"]
 
     # Return the JPlag object dynamically
     return Jplag(lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
                  results_path=get_results_path(request), segments_path=include_segments_path,
                  folder_to_compare_path=get_folder_path(request), file_language=detection_language,
-                 number_of_matches="1%")
+                 threshold=threshold)
 
 
 # Register detection packages
@@ -212,7 +213,7 @@ detection_libs_configs = {
 null_detection_libs = {
     "JPlag": Jplag(lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
                    results_path="", segments_path="", folder_to_compare_path="", file_language="c/c++",
-                   number_of_matches="1%"),
+                   threshold="80%"),
 }
 
 

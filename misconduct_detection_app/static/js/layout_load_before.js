@@ -1,5 +1,10 @@
 //Loaded in layout.html (every page)
 
+// Make the slider update the threshold text
+$(document).on('input', '#thresholdSlider', function() {
+    $('#detectionThreshold').html( $(this).val() );
+});
+
 // NOTE: This patchy implementation from Xin is recommended to be refactored
 
 function loadUploadedComparingFile() {
@@ -209,6 +214,7 @@ function loadDetectionLib() {
         // else send the variables set here later.
         detectionLanguage = $("input[type='radio']:checked", ".programmingLanguageChoosingLanguageFormDivs").val()
         detectionLibSelection = $("input[name=detectionLib]:checked").val();
+        detectionThreshold = $("#detectionThreshold").text();
         if (detectionLanguage === undefined || detectionLibSelection === undefined) {
             console.error("Detection Library not properly selected")
             return;
@@ -225,6 +231,7 @@ function loadDetectionLib() {
         programmingConfigs.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
         programmingConfigs.append("detectionLibSelection", detectionLibSelection);
         programmingConfigs.append("detectionLanguage", detectionLanguage);
+        programmingConfigs.append("detectionThreshold", detectionThreshold);
         $.ajax({
             url: "/configs/savingConfigs/",
             type: 'POST',
@@ -253,6 +260,18 @@ function loadDetectionLib() {
     });
 }
 
+function loadDetectionPackageSettings(){
+    // Auto selects the configured radio buttons for the detection lib
+    if(detectionLibSelection){
+        let formId = "#programmingLanguageChoosingDetectionLibForm" + detectionLibSelection;
+        $(formId).click();
+        $("input[value='" + detectionLanguage + "']").click();
+        $("#thresholdSlider").val(parseInt(detectionThreshold));
+        $("#detectionThreshold").text(detectionThreshold);
+    }
+
+}
+
 $(document).ready(function (){
     // Load the elements in order
     loadUploadedComparingFile();
@@ -260,4 +279,5 @@ $(document).ready(function (){
     loadSelectedSegments();
     loadResults();
     loadDetectionLib();
+    loadDetectionPackageSettings();
 });

@@ -22,6 +22,14 @@ function setFileDetectionPackage() {
             programmingConfigs.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
             programmingConfigs.append("detectionLibSelection", autoDetectionLibSelection);
             programmingConfigs.append("detectionLanguage", autoDetectionLanguage);
+            if(detectionThreshold){
+                // Previous value
+                programmingConfigs.append("detectionThreshold", detectionThreshold);
+            }else{
+                // Default value
+                programmingConfigs.append("detectionThreshold", 80);
+            }
+
             $.ajax({
                 url: "/configs/savingConfigs/",
                 type: 'POST',
