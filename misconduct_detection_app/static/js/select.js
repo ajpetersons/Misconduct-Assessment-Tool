@@ -33,9 +33,7 @@ function shadeColor(color, percent) {
 }
 
 /**
- * Check whether an object is empty
- * @param obj
- * @returns {boolean}
+ * Check whether the segments section is empty
  */
 function areSegmentsEmpty() {
     let i;
@@ -377,6 +375,15 @@ function saveChanges() {
 function findSelectedRange(selectedText) {
     let startNode = $(selectedText.anchorNode).closest("li")[0];
     let endNode = $(selectedText.focusNode).closest("li")[0];
+
+    // Check if the start node is after the end node (Case of selecting from the bottom)
+    if ($("li").index(startNode) > $("li").index(endNode)) {
+        // Swap them
+        let tempNode = startNode;
+        startNode = endNode;
+        endNode = tempNode;
+    }
+
     let range = document.createRange();
     range.setStartBefore(startNode);
     range.setEndAfter(endNode);
