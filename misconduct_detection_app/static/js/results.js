@@ -330,7 +330,10 @@ $(document).ready(function (){
             $segmentDetails.append($("<button></button>").attr({
                 "class": "btn btn-outline-primary btn-sm showDetailsButton",
                 "style": "width: 100px;margin-left: 1%;",
-                "id": jPlagResultsKey
+                "id": jPlagResultsKey,
+                "data-toggle": "tooltip",
+                "data-placement": "top",
+                "title": "Similar files detected"
             }).click(
                 function () {
                     $("#codeDetails" + jPlagResultsKey).toggle();
@@ -359,4 +362,10 @@ $(document).ready(function (){
 
     }
     PR.prettyPrint();
+
+    // Enable tootips
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+    
 });
