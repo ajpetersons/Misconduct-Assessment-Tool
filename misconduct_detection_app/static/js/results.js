@@ -57,7 +57,7 @@ $("#report-form").submit(function (e) {
     var courseName = $("#course-name").val();
     var coursework = $("#coursework").val();
     var reportNotes = $("#report-notes").val();
-    var segmentDetailed = $("#report-form input[name=segmentRadios]:checked").val()
+    var segmentDetailed = $("#report-form input[name=segmentRadios]:checked").val();
 
     var detailed = segmentDetailed === "detailed";
 
@@ -67,16 +67,16 @@ $("#report-form").submit(function (e) {
 
     var doc = new jsPDF();
 
-    var pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-    console.log(`Page Height: ${pageHeight}`);
-    var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-    console.log(`Page Width: ${pageWidth}`);
+    var page_height = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+    console.log(`Page Height: ${page_height}`);
+    var page_width = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+    console.log(`Page Width: ${page_width}`);
     var v_margin = 20;
     var h_margin = 10;
     //Drawing coordinates
     var y = v_margin;
     var x = h_margin;
-    const line_width = pageWidth - (h_margin * 2);
+    const line_width = page_width - (h_margin * 2);
     var vspace = 10;
     var line_height = 12; // mm
     var font_size = 12;
@@ -91,13 +91,13 @@ $("#report-form").submit(function (e) {
     var separate_sections = function () {
         doc.line(x, y, line_width+h_margin, y);
         y += vspace;
-    }
+    };
 
     // Switches fond size
     var change_font_size = function (size) {
         font_size = size;
         doc.setFontSize(font_size)
-    }
+    };
 
     // Adds a footer to the bottom of the page
     var add_footer = function () {
@@ -109,15 +109,15 @@ $("#report-form").submit(function (e) {
         orig_font_size = font_size;
         change_font_size(subsection_size);
 
-        doc.text(pageWidth / 2, pageHeight - 10, str, 'center');
+        doc.text(page_width / 2, page_height - 10, str, 'center');
 
         change_font_size(orig_font_size);
 
-    }
+    };
 
     // Prints text with automatic line spacing and page change
     var print_text = function (text, html=false) {
-        if (y > pageHeight - v_margin) {
+        if (y > page_height - v_margin) {
             add_footer();
             // Change page
             y = v_margin;
@@ -131,7 +131,7 @@ $("#report-form").submit(function (e) {
         }
 
         y += font_size / 2;
-    }
+    };
 
     // Prints texts with automatic line change
     var print_long_text = function (long_text){
@@ -139,7 +139,7 @@ $("#report-form").submit(function (e) {
         for (let i = 0; i < split_text.length; i++) {
             print_text(split_text[i]);
         }
-    }
+    };
 
     //Title
     change_font_size(title_size);
@@ -268,7 +268,7 @@ $("#report-form").submit(function (e) {
         subject: '',
         author: 'Misconduct Detection Project',
         keywords: 'misconduct, academic, assessment, report',
-        creator: 'Misconduct Detection Project Report generation created by Stelios Milisavljevic s1509375 (University of Edinburgh School of Informatics)'
+        creator: 'Misconduct Assessment Tool: Report generation created by Stelios Milisavljevic s1509375 (University of Edinburgh School of Informatics)'
     });
     doc.output('dataurlnewwindow');
 });
@@ -277,13 +277,17 @@ $(document).ready(function (){
 
     // Populate results page
 
+    // General stats
     $("#segmentsContainer").before(
-        "<div class='results-summary'>" +
+        "<div id='results-summary'>" +
         `<h4>Number of total submissions: <i>${jPlagSubmissionNumber}</i></h4>Including the suspect submission: ${isFileIncluded}` +
         `<p>Joint Probability: <i>${joint_probability}</i><br/>Joint Expectation: <i>${expectation}</i></p>` +
         "</div>"
     );
 
+    let filesWithAllSegments;
+
+    // Each segment
     let i;
     for (i = 1; i <= maxSegment; i++) {
         let segmentFilesKey = "Segment_" + i + "." + file_end;
@@ -346,10 +350,11 @@ $(document).ready(function (){
                 "style": "display: none",
             }));
 
+            // Links to the similar files
+
             suspectFilesKeys.forEach(suspectFilesKey => {
                 const filePath = suspectFilesKey.substring(suspectFilesKey.indexOf("folder") + 8);
                 const fileLink = jPlagResults[jPlagResultsKey][suspectFilesKey][1];
-                //console.log(fileLink)
                 let linkToJPlagResult = document.createElement("a");
                 linkToJPlagResult.setAttribute("href", "details\\" + fileLink);
                 linkToJPlagResult.setAttribute("target", "_blank");
@@ -357,10 +362,42 @@ $(document).ready(function (){
                 linkToJPlagResult.appendChild(document.createElement("br"));
 
                 document.getElementById("codeDetails" + jPlagResultsKey).appendChild(linkToJPlagResult);
+
+
+
             });
+
+            // Determine if the files has the same segments as the suspect
+            if(!filesWithAllSegments){
+                // First call, initialize filesWithAllSegments
+                filesWithAllSegments = new Set(suspectFilesKeys);
+            }else{
+                let currentFiles = new Set(suspectFilesKeys);
+                filesWithAllSegments = new Set(
+                    [...filesWithAllSegments].filter(x => currentFiles.has(x))
+                );
+            }
+        }else{
+            // No similars for this file, thus no file will have all the segments
+            filesWithAllSegments = new Set();
         }
 
     }
+    console.log(filesWithAllSegments);
+    console.log(filesWithAllSegments.size> 0);
+    let filesWithAllSegmentsElement = $("<div id='all-segments-same'></div>");
+    if(filesWithAllSegments !== undefined && filesWithAllSegments.size>0){
+        $("#results-summary").append("<h5>Files containing all of the segments:</h5>");
+
+    }
+    filesWithAllSegments.forEach(suspectFilesKey => {
+
+        const filePath = suspectFilesKey.substring(suspectFilesKey.indexOf("folder") + 8);
+
+        //$("#results-summary").append(`<p>${filePath}</p>`);
+        filesWithAllSegmentsElement.append(`<i>${filePath}</i><br>`);
+    });
+    $("#results-summary").append(filesWithAllSegmentsElement.append("<br>"));
     PR.prettyPrint();
 
     // Enable tootips
