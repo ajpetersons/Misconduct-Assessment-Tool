@@ -1,11 +1,16 @@
 // Set name and other global variables, Django variables for this page
 pageName = "Results";
 
+// Precision of results
+const decimalPrecision = 5;
+
 var individual_probabilities = [];
 var joint_probability = 1;
 var expectation = 0;
 
 var correctedSubmissionNumber;
+
+let filesWithAllSegments;
 
 isFileIncludedBool = isFileIncluded === "Yes";
 
@@ -196,7 +201,7 @@ $("#report-form").submit(function (e) {
     if (reportNotes !== "") {
         let orig_font_size = font_size;
         print_text(`Notes:`);
-
+        y -= 2;
         change_font_size(text_size);
         print_long_text(reportNotes);
         font_size = orig_font_size;
@@ -218,8 +223,8 @@ $("#report-form").submit(function (e) {
     change_font_size(subsection_size + 1);
     print_text(`Student's questionable segments`);
     change_font_size(subsection_size);
-    print_text(`Joint Probability:     ${joint_probability}`);
-    print_text(`Joint Expectation:   ${expectation}`);
+    print_text(`Joint Probability:     ${joint_probability.toFixed(decimalPrecision)}`);
+    print_text(`Joint Expectation:   ${expectation.toFixed(decimalPrecision)}`);
     change_font_size(text_size);
     if(expectation>1){
         print_long_text("A joint expectation > 1 suggests at least one student is anticipated to have this combination of segments.");
@@ -227,6 +232,19 @@ $("#report-form").submit(function (e) {
         print_long_text("A joint expectation < 1 suggests no student is anticipated to have this combination of segments.");
     }
 
+    // Submission with the same segment
+    if (filesWithAllSegments !== undefined && filesWithAllSegments.size > 0) {
+        y += 3;
+        change_font_size(subsection_size);
+        print_text(`Submissions containing all of the segments:`);
+        y -= 1;
+        change_font_size(text_size);
+        filesWithAllSegments.forEach(suspectFilesKey => {
+            const filePath = suspectFilesKey.substring(suspectFilesKey.indexOf("folder") + 8);
+            print_long_text(filePath);
+        });
+
+    }
 
     separate_sections();
     // Segments section creation
@@ -243,7 +261,7 @@ $("#report-form").submit(function (e) {
         //print_text(segmentFilesKey);
         print_text(segmentName.replace("_", " "));
         change_font_size(subsection_size);
-        print_text(`Individual probability:               ${individual_probabilities[segmentName]}`);
+        print_text(`Individual probability:               ${individual_probabilities[segmentName].toFixed(decimalPrecision)}`);
         change_font_size(subsection_size-1);
         let suspectFilesKeys = Object.keys(jPlagResults[segmentName]).filter(key => jPlagResults[segmentName].hasOwnProperty(key) === true);
         let similarSubmissionNumber = suspectFilesKeys.length - 1;
@@ -281,11 +299,9 @@ $(document).ready(function (){
     $("#segmentsContainer").before(
         "<div id='results-summary'>" +
         `<h4>Number of total submissions: <i>${jPlagSubmissionNumber}</i></h4>Including the suspect submission: ${isFileIncluded}` +
-        `<p>Joint Probability: <i>${joint_probability}</i><br/>Joint Expectation: <i>${expectation}</i></p>` +
+        `<p>Joint Probability: <i>${joint_probability.toFixed(decimalPrecision)}</i><br/>Joint Expectation: <i>${expectation.toFixed(decimalPrecision)}</i></p>` +
         "</div>"
     );
-
-    let filesWithAllSegments;
 
     // Each segment
     let i;
@@ -323,7 +339,7 @@ $(document).ready(function (){
         let $segmentDetails = $(`#${segmentName}Details`);
         let jPlagResultsKey = segmentName;
         let segmentDetailsStructure = "<p class='card-text'>" +
-            "Individual Probability: " + individual_probabilities[jPlagResultsKey].toString() +
+            "Individual Probability: " + individual_probabilities[jPlagResultsKey].toFixed(decimalPrecision).toString() +
             "</p>";
         $segmentDetails.append(segmentDetailsStructure);
 
@@ -387,7 +403,7 @@ $(document).ready(function (){
     console.log(filesWithAllSegments.size> 0);
     let filesWithAllSegmentsElement = $("<div id='all-segments-same'></div>");
     if(filesWithAllSegments !== undefined && filesWithAllSegments.size>0){
-        $("#results-summary").append("<h5>Files containing all of the segments:</h5>");
+        $("#results-summary").append("<h5>Submissions containing all of the segments:</h5>");
 
     }
     filesWithAllSegments.forEach(suspectFilesKey => {
