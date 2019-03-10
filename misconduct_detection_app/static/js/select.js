@@ -88,18 +88,14 @@ function redrawAccordingToBottomBar() {
 
 function redrawBottomBar() {
     $("#segmentsPathList").empty();
+    const icon = "view_list";
     if (areSegmentsEmpty()) {
-        $("#segmentsPathList").append($("<div></div>").attr({
-            "class": "btn btn-outline-secondary disabled",
-            "role": "button",
-        }).text("No segments to show"));
+        let button = createButtonWithIcon(icon, "No segments selected", true);
+        $("#segmentsPathList").append(button);
     } else {
-        let linkToRes = $("<a></a>").attr({
-            'href': '/select/',
-            "class": "btn btn-outline-primary",
-            "role": "button",
-        }).text("Selected segments");
-        $("#segmentsPathList").append(linkToRes);
+        let link = "/select/";
+        let button = createButtonWithIcon(icon, "Selected segments", false, link, false);
+        $("#segmentsPathList").append(button);
     }
 }
 

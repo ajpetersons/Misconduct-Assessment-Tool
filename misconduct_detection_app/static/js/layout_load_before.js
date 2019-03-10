@@ -5,8 +5,39 @@ $(document).on('input', '#thresholdSlider', function() {
     $('#detectionThreshold').html( $(this).val() );
 });
 
-// NOTE: This patchy implementation from Xin is recommended to be refactored
+// Creates a bottom bar button formatted correctly with it's icon
+function createButtonWithIcon(iconName, text, disabled, link = "", newTab = false) {
+    let topLevel;
+    if (disabled) {
+        topLevel = $("<div></div>").attr({ // Kept original div from Xin
+            "class": "btn btn-outline-secondary disabled",
+            "role": "button",
+        });
+    } else {
+        topLevel = $("<a></a>").attr({
+            "class": "btn btn-outline-primary",
+            "role": "button",
+        });
+        if (link !== "") {
+            topLevel.attr("href", link);
+        }
+        if (newTab) {
+            topLevel.attr("target", "_blank");
+        }
+    }
+    topLevel.append(
+        $("<div class='row'></div>").append(
+            $("<div class='col-2'></div>").append(
+                $("<i class='material-icons'></i>").text(iconName)
+            )
+        ).append(
+            $("<div class='col-8'></div>").text(text)
+        )
+    );
+    return topLevel;
+}
 
+// NOTE: This patchy implementation from Xin is recommended to be refactored
 function loadUploadedComparingFile() {
     // Format data
     fileToComparePathList = fileToComparePathList[0];
@@ -23,20 +54,14 @@ function loadUploadedComparingFile() {
 
 
     // If file exists, show the file. If not, show hint
+    const icon = "description";
     if (fileToComparePathList === "NOFOLDEREXISTS") {
-        $("#fileToComparePathList").append($("<div></div>").attr({
-            "class": "btn btn-outline-secondary disabled",
-            "role": "button",
-        }).text("No uploaded file"));
+        let button = createButtonWithIcon(icon, "No uploaded file", true);
+        $("#fileToComparePathList").append(button);
     } else {
-        // console.log("DEBUG: FILE TO COMP "+ fileToComparePathList);
-        let linkToFile = $("<a></a>").attr({
-            "class": "btn btn-outline-primary",
-            "role": "button",
-            "href": "/examine/singlefiles/" + fileToComparePathList,
-            "target": "_blank",
-        }).text(fileToComparePathList);
-        $("#fileToComparePathList").append(linkToFile);
+        let link = "/examine/singlefiles/" + fileToComparePathList;
+        let button = createButtonWithIcon(icon, fileToComparePathList, false, link, true);
+        $("#fileToComparePathList").append(button);
     }
 }
 
@@ -52,21 +77,16 @@ function loadUploadedFolder() {
     }
 
     // If folder exists, show the folder. If not, show hint
+    const icon = "folder";
     if (folderPathList[0] === "NOFOLDEREXISTS") {
-        $("#folderPathList").append($("<div></div>").attr({
-            "class": "btn btn-outline-secondary disabled",
-            "role": "button",
-        }).text("No uploaded folder"));
+        let button = createButtonWithIcon(icon, "No uploaded folder", true);
+        $("#folderPathList").append(button);
     } else {
+        let link = "/upload/uploadedFolder/";
+        let button = createButtonWithIcon(icon, "Uploaded Folder", false, link, true);
+        $("#folderPathList").append(button);
 
-        $("#folderPathList").append($("<a></a>").attr({
-            "class": "btn btn-outline-primary",
-            "role": "button",
-            "href": "/upload/uploadedFolder/",
-            "target": "_blank",
-        }).text("Uploaded Folder"));
-
-        /* // Xin implementation as a popup
+        /* // Xin's implementation as a popup
         $("#folderPathList").append($("<a></a>").attr({
             "tabindex": "0",
             "class": "btn btn-outline-primary",
@@ -111,18 +131,14 @@ function loadSelectedSegments() {
     $("#bottomBar").append("<div id='segmentsPathList'></div>");
 
     // If segment selections exist, show the link to result page. If not, show hint
+    const icon = "view_list";
     if (segmentsPathList === "NOFOLDEREXISTS") {
-        $("#segmentsPathList").append($("<div></div>").attr({
-            "class": "btn btn-outline-secondary disabled",
-            "role": "button",
-        }).text("No segments to show"));
+        let button = createButtonWithIcon(icon, "No segments selected", true);
+        $("#segmentsPathList").append(button);
     } else {
-        let linkToRes = $("<a></a>").attr({
-            "href": "/select/",
-            "class": "btn btn-outline-primary",
-            "role": "button",
-        }).text("Selected segments");
-        $("#segmentsPathList").append(linkToRes);
+        let link = "/select/";
+        let button = createButtonWithIcon(icon, "Selected segments", false, link, false);
+        $("#segmentsPathList").append(button);
     }
 }
 
@@ -132,18 +148,14 @@ function loadResults() {
     $("#bottomBar").append("<div id='resultsPathList'></div>");
 
     // If results exist, show the link to result page. If not, show hint
+    const icon = "assignment";
     if (resultsPathList === "NOFOLDEREXISTS") {
-        $("#resultsPathList").append($("<div></div>").attr({
-            "class": "btn btn-outline-secondary disabled",
-            "role": "button",
-        }).text("No results to show"));
+        let button = createButtonWithIcon(icon, "No results to show", true);
+        $("#resultsPathList").append(button);
     } else if (resultsPathList === "RESULTSEXISTS"){
-        let linkToRes = $("<a></a>").attr({
-            "href": "/results/",
-            "class": "btn btn-outline-primary",
-            "role": "button",
-        }).text("Last detection results");
-        $("#resultsPathList").append(linkToRes);
+        let link = "/results/";
+        let button = createButtonWithIcon(icon, "Last detection results", false, link, false);
+        $("#resultsPathList").append(button);
     }
 }
 
@@ -152,16 +164,20 @@ function loadDetectionLib() {
     $("#bottomBar").append("<div id='detectionLibSelection'></div>");
 
     // If detection lib selected, show the lib name. If not, show hint
+    const icon = "settings";
     if (configsList === "NOFOLDEREXISTS") {
+        /*
         $("#detectionLibSelection").append($("<div></div>").attr({
             "class": "btn btn-outline-secondary disabled",
             "role": "button",
         }).text("Detection library not selected"));
+        */
+        let button = createButtonWithIcon(icon, "Detection library not selected", true);
+        $("#detectionLibSelection").append(button);
     } else {
-        $("#detectionLibSelection").append($("<div></div>").attr({
-            "class": "btn btn-outline-primary",
-            "role": "button",
-        }).text(detectionLibSelection + " : " + detectionLanguage));
+        let button = createButtonWithIcon(icon, detectionLibSelection + " : " + detectionLanguage, false);
+        button.addClass("text-primary"); // Add the link colour to match the other buttons
+        $("#detectionLibSelection").append(button);
     }
 
     // Construct the modal dynamically
@@ -219,13 +235,11 @@ function loadDetectionLib() {
             console.error("Detection Library not properly selected")
             return;
         }
-        console.warn(detectionLanguage, detectionLibSelection)
 
         $("#detectionLibSelection").empty();
-        $("#detectionLibSelection").append($("<div></div>").attr({
-            "class": "btn btn-outline-primary",
-            "role": "button",
-        }).text(detectionLibSelection + " : " + detectionLanguage));
+        let button = createButtonWithIcon(icon, detectionLibSelection + " : " + detectionLanguage, false);
+        button.addClass("text-primary"); // Add the link colour to match the other buttons
+        $("#detectionLibSelection").append(button);
 
         let programmingConfigs = new FormData();
         programmingConfigs.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
