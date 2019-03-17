@@ -269,7 +269,7 @@ function removeHighlight(masterNode) {
     masterNode.find("span").css("background", "");
 }
 
-function highLightOriginalText(selectedTextRange, startNode, endNode, segmentNumber) {
+function highlightCode(selectedTextRange, startNode, endNode, segmentNumber) {
     // Set the link
     let highlightLink = document.createElement("a");
     //highlightLink.setAttribute("style", "color: black; background: " + highLighterColors[maxSegmentNumber % highLighterColors.length]);
@@ -456,7 +456,7 @@ function addSelectedSegment() {
     if (checkSelectedText(selectedText)) {
         maxSegmentNumber++;
         maxSegmentNumber = parseInt(maxSegmentNumber);
-        highLightOriginalText(selectedTextRange, startNode, endNode, maxSegmentNumber);
+        highlightCode(selectedTextRange, startNode, endNode, maxSegmentNumber);
         drawOneSegment(selectedText, maxSegmentNumber);
         saveChanges();
         updateNextButtonStatus();
@@ -479,12 +479,11 @@ $("#segmentDisplayBox").on("click", ".append-header-button", function (evt){
     let selection = selectionRange[3];
     let selectedText = selection.toString();
     if (selectedText !== "") {
-        highLightOriginalText(selectedTextRange, startNode, endNode, currentSegmentNumber);
+        highlightCode(selectedTextRange, startNode, endNode, currentSegmentNumber);
 
         let $inputText = $("#inputText" + currentSegmentNumber);
         let originalText = $inputText.text();
         $inputText.text(originalText
-            //+ "\n\n====== ADDITION ======\n\n"
             + "\n\n\n" + selectedText);
     }
 
