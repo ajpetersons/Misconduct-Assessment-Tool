@@ -481,7 +481,12 @@ def run_detection_core(request):
     extra_settings = {}
     extra_settings["detectionLanguage"] = configs_path_list["detectionLanguage"]
     extra_settings["detectionThreshold"] = configs_path_list["detectionThreshold"]
-    detection_lib = detection_libs_configs[configs_path_list["detectionLibSelection"]](request, extra_settings)
+    try:
+        detection_lib = detection_libs_configs[configs_path_list["detectionLibSelection"]](request, extra_settings)
+    except FileNotFoundError:
+        # Detection lib initialization failed, most likely no results
+        return redirect('error_no_results_error')
+
     detection_lib.run_without_getting_results(get_temp_working_path(request))
     DETECTION_LIBS[configs_path_list["detectionLibSelection"]] = detection_lib
 
