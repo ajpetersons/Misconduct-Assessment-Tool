@@ -258,14 +258,9 @@ class Jplag(DetectionLib):
         small_counter = 0
         normal_counter = 0
 
-        # small_path = os.path.join(temp_working_path, "small")
-        # normal_path = os.path.join(temp_working_path, "normal")
-
         # Preparing files
         if not os.path.exists(temp_working_path):
             os.makedirs(temp_working_path)
-            # os.makedirs(small_path)
-            #os.makedirs(normal_path)
         else:
             logger.critical("Temp working path not empty! <{0}>".format(temp_working_path))
 
@@ -277,12 +272,10 @@ class Jplag(DetectionLib):
             file_size = file_lines(current_file)
             if file_size < self.NORMAL_SIZE_SEGMENT:
                 # Segment is small size
-                #shutil.copy(current_file, os.path.join(small_path, file_name))
                 small_counter += 1
                 small_files.append(file_name)
             else:
                 # Segment is normal size
-                #shutil.copy(current_file, os.path.join(normal_path, file_name))
                 normal_counter += 1
                 normal_files.append(file_name)
             shutil.copy(current_file, os.path.join(temp_working_path, file_name))
@@ -311,11 +304,11 @@ class Jplag(DetectionLib):
                                                                     temp_working_path))
 
             # Then check the normal segments
-            os.system("java -jar {0} -l {1} -m {2}% -r {3} {4}".format(self.lib_path,
-                                                                self.file_language,
-                                                                self.threshold,
-                                                                os.path.join(self.results_path, "normal"),
-                                                                temp_working_path))
+            os.system("java -jar {0} -t 6 -l {1} -m {2}% -r {3} {4}".format(self.lib_path,
+                                                                            self.file_language,
+                                                                            self.threshold,
+                                                                            os.path.join(self.results_path, "normal"),
+                                                                            temp_working_path))
 
             # Save which segments are small and which normal size
             with open(os.path.join(self.results_path, 'optimized_files.pkl'), 'wb') as f:

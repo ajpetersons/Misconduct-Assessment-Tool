@@ -47,7 +47,7 @@ def generate_uploaded_file_list(request):
         segments_path_list = ["SEGMENTSEXISTS"]
     else:
         segments_path_list = ["NOFOLDEREXISTS"]
-    if os.path.exists(results_path):
+    if os.path.exists(os.path.join(get_segments_path(request), "include_segments_path")):
         results_path_list = ["RESULTSEXISTS"]
     else:
         results_path_list = ["NOFOLDEREXISTS"]
