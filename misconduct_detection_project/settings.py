@@ -142,7 +142,7 @@ LOGGING = {
             '()': 'django.utils.log.ServerFormatter',
             'format': '[%(server_time)s] %(message)s',
         },
-        'standard': {
+        'timestamped': {
             'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
             'datefmt': "%d/%b/%Y %H:%M:%S"
         },
@@ -171,8 +171,8 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': './mdp_debug.log',
-            'formatter': 'standard'
+            'filename': './mdp.log',
+            'formatter': 'timestamped'
         }
     },
     'loggers': {

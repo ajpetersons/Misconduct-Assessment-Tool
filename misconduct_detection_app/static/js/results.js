@@ -388,13 +388,14 @@ $(document).ready(function (){
                 // First call, initialize filesWithAllSegments
                 filesWithAllSegments = new Set(suspectFilesKeys);
             }else{
-                let currentFiles = new Set(suspectFilesKeys);
+                // Only include the files that also appear for this segment
+                let currentSegmentFiles = new Set(suspectFilesKeys);
                 filesWithAllSegments = new Set(
-                    [...filesWithAllSegments].filter(x => currentFiles.has(x))
+                    [...filesWithAllSegments].filter(x => currentSegmentFiles.has(x))
                 );
             }
         }else{
-            // No similars for this file, thus no file will have all the segments
+            // No matching files for this segment, thus no file in general will have all the segments
             filesWithAllSegments = new Set();
         }
 
