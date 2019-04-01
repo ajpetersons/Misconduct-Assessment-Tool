@@ -329,11 +329,12 @@ $(document).ready(function (){
 
         // Add the segment code
         let segmentCodeStructure = "<p class='card-text'>" +
-            "<pre class='prettyprint linenums lang-c lang-cpp lang-java' style='white-space:pre-wrap'>" +
-            segmentFiles[segmentFilesKey] +
+            `<pre id='${segmentName}CodePrettified' class='prettyprint linenums lang-c lang-cpp lang-java' style='white-space:pre-wrap'>` +
             "</pre>" +
             "</p>";
         $(`#${segmentName}Code`).append(segmentCodeStructure);
+        // Need to add code using .text() because of tag escaping
+        $(`#${segmentName}CodePrettified`).text(segmentFiles[segmentFilesKey]);
 
         // Add the segment details
         let $segmentDetails = $(`#${segmentName}Details`);

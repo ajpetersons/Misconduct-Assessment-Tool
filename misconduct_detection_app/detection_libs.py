@@ -217,35 +217,9 @@ class Jplag(DetectionLib):
         :param temp_working_path: the temp working folder path
         :type temp_working_path: str
         """
-        self.run_detection_optimized(temp_working_path)  # TODO TEST AND SWITCH
+        self.run_detection_optimized(temp_working_path)
         return
 
-        logger.debug('Running detection on working environment %s', temp_working_path)
-        counter = 0
-
-        # Preparing files
-        if not os.path.exists(temp_working_path):
-            os.makedirs(temp_working_path)
-
-        for file_name in os.listdir(self.segments_path):
-            shutil.copy(os.path.join(self.segments_path, file_name), os.path.join(temp_working_path, file_name))
-
-        for (dir_path, dir_names, file_names) in os.walk(self.folder_to_compare_path):
-            for file_name in file_names:
-                if not os.path.exists(temp_working_path + file_name):
-                    self.file_relation[str(counter)] = os.path.join(dir_path, file_name)
-                    shutil.copy(self.file_relation[str(counter)],
-                                temp_working_path + "/" + str(counter) + "_" + file_name)
-                    counter += 1
-
-        # HACK: Please notice here, you shall never allow users to run code on your server directly.
-        # Try only receive part parameters from users, such as what I did here. DO NOT let users run
-        # their command directly, that would be very dangerous.
-        os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
-                                                                  self.number_of_matches,
-                                                                  self.file_language,
-                                                                  self.results_path,
-                                                                  temp_working_path))
 
     def run_detection_optimized(self, temp_working_path):
         """Run the detection with optimized sensitivity parameters
