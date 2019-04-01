@@ -27,5 +27,5 @@ $("#cancelButtonFinal").click(function () {
 $(document).ready(function (){
     $("#layoutHeader").text(pageName);
     $("#title").text(pageName + " • " + toolName);
-    $("#layoutToolName").text(toolName);
+    $("#layoutToolName").html(toolName.italics());
 });
