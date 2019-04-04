@@ -18,16 +18,16 @@ number is lower than one, a case of misconduct is suggested. Please note that th
 ## Screens
  
 #### Welcome Page
-![screens](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/welcome_page.png?raw=true)
+![Welcome Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/welcome_page.png?raw=true)
 
 #### Upload Page
-![screens](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/upload_page.png?raw=true)
+![Upload Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/upload_page.png?raw=true)
 
 #### Segment Selection Page
-![screens](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/segments_selection_page.png?raw=true)
+![Segment Selection Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/segments_selection_page.png?raw=true)
 
 #### Results Page
-![screens](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/results_page.png?raw=true)
+![Results Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/results_page.png?raw=true)
 
 ## Requirements
 
