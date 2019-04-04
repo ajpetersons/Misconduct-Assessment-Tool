@@ -47,7 +47,7 @@ def generate_uploaded_file_list(request):
         segments_path_list = ["SEGMENTSEXISTS"]
     else:
         segments_path_list = ["NOFOLDEREXISTS"]
-    if os.path.exists(results_path):
+    if os.path.exists(os.path.join(get_segments_path(request), "include_segments_path")):
         results_path_list = ["RESULTSEXISTS"]
     else:
         results_path_list = ["NOFOLDEREXISTS"]
@@ -93,6 +93,26 @@ def return_uploaded_files(request):
     }
     return context
 
+
+def update_bottom_bar(request):
+    """ Used to update the context of the bottom bar at the upload page
+    Note: similar to return_uploaded_files, but returns a dict instead of a
+    DjangoJSON Encoded dict that is used with templates
+
+    :param request:
+    :return:
+    """
+    logger.debug("Returning uploaded files list for request %s", request)
+    file_to_compare_path_list, results_path_list, folder_path_list, segments_path_list, configs_path_list \
+        = generate_uploaded_file_list(request)
+    context = {
+        "fileToComparePathList": file_to_compare_path_list,
+        "resultsPathList": results_path_list,
+        "folderPathList": folder_path_list,
+        "segmentsPathList": segments_path_list,
+        "configsList": configs_path_list,
+    }
+    return context
 
 def return_supported_detection_lib(request):
     logger.debug("Return supported detection libraries")

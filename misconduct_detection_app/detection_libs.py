@@ -173,7 +173,7 @@ def file_lines(file_path):
 class Jplag(DetectionLib):
     """JPlag detection library."""
 
-    def __init__(self, lib_path, results_path, segments_path, folder_to_compare_path, file_language, number_of_matches,
+    def __init__(self, lib_path, results_path, segments_path, folder_to_compare_path, file_language, threshold,
                  name="JPlag"):
         """Create a new JPlag detection package wrapper object.
 
@@ -205,7 +205,7 @@ class Jplag(DetectionLib):
         assert (file_language in self.file_language_supported), "Language parameter {0} not supported by JPlag".format(
             file_language)
         self.file_language = file_language
-        self.number_of_matches = number_of_matches  # TODO: Might get rid of it
+        self.threshold = threshold
         self.file_relation = {}
         self.NORMAL_SIZE_SEGMENT = 12
         self.optimized = False
@@ -217,35 +217,9 @@ class Jplag(DetectionLib):
         :param temp_working_path: the temp working folder path
         :type temp_working_path: str
         """
-        self.run_detection_optimized(temp_working_path)  # TODO TEST AND SWITCH
+        self.run_detection_optimized(temp_working_path)
         return
 
-        logger.debug('Running detection on working environment %s', temp_working_path)
-        counter = 0
-
-        # Preparing files
-        if not os.path.exists(temp_working_path):
-            os.makedirs(temp_working_path)
-
-        for file_name in os.listdir(self.segments_path):
-            shutil.copy(os.path.join(self.segments_path, file_name), os.path.join(temp_working_path, file_name))
-
-        for (dir_path, dir_names, file_names) in os.walk(self.folder_to_compare_path):
-            for file_name in file_names:
-                if not os.path.exists(temp_working_path + file_name):
-                    self.file_relation[str(counter)] = os.path.join(dir_path, file_name)
-                    shutil.copy(self.file_relation[str(counter)],
-                                temp_working_path + "/" + str(counter) + "_" + file_name)
-                    counter += 1
-
-        # HACK: Please notice here, you shall never allow users to run code on your server directly.
-        # Try only receive part parameters from users, such as what I did here. DO NOT let users run
-        # their command directly, that would be very dangerous.
-        os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
-                                                                  self.number_of_matches,
-                                                                  self.file_language,
-                                                                  self.results_path,
-                                                                  temp_working_path))
 
     def run_detection_optimized(self, temp_working_path):
         """Run the detection with optimized sensitivity parameters
@@ -258,14 +232,9 @@ class Jplag(DetectionLib):
         small_counter = 0
         normal_counter = 0
 
-        # small_path = os.path.join(temp_working_path, "small")
-        # normal_path = os.path.join(temp_working_path, "normal")
-
         # Preparing files
         if not os.path.exists(temp_working_path):
             os.makedirs(temp_working_path)
-            # os.makedirs(small_path)
-            #os.makedirs(normal_path)
         else:
             logger.critical("Temp working path not empty! <{0}>".format(temp_working_path))
 
@@ -277,12 +246,10 @@ class Jplag(DetectionLib):
             file_size = file_lines(current_file)
             if file_size < self.NORMAL_SIZE_SEGMENT:
                 # Segment is small size
-                #shutil.copy(current_file, os.path.join(small_path, file_name))
                 small_counter += 1
                 small_files.append(file_name)
             else:
                 # Segment is normal size
-                #shutil.copy(current_file, os.path.join(normal_path, file_name))
                 normal_counter += 1
                 normal_files.append(file_name)
             shutil.copy(current_file, os.path.join(temp_working_path, file_name))
@@ -304,29 +271,29 @@ class Jplag(DetectionLib):
             self.optimized = True
 
             # First check the smaller segments
-            os.system("java -jar {0} -t 5 -l {1} -r {2} {3}".format(self.lib_path,
+            os.system("java -jar {0} -t 3 -l {1} -m {2}% -r {3} {4}".format(self.lib_path,
                                                                     self.file_language,
+                                                                    self.threshold,
                                                                     os.path.join(self.results_path, "small"),
-                                                                    # small_path))
                                                                     temp_working_path))
 
             # Then check the normal segments
-            os.system("java -jar {0} -l {1} -r {2} {3}".format(self.lib_path,
-                                                               self.file_language,
-                                                               os.path.join(self.results_path, "normal"),
-                                                               # normal_path))
-                                                               temp_working_path))
+            os.system("java -jar {0} -t 6 -l {1} -m {2}% -r {3} {4}".format(self.lib_path,
+                                                                            self.file_language,
+                                                                            self.threshold,
+                                                                            os.path.join(self.results_path, "normal"),
+                                                                            temp_working_path))
 
             # Save which segments are small and which normal size
             with open(os.path.join(self.results_path, 'optimized_files.pkl'), 'wb') as f:
                 pickle.dump([small_files, normal_files], f)
 
         else:
-            os.system("java -jar {0} -m {1} -l {2} -r {3} {4}".format(self.lib_path,
-                                                                      self.number_of_matches,
-                                                                      self.file_language,
-                                                                      self.results_path,
-                                                                      temp_working_path))
+            os.system("java -jar {0} -l {1} -m {2}% -r {3} {4}".format(self.lib_path,
+                                                                       self.file_language,
+                                                                       self.threshold,
+                                                                       self.results_path,
+                                                                       temp_working_path))
 
     def results_interpretation(self):
         """Interpret the results produced by JPlag.

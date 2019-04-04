@@ -8,7 +8,7 @@
 {% block sideButton %}
     <div class="col-md-3">
         <a href="upload">
-            <button class="btn btn-outline-secondary btn-lg btn-custom-size">
+            <button class="btn btn-light border border-dark btn-lg btn-custom-size">
                 <div class="row">
                     <div class="col-2">
                         <i class="material-icons">navigate_next</i>
@@ -25,22 +25,30 @@
 
 {% block content %}
     <p>
-        Welcome the Misconduct Assessment Tool (MAT).
+        Welcome the Misconduct Assessment Tool (<i>MAT</i>).
     </p>
     <p>
         The aim of this tool is to help situations where student
         submissions that are not obvious cases of academic misconduct, but suspected of misconduct due to <it>multiple
         small segments</it> being <it>similar.</it>
+        The expected number of submissions with that exact
+        combination of segments are estimated.
+        <br>
+        <b>Note:</b> <i>MAT</i> is built to assist the decision making process, it does <i>not</i> replace it.
     </p>
 
     <ul>
-        <li>First, upload the suspect file to check and a folder which contains all of the submissions</li>
+        <li>First, <i>upload</i> the suspect file to check and a folder which contains all of the submissions</li>
         <!--li>Then, you will have a chance to review the files you uploaded and edit them.</li-->
-        <li>Next, select the susceptible code segments from the suspect submission, to be compared with the rest of the submissions</li>
-        <li>Finally, the results page provides more information about the segments and a final report can be generated for sharing.</li>
+        <li>Next, <i>select</i> the susceptible code segments from the suspect submission, to be compared with the rest
+            of the submissions
+        </li>
+        <li>Finally, the <i>results</i> page provides more information about the segments and a final report can be
+            generated for sharing.
+        </li>
     </ul>
 
     <p>
-        Click "Next" to begin.
+        Select <i>Next</i> to begin.
     </p>
 {% endblock %}

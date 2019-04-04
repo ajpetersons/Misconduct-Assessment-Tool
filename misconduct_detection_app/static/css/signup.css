@@ -1,0 +1,18 @@
+label {
+    font-size: 18px;
+    line-height: 1.5em;
+}
+
+span {
+    font-style: italic;
+}
+
+span, li {
+    font-size: 15px;
+    line-height: 1.5em;
+}
+
+/* input fields height */
+p > input {
+    height: 1.5em;
+}

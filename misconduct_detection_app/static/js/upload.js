@@ -4,25 +4,147 @@ pageName = "Upload";
 let uploadFileFinish = false;
 let uploadFolderFinish = false;
 
+function setFileDetectionPackage() {
+    $.ajax({
+        url: '/select/autoDetect/',
+        type: "GET",
+        dataType: "json",
+        success: function (autoDetectResults) {
+            let autoDetectionLibSelection = autoDetectResults[0];
+            let autoDetectionLanguage = autoDetectResults[1];
+            if (autoDetectResults === "FILE_TYPE_NOT_SUPPORTED") {
+                $("#languageSelectionModal").modal("show");
+                autoDetectionLibSelection = "JPlag";
+                autoDetectionLanguage = "text";
+            }
+
+            let programmingConfigs = new FormData();
+            programmingConfigs.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
+            programmingConfigs.append("detectionLibSelection", autoDetectionLibSelection);
+            programmingConfigs.append("detectionLanguage", autoDetectionLanguage);
+            if(detectionThreshold){
+                // Previous value
+                programmingConfigs.append("detectionThreshold", detectionThreshold);
+            }else{
+                // Default value
+                programmingConfigs.append("detectionThreshold", 80);
+            }
+
+            $.ajax({
+                url: "/configs/savingConfigs/",
+                type: 'POST',
+                cache: false,
+                data: programmingConfigs,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+                beforeSend: function () {
+                    uploading = true;
+                },
+                success: function (data) {
+                    uploading = false;
+                }
+            });
+            let $detectionLibSelection = $("#detectionLibSelection");
+            $detectionLibSelection.empty();
+            $detectionLibSelection.append($("<div></div>").attr({
+                "class": "btn btn-outline-primary",
+                "role": "button",
+            }).text(autoDetectionLibSelection + " : " + autoDetectionLanguage));
+
+        }
+    });
+}
+
+$("#changeDetectionLib").on("click", function () {
+    $("#languageSelectionModal").modal("hide");
+    $("#programmingLanguageChoosingModal").modal("show");
+});
+
+// Update the bottom bar from the context processor
+// (Xin implemented the bottom bar to be updated using the context processor and used to not update until selecting next)
+function updateBottomBar() {
+    $.ajax({
+        url: "/upload/updateContext/",
+        type: 'GET',
+        cache: false,
+        success: function (data) {
+            //console.log(data);
+            let context = data;
+            fileToComparePathList = context["fileToComparePathList"];
+            resultsPathList = context["resultsPathList"];
+            folderPathList = context["folderPathList"];
+            segmentsPathList = context["segmentsPathList"];
+            detectionLibList = context["detectionLibList"];
+            configsList = context["configsList"];
+
+            loadUploadedComparingFile();
+            loadUploadedFolder();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.warn("Error updating bottom bar");
+        }
+    });
+}
+
 function modifyDOMAfterUploadingFile() {
     uploadFileFinish = true;
     openNextButton();
     $("#uploadFileLabel").text("Reupload");
-    $("#uploadFileCheck").empty();
+    updateBottomBar();
 }
 
 function modifyDOMAfterUploadingFolder() {
     uploadFolderFinish = true;
     openNextButton();
     $("#uploadFolderLabel").text("Reupload");
+    updateBottomBar();
+}
+
+var isFileIncluded;
+
+function checkFileIncluded() {
+    // Check if the uploaded file is included in the uploaded folder
+    $.ajax({
+        url: "checkIncluded/",
+        type: 'GET',
+        cache: false,
+        success: function (data) {
+            isFileIncluded = data;
+            updateSubmissionsCount();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.warn("Error checking if file included in folder");
+        }
+    });
+}
+
+function updateSubmissionsCount() {
+    if (isFileIncluded === "Yes") {
+        $("#fileIncludedCheck").html("(Uploaded file <i>included</i> in the folder)")
+    } else if (isFileIncluded === "No") {
+        $("#fileIncludedCheck").html("(Uploaded file <i>not included</i> in the folder)")
+    }
+}
+
+function fileUploaded() {
+    modifyDOMAfterUploadingFile();
+    $("#uploadFileCheck").empty();
+    $("#uploadFileCheck").append("<i class='material-icons'>check</i> File uploaded.");
+    checkFileIncluded();
+}
+
+function folderUploaded() {
+    modifyDOMAfterUploadingFolder();
     $("#uploadFolderCheck").empty();
+    $("#uploadFolderCheck").append("<i class='material-icons'>check</i> Folder uploaded. <i>" + numberOfSubmissions + " submissions</i>");
+    checkFileIncluded();
 }
 
 function uploadFile() {
-    modifyDOMAfterUploadingFile();
     let singleFile = new FormData($('#uploadFileForm')[0]);
-    $("#uploadFileCheck").append("<i class='fa fa-spinner fa-spin'></i>Please wait while uploading...");
-    
+    $("#uploadFileCheck").html("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
+
     $.ajax({
         url: "uploadFile/",
         type: 'POST',
@@ -30,26 +152,30 @@ function uploadFile() {
         data: singleFile,
         processData: false,
         contentType: false,
-        dataType:"json",
         beforeSend: function(){
             uploading = true;
         },
-        success : function(data) {
+        success: function (data) {
             uploading = false;
+            setFileDetectionPackage();
+            fileUploaded();
+
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.warn("Error sending the file");
+            alert("Error: file not uploaded");
+            //alert(xhr.status);
+            //alert(thrownError);
+            $("#uploadFileCheck").html('<i class="material-icons">block</i>There was an error while uploading the file');
         }
     });
 
-    $(document).ajaxStop(function() {
-        $("#uploadFileCheck").empty();
-        $("#uploadFileCheck").append("<i class='material-icons'>check</i>Selected file uploaded.");
-
-    });
 }
 
 function uploadFolder() {
-    modifyDOMAfterUploadingFolder();
     let folderFile = new FormData($('#uploadFolderForm')[0]);
-    $("#uploadFolderCheck").append("<i class='fa fa-spinner fa-spin'></i>Please wait while uploading...");
+    $("#fileIncludedCheck").empty();
+    $("#uploadFolderCheck").html("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
 
     $.ajax({
         url: "uploadFolder/",
@@ -64,41 +190,44 @@ function uploadFolder() {
         },
         success : function(data) {
             uploading = false;
+            numberOfSubmissions = data;
+            folderUploaded();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.warn("Error sending the file");
+            alert("Error: folder not uploaded");
+            $("#uploadFolderCheck").html('<i class="material-icons">block</i>There was an error while uploading the folder');
         }
     });
 
-    $(document).ajaxStop(function() {
-        $("#uploadFolderCheck").empty();
-        $("#uploadFolderCheck").append("<i class='material-icons'>check</i>Selected folder uploaded.");
-    });
 }
 
 function openNextButton() {
-    if (uploadFileFinish == true && uploadFolderFinish == true) {
+    if (uploadFileFinish && uploadFolderFinish && numberOfSubmissions > 0) {
         document.getElementById("nextButton").removeAttribute("disabled");
-        document.getElementById("nextButton").removeAttribute("title");
+    } else {
+        // Disable the next button
+        document.getElementById("nextButton").setAttribute("disabled", "");
     }
 }
 
 $("#uploadFileForm").change(function (){
-    uploadFile(); 
+    uploadFile();
  });
 
 $("#uploadFolderForm").change(function (){
-   uploadFolder(); 
+    uploadFolder();
 });
 
 $(document).ready(function () {
     if (fileToComparePathList != "NOFOLDEREXISTS") {
         modifyDOMAfterUploadingFile();
-        $("#uploadFileCheck").empty();
-        $("#uploadFileCheck").append("<i class='material-icons'>check</i>File uploaded.");
+        fileUploaded();
     }
 
     if (folderPathList[0] != "NOFOLDEREXISTS") {
         modifyDOMAfterUploadingFolder();
-        $("#uploadFolderCheck").empty();
-        $("#uploadFolderCheck").append("<i class='material-icons'>check</i>Folder uploaded.");
+        folderUploaded();
     }
     openNextButton();
     console.log('document.ready()')

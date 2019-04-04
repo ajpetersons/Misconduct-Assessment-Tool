@@ -8,13 +8,14 @@
         const jPlagResults = JSON.parse("{{ jPlagResultsJsonString|escapejs }}");
         const segmentFiles = JSON.parse("{{ segmentFilesJsonString|escapejs }}");
         let jPlagSubmissionNumber = "{{ jPlagSubmissionNumber }}";
+        let isFileIncluded = "{{ isFileIncluded }}";
     </script>
     <script src="{% static 'js/results.js' %}" defer></script>
     <!-- Report generation script source: https://rawgit.com/MrRio/jsPDF/master/docs/ -->
     <script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
     <!-- script src="{% static 'js/jspdf.js' %}" ></script -->
     <!-- Beautify code snippets, source: https://github.com/google/code-prettify -->
-    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?lang=css&amp;"></script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
     <style>
         li.L0, li.L1, li.L2, li.L3,
         li.L5, li.L6, li.L7, li.L8 {
@@ -47,7 +48,7 @@
 {% block sideButton %}
     <div class="col-md-3">
         <a href="#">
-            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size disabled">
+            <button type="button" class="btn btn-light border border-dark btn-lg btn-custom-size disabled">
                 <div class="row">
                     <div class="col-2">
                         <i class="material-icons">navigate_next</i>
@@ -61,7 +62,7 @@
         </a>
         <br>
         <a href="\select\">
-            <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size">
+            <button type="button" class="btn btn-light border border-dark btn-lg btn-custom-size">
                 <div class="row">
                     <div class="col-2">
                         <i class="material-icons">navigate_before</i>
@@ -73,7 +74,7 @@
             </button>
         </a>
         <br>
-        <button type="button" class="btn btn-outline-secondary btn-lg btn-custom-size" data-toggle="modal"
+        <button type="button" class="btn btn-light border border-dark btn-lg btn-custom-size" data-toggle="modal"
                 data-target="#cancelButton">
             <div class="row">
                 <div class="col-2">

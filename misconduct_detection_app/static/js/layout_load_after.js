@@ -26,6 +26,6 @@ $("#cancelButtonFinal").click(function () {
 
 $(document).ready(function (){
     $("#layoutHeader").text(pageName);
-    $("#title").text(toolName + " -- " + pageName);
-    $("#layoutToolName").text(toolName);
+    $("#title").text(pageName + " • " + toolName);
+    $("#layoutToolName").html(toolName.italics());
 });

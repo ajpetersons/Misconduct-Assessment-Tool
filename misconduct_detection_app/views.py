@@ -4,11 +4,12 @@ import pickle
 import json
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from django.core.serializers.json import DjangoJSONEncoder
 
 from .env_settings import *
+from . import context_processors
 
 import logging
 logger = logging.getLogger(__name__)
@@ -25,7 +26,6 @@ def index(request):
     """
     return render(request, 'misconduct_detection_app/welcome.html')
 
-
 def upload_index(request):
     """The upload page
 
@@ -34,8 +34,30 @@ def upload_index(request):
     :return: render
     :rtype: render
     """
-    return render(request, 'misconduct_detection_app/upload.html')
 
+    context = {
+        "numberOfSubmissions": number_of_submissions(request),
+    }
+    return render(request, 'misconduct_detection_app/upload.html', context)
+
+
+def uploaded_folder_index(request):
+    """ The uploaded folder page
+
+        :param request: request
+        :type request: HttpRequest
+        :return: render
+        :rtype: render
+    """
+    # Check if uploaded file is in uploaded folder
+    is_file_included = "No"
+    if is_file_included_in_folder(request):
+        is_file_included = "Yes"
+    context = {
+        "numberOfSubmissions": number_of_submissions(request),
+        "isFileIncluded": is_file_included
+    }
+    return render(request, 'misconduct_detection_app/uploadedFolder.html', context)
 
 def select_index(request):
     """The select page
@@ -103,7 +125,7 @@ def results_index(request):
 
     if not configs_path_list["detectionLibSelection"] in DETECTION_LIBS.keys():
         try:
-            with open(os.path.join(get_results_path(request), "results_keys"), "rb") as f:
+            with open(os.path.join(get_results_path(request), "results_keys.pkl"), "rb") as f:
                 DETECTION_LIBS[configs_path_list["detectionLibSelection"]] = pickle.load(f)
         except FileNotFoundError:
             return redirect("error_results_keys_not_exists")
@@ -112,11 +134,17 @@ def results_index(request):
 
     segment_files_json_string = json.dumps(segment_files, cls=DjangoJSONEncoder)
     jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
+    # Check if uploaded file is in uploaded folder
+    is_file_included = "No"
+    if is_file_included_in_folder(request):
+        is_file_included = "Yes"
 
     context = {
         "jPlagResultsJsonString": jplag_results_json_string,
-        "jPlagSubmissionNumber": jplag_submission_number,
+        # "jPlagSubmissionNumber": jplag_submission_number, # Deprecated
+        "jPlagSubmissionNumber": number_of_submissions(request),
         "segmentFilesJsonString": segment_files_json_string,
+        "isFileIncluded": is_file_included
     }
 
     return render(request, 'misconduct_detection_app/results.html', context)
@@ -203,10 +231,13 @@ def upload_folder(request):
     if request.method == 'POST':
         files = request.FILES.getlist('file')
         for f in files:
+            if str(f)[0] == '.':
+                # Skip UNIX/Mac hidden files
+                continue
             file_name, file_extension = os.path.splitext(str(f))
             original_path = f.original_path
             handle_upload_folder(request, f, file_name, file_extension, original_path)
-        return HttpResponse('Upload Success')
+        return HttpResponse(number_of_submissions(request))
     else:
         return HttpResponse('Uploading Failed')
 
@@ -230,6 +261,30 @@ def handle_upload_folder(request, file, file_name, file_extension, original_path
         for chunk in file.chunks():
             destination.write(chunk)
 
+
+def upload_check_included(request):
+    """
+    Check if the uploaded folder has the uploaded file included
+
+    :param request:
+    :return: Yes/No/NA
+    """
+    if os.path.exists(get_folder_path(request)) and os.path.exists(get_file_to_compare_path(request)):
+        if is_file_included_in_folder(request):
+            return HttpResponse("Yes")
+        else:
+            return HttpResponse("No")
+    else:
+        return HttpResponse("NA")
+
+
+def upload_update_context(request):
+    """
+    Update the context of the bottom bar
+    :param request:
+    :return: Json formatted context
+    """
+    return JsonResponse(context_processors.update_bottom_bar(request))
 
 # ------------------------------------Examination Code------------------------------------
 def examine_file(request, name):
@@ -423,8 +478,15 @@ def run_detection_core(request):
         paraname, paradata = line.split(",")
         configs_path_list[paraname] = paradata
 
-    extra_settings = configs_path_list["detectionLanguage"]
-    detection_lib = detection_libs_configs[configs_path_list["detectionLibSelection"]](request, extra_settings)
+    extra_settings = {}
+    extra_settings["detectionLanguage"] = configs_path_list["detectionLanguage"]
+    extra_settings["detectionThreshold"] = configs_path_list["detectionThreshold"]
+    try:
+        detection_lib = detection_libs_configs[configs_path_list["detectionLibSelection"]](request, extra_settings)
+    except FileNotFoundError:
+        # Detection lib initialization failed, most likely no results
+        return redirect('error_no_results_error')
+
     detection_lib.run_without_getting_results(get_temp_working_path(request))
     DETECTION_LIBS[configs_path_list["detectionLibSelection"]] = detection_lib
 
@@ -432,7 +494,7 @@ def run_detection_core(request):
     if not os.path.exists(get_results_path(request)):
         return redirect('error_no_results_error')
 
-    with open(os.path.join(get_results_path(request), "results_keys"), "wb") as f:
+    with open(os.path.join(get_results_path(request), "results_keys.pkl"), "wb") as f:
         pickle.dump(detection_lib, f)
 
     return redirect('results')
@@ -489,9 +551,9 @@ def saving_configs(request):
                     # Clean the config file first
                     with open(os.path.join(get_configs_path(request), "configs.txt"), 'w') as f:
                         f.write("detectionLibSelection," + request.POST[parameter])
-                if parameter == "detectionLanguage":
+                else:
                     with open(os.path.join(get_configs_path(request), "configs.txt"), 'a') as f:
-                        f.write("\ndetectionLanguage," + request.POST[parameter])
+                        f.write("\n"+parameter+"," + request.POST[parameter])
         return HttpResponse('Selection Succeeded')
     else:
         return HttpResponse('Selection Failed')

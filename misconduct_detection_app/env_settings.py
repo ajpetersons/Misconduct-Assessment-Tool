@@ -2,7 +2,7 @@ import shutil
 
 from .detection_libs import Jplag
 import os
-
+from filecmp import cmp
 
 # Global system parameters defined here.
 APP_PATH = "misconduct_detection_app"
@@ -69,6 +69,59 @@ def get_folder_path(request):
     folder_path = os.path.join(APP_PATH, "uploads", get_user_id(request), "folders")
     return folder_path
 
+
+def get_list_of_files(dirName):
+    # source: https://thispointer.com/python-how-to-get-list-of-files-in-directory-and-sub-directories/
+    # create a list of file and sub directories
+    # names in the given directory
+    listOfFile = os.listdir(dirName)
+    allFiles = list()
+    # Iterate over all the entries
+    for entry in listOfFile:
+        # Create full path
+        fullPath = os.path.join(dirName, entry)
+        # If entry is a directory then get the list of files in this directory
+        if os.path.isdir(fullPath):
+            allFiles = allFiles + get_list_of_files(fullPath)
+        else:
+            allFiles.append(fullPath)
+
+    return allFiles
+
+
+def is_file_included_in_folder(request):
+    """
+    Check if the uploaded file is included in the uploaded folder
+
+    :param request:
+    :return:
+    """
+    file_path = get_file_to_compare_path(request)
+    file = get_list_of_files(file_path)[0]
+    folder_path = get_folder_path(request)
+    folder_files = get_list_of_files(folder_path)
+
+    for folder_file in folder_files:
+        if cmp(file, folder_file):
+            return True
+
+    return False
+
+
+def number_of_submissions(request):
+    """
+    Helper function to find the number of submissions of an uploaded folder
+    :param request:
+    :return:
+    """
+    number_of_submissions = 0
+    if os.path.exists(get_folder_path(request)):
+        d = os.path.join(get_folder_path(request), os.listdir(get_folder_path(request))[0])
+        number_of_submissions = len([os.path.join(d, o) for o in os.listdir(d)
+                                     if os.path.isdir(os.path.join(d, o))])
+        # number_of_submissions = len(os.listdir(
+        #    os.path.join(get_folder_path(request), os.listdir(get_folder_path(request))[0])))
+    return number_of_submissions
 
 def get_temp_working_path(request):
     """Dynamically get the temp working folder path
@@ -139,13 +192,14 @@ def jplag_default_creator(request, extra_settings):
                     os.path.join(include_segments_path, "Segment_" + checked_segment + extension_name))
 
     # Decompress the extra parameters
-    detection_language = extra_settings
+    detection_language = extra_settings["detectionLanguage"]
+    threshold = extra_settings["detectionThreshold"]
 
     # Return the JPlag object dynamically
     return Jplag(lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
                  results_path=get_results_path(request), segments_path=include_segments_path,
                  folder_to_compare_path=get_folder_path(request), file_language=detection_language,
-                 number_of_matches="1%")
+                 threshold=threshold)
 
 
 # Register detection packages
@@ -159,7 +213,7 @@ detection_libs_configs = {
 null_detection_libs = {
     "JPlag": Jplag(lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
                    results_path="", segments_path="", folder_to_compare_path="", file_language="c/c++",
-                   number_of_matches="1%"),
+                   threshold="80%"),
 }
 
 
@@ -186,8 +240,7 @@ def auto_detect_programming_language(request):
     # Return results based on previous settings and local file
     uploaded_file_name = get_file_to_compare_path(request)
     extension_name = os.listdir(uploaded_file_name)[0]
-    extension_name = extension_name[extension_name.find(".") + 1:]
-
+    extension_name = extension_name[extension_name.rfind(".") + 1:]
     try:
         return selection_dict[extension_name]
     except KeyError:

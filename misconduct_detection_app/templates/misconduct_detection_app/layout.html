@@ -19,10 +19,10 @@
 
     <script src="{% static 'js/jquery-3.3.1.js' %}" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous" defer></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous" defer></script>    
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous" defer></script>
 
-    <link rel="icon" href="{% static 'ico/tinyi.ico' %}" type="image/x-icon">
-    <link rel="shortcut icon" href="{% static 'ico/tinyi.ico' %}" type="image/x-icon">
+    <link rel="icon" href="{% static 'ico/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'ico/favicon.ico' %}" type="image/x-icon">
 
     <!-- Global variables defined here -->
     <script>
@@ -31,22 +31,27 @@
 
         // Highlighter colors using in segments selection
         var highLighterColors = [
-            "#ccebc5",
+
             "#a8ddb5",
+            "#c2e5f0",
+            "#f0a8d2",
+            "#f7a187",
+            "#ff4d4d",
+            "#ffff80",
+            "#99ffff",
+            "#ccebc5",
+            "#66bd63",
             "#7bccc4",
-            "#4eb3d3",
             "#fde0dd",
+            "#fdae61",
             "#fcc5c0",
+            "#d9ef8b",
             "#fa9fb5",
             "#f768a1",
-            "#dd3497",
-            "#f46d43",
-            "#fdae61",
             "#fee08b",
-            "#ffffbf",
-            "#d9ef8b",
             "#a6d96a",
-            "#66bd63",
+            "#ffffbf",
+
         ];
 
         // Django global variables defined here
@@ -60,6 +65,7 @@
         
         var detectionLibSelection = configsList["detectionLibSelection"];
         var detectionLanguage = configsList["detectionLanguage"];
+        var detectionThreshold = configsList["detectionThreshold"];
     </script>
 
     <script src="{% static 'js/layout_load_before.js' %}" defer></script>
@@ -80,41 +86,42 @@
     <!--The top navbar-->
     <nav class="navbar fixed-top navbar-light bg-light border-bottom" id="topBar">
         <!-- Name shown-->
-        <a class="navbar-brand" href="/" id="layoutToolName">Tool-Name</a>
+        <a class="navbar-brand" href="/" id="layoutToolName"><!--Tool-Name--></a>
         <!-- Page Title-->
-        <header id="layoutHeader">#Title</header>
+        <header id="layoutHeader"><!--#Title--></header>
         <!-- Log in panel-->
-        <div class="btn-group">
+        <div class="btn-group" id="login-form-group">
+
             <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Sign in / Sign up
+                {% if user.is_authenticated %}
+                    User: <i>{{ user.get_username }}</i>
+                {% else %}
+                    Sign In
+                    <!--li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li-->
+                {% endif %}
             </button>
-            <div class="dropdown-menu pull-right dropdown-menu-right">
-                <form class="px-4 py-3">
-                    <div class="form-group">
-                    <label for="dropdownFormEmail1">Email address</label>
-                    <input type="email" class="form-control" id="DropdownFormEmail" placeholder="email@sms.ed.ac.com">
-                    </div>
-                    <div class="form-group">
-                    <label for="dropdownFormPassword1">Password</label>
-                    <input type="password" class="form-control" id="DropdownFormPassword" placeholder="Password">
-                    </div>
-                    <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="dropdownCheck">
-                    <label class="form-check-label" for="dropdownCheck">
-                        Remember me
-                    </label>
-                    </div>
-                    <button type="submit" class="btn btn-primary disabled">Sign in</button>
-                </form>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">New User? Sign up</a>
-                <a class="dropdown-item" href="#">Forgot password?</a>
+            <div id="login-dp" class="dropdown-menu pull-right dropdown-menu-right px-4 py-3">
+                {% if user.is_authenticated %}
+                    <!-- Commented lines: Go to previous page next -->
+                    <!--a class="btn btn-secondary btn-block" href="{% url 'logout' %}?next={{ request.path }}">Logout</a-->
+                    <!-- Go to home page -->
+                    <a class="btn btn-secondary btn-block" href="{% url 'logout' %}?next={{ views.index }}">Logout</a>
+                {% else %}
+                    <form class="" method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        <label for="id_username">Username:</label> <input class="form-control" id="id_username"
+                                                                          type="text" name="username" maxlength="30"/>
+                        <label for="id_password">Password:</label> <input class="form-control" type="password"
+                                                                          name="password" id="id_password"/>
+                        <br/>
+                        <input type="submit" class="btn btn-primary btn-block" value="Log in"/>
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}"/>
+                    </form>
+                    <div class="dropdown-divider"></div>
+                    <a class="btn btn-secondary btn-block" href="{% url 'signup' %}?next={{ request.path }}">Sign up</a>
+                {% endif %}
             </div>
         </div>
-    </nav>
-
-    <!--The bottom navbar-->
-    <nav class="navbar navbar-light bg-light fixed-bottom border-top" id="bottomBar">
     </nav>
 
     <!--The programming language choosing panel-->
@@ -122,7 +129,8 @@
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="programmingLanguageChoosingModalTitle">Detection Package</h5>
+                <h5 class="modal-title" id="programmingLanguageChoosingModalTitle">Similarity Detection Package
+                    Settings</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 </button>
             </div>
@@ -130,13 +138,26 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-md-6 ml-auto border-right">
-                            <h5>Select the detection package:</h5>
+                            <h5>Similarity Detection Package:</h5>
                             <form id="programmingLanguageChoosingDetectionLibForm">
                             </form>
                         </div>
                         <div class="col-md-6 ml-auto" id="programmingLanguageChoosingLanguageFormDiv">
-                            <h5>Select the programming language to detect:</h5>
+                            <h5>Submission programming language:</h5>
                             <h7 id="programmingLanguageChoosingLanguageFormGuide">Select a detection package first.</h7>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row border-top">
+                        <div class="col-12 ">
+                            <br>
+                            <form>
+                                <h5>Similarity percentage detection threshold:</h5>
+                            <input id="thresholdSlider" type="range" class="custom-range" min="0" max="100" step="10" value="80"/>
+                            <br>
+                                <h6><b>Threshold:</b> <span id="detectionThreshold">80</span>%</h6>
+                            <h7>Any similarities below the threshold will be <i>ignored</i></h7>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -192,6 +213,13 @@
             </div>
         </nav>
     </div>
+
+    <!--The bottom navbar-->
+    <!-- hide in small screens -->
+    <footer class="footer d-sm-none d-md-block">
+        <nav class="navbar navbar-light bg-light fixed-bottom border-top" id="bottomBar">
+        </nav>
+    </footer>
 
     <form method="post" id="cancelButtonFrom">
         {% csrf_token %}
