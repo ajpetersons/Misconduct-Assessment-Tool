@@ -15,20 +15,6 @@ resulting number should be the number of students anticipated to have the exact 
 number is lower than one, a case of misconduct is suggested. Please note that the results are not conclusive.
 
 
-## Screens
- 
-#### Welcome Page
-![Welcome Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/welcome_page.png?raw=true)
-
-#### Upload Page
-![Upload Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/upload_page.png?raw=true)
-
-#### Segment Selection Page
-![Segment Selection Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/segments_selection_page.png?raw=true)
-
-#### Results Page
-![Results Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/results_page.png?raw=true)
-
 ## Requirements
 
 > `Java` SE Runtime Environment(JRE) >= 1.8.0
@@ -87,6 +73,21 @@ python manage.py migrate
 ```sh
 python manage.py runserver <optional ip:port>
 ```
+
+## Screens
+ 
+#### Welcome Page
+![Welcome Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/welcome_page.png?raw=true)
+
+#### Upload Page
+![Upload Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/upload_page.png?raw=true)
+
+#### Segment Selection Page
+![Segment Selection Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/segments_selection_page.png?raw=true)
+
+#### Results Page
+![Results Page](https://github.com/iamstelios/Misconduct-Assessment-Tool/blob/master/screens/results_page.png?raw=true)
+
 
 ## Meta
 
