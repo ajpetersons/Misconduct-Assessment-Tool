@@ -1,0 +1,23 @@
+name: mat
+channels:
+  - anaconda
+  - defaults
+dependencies:
+  - beautifulsoup4=4.7.1=py37_1
+  - ca-certificates=2019.1.23=0
+  - certifi=2018.11.29=py37_0
+  - openssl=1.1.1=he774522_0
+  - pip=19.0.3=py37_0
+  - python=3.7.2=h8c8aaf0_10
+  - pytz=2018.9=py37_0
+  - setuptools=40.8.0=py37_0
+  - soupsieve=1.7.1=py37_0
+  - sqlite=3.26.0=he774522_0
+  - vc=14.1=h21ff451_3
+  - vs2015_runtime=15.5.2=3
+  - wheel=0.33.1=py37_0
+  - wincertstore=0.2=py37_0
+  - pip:
+    - django==2.1.7
+prefix: C:\Users\steli\Anaconda3\envs\mat
+
