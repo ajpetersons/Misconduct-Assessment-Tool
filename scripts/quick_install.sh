@@ -2,7 +2,7 @@
 echo "==================================================================="
 echo "= Welcome to the Misconduct Assessment Tool Quick Install Script! ="
 echo "==================================================================="
-echo "Install Conda? [Y,n]"
+echo "Install Miniconda3? [Y,n]"
 read input
 if [[ $input == "Y" || $input == "y" ]]; then
     wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -12,21 +12,21 @@ if [[ $input == "Y" || $input == "y" ]]; then
     echo "export PATH=\""\$PATH":$HOME/miniconda3/bin\"" >> ~/.benv
     source ~/.benv
 else
-        echo "don't do that"
+        echo "Skipping Conda installation"
 fi
 
 conda_root="$HOME/miniconda3/envs/mat"
-install_pos="$(pwd)"
+echo "Creating virtual environment"
+conda env create -f environment.yml
+conda activate mat
 
-echo "Your conda root is:"
+echo "Virtual environment path:"
 echo $conda_root
+
+cd ..
+install_pos="$(pwd)"
 echo "Your installation path is:"
 echo $install_pos
-
-conda env create -f environment.yml
-source activate mat
-
-git clone https://github.com/iamstelios/Misconduct-Assessment-Tool
 
 cd $conda_root
 
@@ -40,12 +40,10 @@ echo "export SECRET_KEY=$secret" >> ./etc/conda/activate.d/env_vars.sh
 echo -e '#!/bin/sh\n' >> ./etc/conda/deactivate.d/env_vars.sh
 echo 'unset SECRET_KEY' >> ./etc/conda/deactivate.d/env_vars.sh
 
-source deactivate mat
-source activate mat
+source conda deactivate
+source conda activate mat
 
 cd $install_pos
-
-cd $install_pos/Misconduct-Assessment-Tool
 
 python manage.py migrate
 
