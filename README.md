@@ -24,13 +24,6 @@ number is lower than one, a case of misconduct is suggested. Please note that th
 
 Otherwise, install the required `Python` dependencies listed in ``environment.yml`` using `pip` manually and skip the the installation guide below
 
-## Quick install on Linux
-
-```sh
-cd Misconduct-Assessment-Tool/scripts/
-bash quick_install.sh
-```
-
 ## Development Installation
 
 1. Clone the repository
