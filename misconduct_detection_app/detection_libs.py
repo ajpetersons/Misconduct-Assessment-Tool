@@ -306,7 +306,7 @@ class Jplag(DetectionLib):
 
         def process_result_file(result_path, file_relation, search_files, path_folder=""):
             # Inner function that processes the html result file
-            with open(result_path) as fp:
+            with open(result_path, encoding='iso-8859-1') as fp:
                 soup = BeautifulSoup(fp, 'html.parser')
 
             # search_files = os.listdir(segments_path)

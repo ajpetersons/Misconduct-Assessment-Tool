@@ -347,7 +347,7 @@ def examine_file_in_result_page(request, name):
         image_data = open(path_file, "rb").read()
         return HttpResponse(image_data, content_type="image/png")
     else:
-        f = open(path_file, 'r')
+        f = open(path_file, 'r', encoding='iso-8859-1')
         file_content = f.read()
         f.close()
         return HttpResponse(file_content)
