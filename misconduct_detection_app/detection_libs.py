@@ -3,6 +3,7 @@ import shutil
 from bs4 import BeautifulSoup
 import bs4
 import pickle
+import subprocess
 
 import logging
 
@@ -405,3 +406,210 @@ class Jplag(DetectionLib):
     @number_of_matches.setter
     def number_of_matches(self, number_of_matches):
         self.__number_of_matches = number_of_matches
+
+
+class SID(DetectionLib):
+    """SID detection library."""
+
+    def __init__(self, results_path, segments_path, folder_to_compare_path, file_language, lib_path=None, name="SID"):
+        """Create a new SID detection package wrapper object.
+        
+        :param name: the name of this library
+        :type name: str
+        :param lib_path: the path of the library on the server
+        :type lib_path: str
+        :param results_path: the path to store produced results. The results format should be:
+        (results, submission_number), where results should be a dict which contains the results
+        and file relations. And the submission_number should be the number of submissions rather
+        than the number of files.
+        :type results_path: str
+        :param segments_path: the path where stores the uploaded single file
+        :type segments_path: str
+        :param folder_to_compare_path: the path where the uploaded folder is stored
+        :type folder_to_compare_path: str
+        ----------------------Only for SID----------------------
+        :param file_language: which languages are supported by this detection package
+        :type file_language: str
+        """
+
+        super().__init__(name, lib_path, results_path, segments_path, folder_to_compare_path)
+        self.file_language_supported = ["python3", "matlab"]
+        assert (file_language in self.file_language_supported), "Language parameter {0} not supported by SID".format(
+            file_language)
+        self.file_language = file_language
+        self.NORMAL_SIZE_SEGMENT = 12
+        logger.debug('New instance of %s', self.name)
+
+
+    def run_detection(self, temp_working_path):
+        """Run the detection with optimized sensitivity parameters
+
+        :param temp_working_path: the temp working folder path
+        :type temp_working_path: str
+        """
+        logger.debug('Running detection on working environment %s', temp_working_path)
+
+        # Preparing files
+        if not os.path.exists(temp_working_path):
+            os.makedirs(temp_working_path)
+            os.makedirs(os.path.join(temp_working_path, "small"))
+            os.makedirs(os.path.join(temp_working_path, "normal"))
+            os.makedirs(os.path.join(temp_working_path, "all_submissions"))
+            os.makedirs(os.path.join(self.results_path, "small"))
+            os.makedirs(os.path.join(self.results_path, "normal"))
+        else:
+            logger.critical("Temp working path not empty! <{0}>".format(temp_working_path))
+
+        small_files = []
+        normal_files = []
+        all_submission_files = []
+
+        for file_name in os.listdir(self.segments_path):
+            current_file = os.path.join(self.segments_path, file_name)
+            file_size = file_lines(current_file)
+            if file_size < self.NORMAL_SIZE_SEGMENT:
+                # Segment is small size
+                small_files.append(current_file)
+                shutil.copy(current_file, os.path.join(temp_working_path, "small", file_name))
+            else:
+                # Segment is normal size
+                normal_files.append(current_file)
+                shutil.copy(current_file, os.path.join(temp_working_path, "normal", file_name))
+
+        counter = 0
+        for (dir_path, _, file_names) in os.walk(self.folder_to_compare_path):
+            for file_name in file_names:
+                current_file = os.path.join(dir_path, file_name)
+                all_submission_files.append(current_file)
+                if not os.path.exists(temp_working_path + file_name):
+                    shutil.copy(current_file,
+                                os.path.join(temp_working_path, "all_submissions", str(counter) + "_" + file_name))
+                    counter += 1
+
+        # HACK: Please notice here, you shall never allow users to run code on your server directly.
+        # Try only receive part parameters from users, such as what I did here. DO NOT let users run
+        # their command directly, that would be very dangerous.
+
+        if len(small_files) > 0:
+            # self.optimized = True
+
+            # First check the smaller segments
+            with open(os.path.join(self.results_path, "small", "result.json"), 'w') as f:
+                cmd = ['sid compare', '-s', '3', '-w', '3', '-l', 'python3', 
+                    '-vv', '--output', os.path.join(self.results_path, "small")]
+                for file in all_submission_files + small_files: 
+                    cmd += ['-f', file]
+                proc = subprocess.Popen(" ".join(cmd), shell=True, stdout=f)
+                proc.wait()
+
+            # Save which segments are small and which normal size
+            # with open(os.path.join(self.results_path, 'optimized_files.pkl'), 'wb') as f:
+            #     pickle.dump([small_files, normal_files], f)
+
+        with open(os.path.join(self.results_path, "normal", "result.json"), 'w') as f:
+            cmd = ['sid compare', '-s', '6', '-w', '10', '-l', 'python3', '-vv', 
+                '--output', os.path.join(self.results_path, "normal")]
+            for file in all_submission_files + normal_files: 
+                cmd += ['-f', file]
+            proc = subprocess.Popen(" ".join(cmd), shell=True, stdout=f)
+            proc.wait()
+
+
+    def results_interpretation(self):
+        number_of_submissions = len(os.listdir(
+            os.path.join(self.folder_to_compare_path, os.listdir(self.folder_to_compare_path)[0])))
+        logger.info("Submission number:", number_of_submissions)
+
+        segment_results = {}
+
+        for f in os.listdir(segments_path): # TODO: should distinguish small and normal files
+            segment_results[f] = self.find_results(f)
+        # TODO: this is not done
+
+        # {
+        #     "Segment_3": {},
+        #     "Segment_2": {
+        #         "misconduct_detection_app/uploads/127.0.0.1/folders/mat_Test/w/Walker.py": [
+        #             "(100.0%)",
+        #             "normal/match0.html"
+        #         ],
+        #         "misconduct_detection_app/uploads/127.0.0.1/folders/mat_Test/l/Python3Listener.py": [
+        #             "(100.0%)",
+        #             "normal/match1.html"
+        #         ]
+        #     }
+        # }
+        return (segment_results, number_of_submissions)
+
+
+    def clean_working_envs(self, temp_working_path):
+        """Delete temp working folder
+        
+        :param temp_working_path: the temp working folder path
+        :type temp_working_path: str
+        """
+        logger.debug('Cleaning working environment %s', temp_working_path)
+        shutil.rmtree(temp_working_path)
+
+
+    def find_results(self, search_file):
+        temp_similarities_for_searching_file = {}
+        for tag in soup.find_all('h4'):
+            if 'Matches sorted by maximum similarity (' in tag.contents:
+                for tr_tag in tag.parent.find_all('tr'):
+                    if search_file in tr_tag.contents[0].contents[0]:
+                        similarities = tr_tag.contents[2:]
+                        for one_similarity in similarities:
+                            original_file_name = one_similarity.contents[0].contents[0]
+                            if "Segment_" in original_file_name:
+                                # matched with another segment edge case
+                                continue
+                            print('filename a full ', original_file_name)
+                            original_result_link = one_similarity.contents[0].get("href")
+                            similarity = one_similarity.contents[2].contents[0]
+                            temp_similarities_for_searching_file[
+                                file_relation[original_file_name[:original_file_name.find("_")]]] = [
+                                similarity, os.path.join(path_folder, original_result_link)]
+
+                for td_tag in tag.parent.find_all('td'):
+                    for element in td_tag.contents:
+                        if isinstance(element, bs4.element.Tag):
+                            if len(element.contents) > 0:
+                                if search_file in element.contents[0]:
+                                    original_file_name = td_tag.parent.contents[0].contents[0]
+                                    if "Segment_" in original_file_name:
+                                        # matched with another segment edge case
+                                        continue
+                                    original_result_link = td_tag.contents[0].get("href")
+                                    similarity = td_tag.contents[2].contents[0]
+                                    print('path_folder = ', path_folder)
+                                    print('filename ', original_file_name[:original_file_name.find("_")])
+                                    temp_similarities_for_searching_file[
+                                        file_relation[original_file_name[:original_file_name.find("_")]]] = [
+                                        similarity, os.path.join(path_folder, original_result_link)]
+
+        return temp_similarities_for_searching_file
+
+
+    # To improve the code readability, following getters setters will not contain comments.
+    @property
+    def file_language(self):
+        return self.__file_language
+
+
+    @file_language.setter
+    def file_language(self, file_language):
+        if file_language not in self.file_language_supported:
+            raise TypeError("Following language type is not supported by Jplag: " + file_language)
+        self.__file_language = file_language
+
+
+    @property
+    def lib_path(self):
+        return self.__lib_path
+
+
+    @lib_path.setter
+    def lib_path(self, lib_path):
+        self.__lib_path = lib_path
+

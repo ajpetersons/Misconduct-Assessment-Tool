@@ -1,6 +1,6 @@
 import shutil
 
-from .detection_libs import Jplag
+from .detection_libs import Jplag, SID
 import os
 from filecmp import cmp
 
@@ -202,9 +202,37 @@ def jplag_default_creator(request, extra_settings):
                  threshold=threshold)
 
 
+def sid_default_creator(request, extra_settings):
+    # First generate the segments which are included
+    with open(get_configs_path(request) + "/" + "checked_boxes" + '.txt', 'r') as f:
+        checked_segments = f.read()
+    include_segments_path = os.path.join(get_segments_path(request), "include_segments_path")
+    if os.path.exists(include_segments_path):
+        shutil.rmtree(include_segments_path)
+    if not os.path.exists(include_segments_path):
+        os.makedirs(include_segments_path)
+    checked_segments = checked_segments.split(",")
+
+    uploaded_file_name = get_file_to_compare_path(request)
+    extension_name = os.listdir(uploaded_file_name)[0]
+    extension_name = extension_name[extension_name.find("."):]
+
+    for checked_segment in checked_segments:
+        shutil.copy(os.path.join(get_segments_path(request), "Segment_" + checked_segment),
+                    os.path.join(include_segments_path, "Segment_" + checked_segment + extension_name))
+
+    # Decompress the extra parameters
+    detection_language = extra_settings["detectionLanguage"]
+
+    # Return the JPlag object dynamically
+    return SID(results_path=get_results_path(request), segments_path=include_segments_path,
+                 folder_to_compare_path=get_folder_path(request), file_language=detection_language)
+
+
 # Register detection packages
 detection_libs_configs = {
     "JPlag": jplag_default_creator,
+    "SID": sid_default_creator,
 }
 
 # This dict contains the null detection lib objects, which is used to provide
@@ -214,6 +242,7 @@ null_detection_libs = {
     "JPlag": Jplag(lib_path=os.path.join(APP_PATH, "detection_libs", "jplag-2.11.9-SNAPSHOT-jar-with-dependencies.jar"),
                    results_path="", segments_path="", folder_to_compare_path="", file_language="c/c++",
                    threshold="80%"),
+    "SID": SID(results_path="", segments_path="", folder_to_compare_path="", file_language="python3"),
 }
 
 
