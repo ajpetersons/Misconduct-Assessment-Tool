@@ -491,8 +491,6 @@ class SID(DetectionLib):
         # their command directly, that would be very dangerous.
 
         if len(small_files) > 0:
-            # self.optimized = True
-
             # First check the smaller segments
             with open(os.path.join(self.results_path, "small", "result.json"), 'w') as f:
                 cmd = ['sid compare', '-s', '3', '-w', '3', '-l', 'python3', 
@@ -502,10 +500,6 @@ class SID(DetectionLib):
                 proc = subprocess.Popen(" ".join(cmd), shell=True, stdout=f)
                 proc.wait()
 
-            # Save which segments are small and which normal size
-            # with open(os.path.join(self.results_path, 'optimized_files.pkl'), 'wb') as f:
-            #     pickle.dump([small_files, normal_files], f)
-
         with open(os.path.join(self.results_path, "normal", "result.json"), 'w') as f:
             cmd = ['sid compare', '-s', '6', '-w', '10', '-l', 'python3', '-vv', 
                 '--output', os.path.join(self.results_path, "normal")]
@@ -514,32 +508,91 @@ class SID(DetectionLib):
             proc = subprocess.Popen(" ".join(cmd), shell=True, stdout=f)
             proc.wait()
 
+        with open(os.path.join(self.results_path, 'optimized_files.pkl'), 'wb') as f:
+            pickle.dump([small_files, normal_files], f)
+
 
     def results_interpretation(self):
+        """Method interprets the results produced by SID.
+        
+        :return: (results, submission_number). The results should be a dict which
+        uses the segment file names as keys. Its values should be the similarity
+        and a list contains similar file links.
+        :rtype: (dict, int)
+        """
         number_of_submissions = len(os.listdir(
             os.path.join(self.folder_to_compare_path, os.listdir(self.folder_to_compare_path)[0])))
         logger.info("Submission number:", number_of_submissions)
 
-        segment_results = {}
+        with open(os.path.join(self.results_path, 'optimized_files.pkl'), 'rb') as f:
+            small_files, normal_files = pickle.load(f)
 
-        for f in os.listdir(segments_path): # TODO: should distinguish small and normal files
-            segment_results[f] = self.find_results(f)
-        # TODO: this is not done
+        small_results = self.parse_result_files("small", small_files)
+        normal_results = self.parse_result_files("normal", normal_files)
 
-        # {
-        #     "Segment_3": {},
-        #     "Segment_2": {
-        #         "misconduct_detection_app/uploads/127.0.0.1/folders/mat_Test/w/Walker.py": [
-        #             "(100.0%)",
-        #             "normal/match0.html"
-        #         ],
-        #         "misconduct_detection_app/uploads/127.0.0.1/folders/mat_Test/l/Python3Listener.py": [
-        #             "(100.0%)",
-        #             "normal/match1.html"
-        #         ]
-        #     }
-        # }
-        return (segment_results, number_of_submissions)
+        results = {**small_results, **normal_results}
+
+        return results, number_of_submissions
+
+
+    def parse_result_files(self, subdir, segment_names):
+        """Method traverses a directory of HTML result files to locate any 
+            result files and parses these files. Overall similarity percentage, 
+            as well as the path to full report is extracted from the HTML report
+        
+        :param subdir: Directory, under results path, which to traverse in order 
+            to find all results. Results are divided in subdirectories to 
+            accommodate different length of files
+        :type subdir: str
+        :param segment_names: List of segment names that are in the current 
+            detection category. This is used to determine if the current result 
+            file corresponds to the segment we are interested in
+        :type segment_names: list of str
+        :return: (results, submission_number). The results should be a dict 
+            which uses the segment file names as keys. Its values should be the 
+            similarity and a list contains similar file links.
+        :rtype: (dict, int)
+        """
+        sources = {}
+
+        files = os.listdir(os.path.join(self.results_path, subdir))
+        for file in files:
+            with open(os.path.join(self.results_path, subdir, file)) as fp:
+                soup = BeautifulSoup(fp, 'html.parser')
+            
+            file_results = soup.find(id='targetFile')
+            filename = file_results.find(class_='name')
+            if filename.contents[0] not in segment_names:
+                continue
+
+            segment_name = self.get_segment_name(filename.contents[0])
+
+            if segment_name not in sources:
+                sources[segment_name] = {}
+
+            remote_file = soup.find(id='sourceFile')
+            remote_filename = remote_file.find(class_='name').contents[0]
+            similarity = file_results.find(class_='similarity').contents[0]
+
+            sources[segment_name][remote_filename] = [
+                similarity.strip(), 
+                os.path.join(subdir, file)
+            ]
+
+        return sources
+
+
+    def get_segment_name(self, full_path):
+        """Method parses full filepath and returns the name of the file without 
+            the file extension
+        
+        :param full_path: Full file path
+        :type full_path: str
+        :return: Name of the file without the extension
+        :rtype: str
+        """
+        filename = os.path.basename(full_path)
+        return filename[:filename.rfind(".")]
 
 
     def clean_working_envs(self, temp_working_path):
@@ -550,45 +603,6 @@ class SID(DetectionLib):
         """
         logger.debug('Cleaning working environment %s', temp_working_path)
         shutil.rmtree(temp_working_path)
-
-
-    def find_results(self, search_file):
-        temp_similarities_for_searching_file = {}
-        for tag in soup.find_all('h4'):
-            if 'Matches sorted by maximum similarity (' in tag.contents:
-                for tr_tag in tag.parent.find_all('tr'):
-                    if search_file in tr_tag.contents[0].contents[0]:
-                        similarities = tr_tag.contents[2:]
-                        for one_similarity in similarities:
-                            original_file_name = one_similarity.contents[0].contents[0]
-                            if "Segment_" in original_file_name:
-                                # matched with another segment edge case
-                                continue
-                            print('filename a full ', original_file_name)
-                            original_result_link = one_similarity.contents[0].get("href")
-                            similarity = one_similarity.contents[2].contents[0]
-                            temp_similarities_for_searching_file[
-                                file_relation[original_file_name[:original_file_name.find("_")]]] = [
-                                similarity, os.path.join(path_folder, original_result_link)]
-
-                for td_tag in tag.parent.find_all('td'):
-                    for element in td_tag.contents:
-                        if isinstance(element, bs4.element.Tag):
-                            if len(element.contents) > 0:
-                                if search_file in element.contents[0]:
-                                    original_file_name = td_tag.parent.contents[0].contents[0]
-                                    if "Segment_" in original_file_name:
-                                        # matched with another segment edge case
-                                        continue
-                                    original_result_link = td_tag.contents[0].get("href")
-                                    similarity = td_tag.contents[2].contents[0]
-                                    print('path_folder = ', path_folder)
-                                    print('filename ', original_file_name[:original_file_name.find("_")])
-                                    temp_similarities_for_searching_file[
-                                        file_relation[original_file_name[:original_file_name.find("_")]]] = [
-                                        similarity, os.path.join(path_folder, original_result_link)]
-
-        return temp_similarities_for_searching_file
 
 
     # To improve the code readability, following getters setters will not contain comments.
