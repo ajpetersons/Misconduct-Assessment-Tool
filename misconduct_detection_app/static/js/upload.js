@@ -173,9 +173,14 @@ function uploadFile() {
 }
 
 function uploadFolder() {
-    let folderFile = new FormData($('#uploadFolderForm')[0]);
+    let folderFile = new FormData();
     $("#fileIncludedCheck").empty();
     $("#uploadFolderCheck").html("<i class='fa fa-spinner fa-spin'></i> Please wait while uploading...");
+
+    for (let value of $('#uploadFolderInput')[0].files) {
+        folderFile.append("file", value, value.webkitRelativePath);
+    }
+    let csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
     $.ajax({
         url: "uploadFolder/",
@@ -185,8 +190,9 @@ function uploadFolder() {
         processData: false,
         contentType: false,
         dataType:"json",
-        beforeSend: function(){
+        beforeSend: function(xhr, settings){
             uploading = true;
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
         },
         success : function(data) {
             uploading = false;
