@@ -8,7 +8,7 @@ from filecmp import cmp
 APP_PATH = "misconduct_detection_app"
 DETECTION_LIBS = {}
 SUPPORTED_PROGRAMMING_LANGUAGE_EXTENSION = [
-    "java", "py", "c", "cpp", "cs", "txt"
+    "java", "py", "c", "cpp", "cs", "txt", "m"
 ]  # the supported language of this tool
 
 # The following default path is used when user is unknown. Which is 'default' situation
@@ -254,12 +254,13 @@ def auto_detect_programming_language(request):
 
     # Allocate default detection packages for different programming languages.
     # Here since we have only JPlag in this iteration, I allocated all programming languages to JPlag
-    selection_dict["java"] = ["JPlag", "java17"]
-    selection_dict["py"] = ["JPlag", "python3"]
-    selection_dict["c"] = ["JPlag", "c/c++"]
-    selection_dict["cpp"] = ["JPlag", "c/c++"]
-    selection_dict["cs"] = ["JPlag", "c#-1.2"]
-    selection_dict["txt"] = ["JPlag", "text"]
+    selection_dict["java"] = [["JPlag"], "java17"]
+    selection_dict["py"] = [["JPlag", "SID"], "python3"]
+    selection_dict["c"] = [["JPlag"], "c/c++"]
+    selection_dict["cpp"] = [["JPlag"], "c/c++"]
+    selection_dict["cs"] = [["JPlag"], "c#-1.2"]
+    selection_dict["txt"] = [["JPlag"], "text"]
+    selection_dict["m"] = [["SID"], "matlab"]
 
     # Raise not implemented errors
     for key in selection_dict.keys():

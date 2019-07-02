@@ -301,7 +301,7 @@ function getAutoDetectionResults() {
                     "You have not set the detection package and programming language!"
                 )
                 $('#autoDetectionConfirmationModal').modal('show');
-            } else if ((detectionLibSelection != autoDetectionLibSelection) || detectionLanguage != autoDetectionLanguage) {
+            } else if ((!autoDetectionLibSelection.includes(detectionLibSelection)) || detectionLanguage != autoDetectionLanguage) {
                 $("#autoDetectionConfirmationModalBody").empty()
                 $("#autoDetectionConfirmationModalConfirm").removeClass("disabled")
                 $("#autoDetectionConfirmationModalBody").append(

@@ -10,7 +10,7 @@ function setFileDetectionPackage() {
         type: "GET",
         dataType: "json",
         success: function (autoDetectResults) {
-            let autoDetectionLibSelection = autoDetectResults[0];
+            let autoDetectionLibSelection = autoDetectResults[0][0];
             let autoDetectionLanguage = autoDetectResults[1];
             if (autoDetectResults === "FILE_TYPE_NOT_SUPPORTED") {
                 $("#languageSelectionModal").modal("show");
@@ -181,6 +181,7 @@ function uploadFolder() {
         folderFile.append("file", value, value.webkitRelativePath);
     }
     let csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    folderFile.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
 
     $.ajax({
         url: "uploadFolder/",
@@ -190,9 +191,8 @@ function uploadFolder() {
         processData: false,
         contentType: false,
         dataType:"json",
-        beforeSend: function(xhr, settings){
+        beforeSend: function(){
             uploading = true;
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
         },
         success : function(data) {
             uploading = false;
