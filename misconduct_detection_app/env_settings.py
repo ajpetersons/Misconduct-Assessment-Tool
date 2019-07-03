@@ -20,29 +20,49 @@ DEFAULT_SEGMENTS_PATH = os.path.join(APP_PATH, "uploads", "Default", "segments")
 DEFAULT_CONFIGS_PATH = os.path.join(APP_PATH, "uploads", "Default", "configs")
 
 
-def get_user_ip(request):
-    """Get ip of current user
-
-    :param request: request
-    :type request: HttpRequest
-    :return: user's ip
+def get_folder_from_session(sess):
+    """Function computes user folder name based on the Django session instance 
+        provided
+    
+    :param sess: User session
+    :type sess: Session
+    :return: Subdirectory name for user specific files
     :rtype: str
     """
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        user_ip = x_forwarded_for.split(',')[0]
-    else:
-        user_ip = request.META.get('REMOTE_ADDR')
-    return user_ip
+    return "guest_{}".format(sess.session_key)
 
 
-# TODO
-"""
-TODO: For later developer - When you finish the authentication part in Django, you can simply replace the user_id
-function to your user id getter. Here since the authentication part hasn't finished, I use ip to distinguish users.
-Which shall not be used when this tool is deployed on a server.
-"""
-get_user_id = get_user_ip
+def get_user_id(request):
+    """Function retrieves user subdirectory name where all uploaded and result 
+        files will be stored
+    
+    :param request: Request that has been made and contains user credentials
+    :type request: HttpRequest
+    :return: Subdirectory name for user specific files
+    :rtype: str
+    """
+    if request.user.is_authenticated:
+        return "authenticated_{}".format(request.user.id)
+
+    return get_folder_from_session(request.session)
+
+
+def get_session_paths(sess):
+    """Function retrieves all paths used to store data for user session. This 
+        function is intended for use with anonymous user sessions, thus takes 
+        Session as a parameter, instead of HttpRequest as majority of other 
+        functions
+    
+    :param sess: Anonymous user session
+    :type sess: Session
+    :return: List of directories used to store data for user session - uploaded 
+        files and result files
+    :rtype: list of str
+    """
+    uploads_dir = os.path.join(APP_PATH, "uploads", get_folder_from_session(sess))
+    results_dir = os.path.join(APP_PATH, "results", get_folder_from_session(sess))
+
+    return [uploads_dir, results_dir]
 
 
 # Dynamic file path getter.

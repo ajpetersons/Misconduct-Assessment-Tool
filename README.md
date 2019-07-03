@@ -54,6 +54,9 @@ activate mat
 4. Follow the link below for instruction of how to include the ``SECRET_KEY`` environment variable in your conda environment.
 <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#saving-environment-variables>
 
+## Clearing user sessions
+
+Django does not ship with built in concurrency mechanisms or asynchronous task execution, thus sessions must be cleaned manually. On production environment that is done by a cronjob running [`clearsessions` command](https://docs.djangoproject.com/en/2.0/ref/django-admin/#django-admin-clearsessions).
 
 ## Running the Misconduct Assessment Tool
 

@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+SESSION_ENGINE = 'misconduct_detection_app.session'
+SESSION_COOKIE_AGE = 86400
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

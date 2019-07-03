@@ -1,0 +1,1 @@
+0 0 * * * /disk/data/s1509375/venv/bin/python /disk/data/s1509375/misconduct_detection_project/manage.py clearsessions
