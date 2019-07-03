@@ -44,6 +44,8 @@ def get_user_id(request):
     if request.user.is_authenticated:
         return "authenticated_{}".format(request.user.id)
 
+    request.session.set_expiry(86400)
+
     return get_folder_from_session(request.session)
 
 
