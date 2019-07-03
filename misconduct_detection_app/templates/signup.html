@@ -1,8 +1,8 @@
-{% extends 'misconduct_detection_app/layout.html' %}
+{% extends 'registration/login_layout.html' %}
 
 {% block head %}
+    {{ block.super }}
     {% load staticfiles %}
-    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
     <script>
         pageName = "Sign Up"
     </script>
@@ -11,9 +11,37 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-primary" type="submit">Sign up</button>
-    </form>
+    <div class="login-content">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <label for="id_username">Username:</label> 
+            <input class="form-control" id="id_username" type="text" name="username" maxlength="30" aria-describedby="usernameHelpBlock"/>
+            <small id="usernameHelpBlock" class="form-text text-muted">
+                Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+            </small>
+            <label for="id_password">Password:</label> 
+            <input class="form-control" type="password" name="password" id="id_password" aria-describedby="passwordHelpBlock"/>
+            <small id="passwordHelpBlock" class="form-text text-muted">
+                <ul>
+                    <li>Your password can't be too similar to your other personal information.</li>
+                    <li>Your password must contain at least 8 characters.</li>
+                    <li>Your password can't be a commonly used password.</li>
+                    <li>Your password can't be entirely numeric.</li>
+                </ul>
+            </small>
+            <label for="id_password2">Password confirmation:</label> 
+            <input class="form-control" type="password" name="password2" id="id_password2" aria-describedby="password2HelpBlock"/>
+            <small id="password2HelpBlock" class="form-text text-muted">
+                Enter the same password as before, for verification.
+            </small>
+            <br>
+            <input class="btn btn-primary btn-block" type="submit" value="Sign up"/>
+            <input type="hidden" name="next" value="{{ next }}"/>
+            <!-- {{ form }} -->
+        </form>
+        <div class="dropdown-divider"></div>
+        <a class="btn btn-secondary btn-block" href="{% url 'login' %}?next={{ request.path }}">Log in</a>
+    </div>
 {% endblock %}

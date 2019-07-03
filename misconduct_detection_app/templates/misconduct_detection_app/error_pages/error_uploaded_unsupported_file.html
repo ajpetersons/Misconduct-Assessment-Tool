@@ -1,6 +1,8 @@
-{% extends 'misconduct_detection_app/layout.html' %}
+{% extends 'misconduct_detection_app/app_layout.html' %}
 
 {% block head %}
+    {# load previous script declarations #}
+    {{ block.super }}
     {% load staticfiles %}
     <script src="{% static 'js/error_pages/error_uploaded_unsupported_file.js' %}" defer></script>
 {% endblock %}

@@ -1,0 +1,10 @@
+p, ul {
+    font-size: 22px;
+    line-height: 50px;
+}
+
+#login-dp {
+    min-width: 300px;
+    padding: 14px;
+    overflow: hidden;
+}

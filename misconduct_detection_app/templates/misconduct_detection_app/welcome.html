@@ -1,8 +1,12 @@
-{% extends 'misconduct_detection_app/layout.html' %}
+{% extends 'misconduct_detection_app/app_layout.html' %}
 
 {% block head %}
+    {# load previous script declarations #}
+    {{ block.super }}
     {% load staticfiles %}
-    <script src="{% static 'js/welcome.js' %}" defer></script>
+    <script>
+        pageName = "Welcome";
+    </script>
 {% endblock %}
 
 {% block sideButton %}

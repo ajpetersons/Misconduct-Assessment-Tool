@@ -5,6 +5,29 @@ let firstCall = true; // print hint on selection box
 let horizontalSpace = "&nbsp;";
 let verticalSpace = "<br/>";
 
+// Highlighter colors using in segments selection
+const highLighterColors = [
+    "#a8ddb5",
+    "#c2e5f0",
+    "#f0a8d2",
+    "#f7a187",
+    "#ff4d4d",
+    "#ffff80",
+    "#99ffff",
+    "#ccebc5",
+    "#66bd63",
+    "#7bccc4",
+    "#fde0dd",
+    "#fdae61",
+    "#fcc5c0",
+    "#d9ef8b",
+    "#fa9fb5",
+    "#f768a1",
+    "#fee08b",
+    "#a6d96a",
+    "#ffffbf",
+];
+
 /**
  * Used for lightening a color
  * @param color (HEX)
@@ -272,7 +295,6 @@ function removeHighlight(masterNode) {
 function highlightCode(selectedTextRange, startNode, endNode, segmentNumber) {
     // Set the link
     let highlightLink = document.createElement("a");
-    //highlightLink.setAttribute("style", "color: black; background: " + highLighterColors[maxSegmentNumber % highLighterColors.length]);
     highlightLink.setAttribute("href", "#highLightedSegmentHeader" + segmentNumber);
     highlightLink.setAttribute("id", "highLightedSegment" + segmentNumber);
     selectedTextRange.surroundContents(highlightLink);

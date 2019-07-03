@@ -9,11 +9,6 @@
     max-width: 140px;
 }
 
-p, ul {
-    font-size: 22px;
-    line-height: 50px;
-}
-
 .popover {
     width: 600px;
     height: 400px;
@@ -48,25 +43,7 @@ body {
     padding-top: 65px;
 }
 
-/* set the sidebar width */
-.w-sidebar {
-    width: 200px;
-    max-width: 200px;
-    z-index: 1050;
-}
-
-/* pad the contents from the sidebar */
-.contents {
-    padding-left: 220px;
-}
-
 /* pad the footer nav bar */
 body > .container-fluid {
     padding-bottom: 60px;
-}
-
-#login-dp {
-    min-width: 300px;
-    padding: 14px;
-    overflow: hidden;
 }
