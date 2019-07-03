@@ -17,14 +17,32 @@ logger = logging.getLogger(__name__)
 # Create your views here.
 # ------------------------------------Index------------------------------------
 def index(request):
-    """The index page
+    """The index page. Shows an initial choice between login and continuing as a
+        guest if user has not made the choice yet. Otherwise shows Landing page 
+        with instructions.
 
     :param request: request
     :type request: HttpRequest
     :return: render
     :rtype: render
     """
-    return render(request, 'misconduct_detection_app/welcome.html')
+    if request.user.is_authenticated or 'guest' in request.session:
+        return render(request, 'misconduct_detection_app/welcome.html')
+
+    return render(request, 'misconduct_detection_app/landing.html')
+
+def guest_index(request):
+    """Proxy page for users willing to continue without logging in. This view 
+        sets guest parameter in session and redirects to Landing page with 
+        instructions.
+
+    :param request: request
+    :type request: HttpRequest
+    :return: render
+    :rtype: render
+    """
+    request.session['guest'] = True
+    return redirect('index')
 
 def upload_index(request):
     """The upload page

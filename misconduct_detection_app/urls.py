@@ -19,6 +19,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('guestLogin/', views.guest_index, name='guest_index'),
     path('upload/', views.upload_index, name='upload_index'),
     path('select/', views.select_index, name='select_index'),
     path('results/', views.results_index, name='results'),

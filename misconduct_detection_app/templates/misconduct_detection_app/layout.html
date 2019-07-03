@@ -96,7 +96,7 @@
                 {% if user.is_authenticated %}
                     User: <i>{{ user.get_username }}</i>
                 {% else %}
-                    Sign In
+                    User: <i>guest</i>
                     <!--li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li-->
                 {% endif %}
             </button>

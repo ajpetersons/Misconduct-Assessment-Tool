@@ -1,0 +1,33 @@
+{% extends 'misconduct_detection_app/layout.html' %}
+
+{% block head %}
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="intro-content">
+        <div class="welcome-message">
+            <p>Hello to the tool. You can log in to your account, create an account or continue as a guest. 
+                If you operate as a guest, your files will be kept for 24 hours and deleted afterwards.</p>
+        </div>
+
+        <div class="login-form">
+            <form class="" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <label for="id_username">Username:</label> <input class="form-control" id="id_username"
+                                                                    type="text" name="username" maxlength="30"/>
+                <label for="id_password">Password:</label> <input class="form-control" type="password"
+                                                                    name="password" id="id_password"/>
+                <br/>
+                <input type="submit" class="btn btn-primary btn-block" value="Log in"/>
+                <input type="hidden" name="next" value="{{ request.get_full_path }}"/>
+            </form>
+            <div class="dropdown-divider"></div>
+            <a class="btn btn-secondary btn-block" href="{% url 'signup' %}?next={{ request.path }}">Sign up</a>
+        </div>
+
+        <div class="dropdown-divider"></div>
+        <a href="/guestLogin/" class="btn btn-secondary btn-block">Continue as a guest</a>
+    </div>
+{% endblock %}
