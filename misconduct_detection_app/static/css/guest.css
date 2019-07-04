@@ -14,8 +14,7 @@
 }
 
 .login-content .welcome-message {
-  margin: 0 -20px 40px;
-  text-align: center;
+  margin-bottom: 40px;
 }
 
 .login-content .welcome-message p {
