@@ -96,6 +96,9 @@ def get_list_of_files(dirName):
     # source: https://thispointer.com/python-how-to-get-list-of-files-in-directory-and-sub-directories/
     # create a list of file and sub directories
     # names in the given directory
+    if not os.path.exists(dirName):
+        return []
+
     listOfFile = os.listdir(dirName)
     allFiles = list()
     # Iterate over all the entries
@@ -119,7 +122,10 @@ def is_file_included_in_folder(request):
     :return:
     """
     file_path = get_file_to_compare_path(request)
-    file = get_list_of_files(file_path)[0]
+    single_file_dir = get_list_of_files(file_path)
+    if len(single_file_dir) == 0:
+        return False
+    file = single_file_dir[0]
     folder_path = get_folder_path(request)
     folder_files = get_list_of_files(folder_path)
 
