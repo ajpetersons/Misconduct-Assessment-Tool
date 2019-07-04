@@ -496,7 +496,7 @@ class SID(DetectionLib):
                 cmd = ['sid compare', '-s', '3', '-w', '3', '-l', 'python3', 
                     '-vv', '--output', os.path.join(self.results_path, "small")]
                 for file in all_submission_files + small_files: 
-                    cmd += ['-f', file]
+                    cmd += ['-f', "'{}'".format(file)]
                 proc = subprocess.Popen(" ".join(cmd), shell=True, stdout=f)
                 proc.wait()
 
@@ -504,7 +504,7 @@ class SID(DetectionLib):
             cmd = ['sid compare', '-s', '6', '-w', '10', '-l', 'python3', '-vv', 
                 '--output', os.path.join(self.results_path, "normal")]
             for file in all_submission_files + normal_files: 
-                cmd += ['-f', file]
+                cmd += ['-f', "'{}'".format(file)]
             proc = subprocess.Popen(" ".join(cmd), shell=True, stdout=f)
             proc.wait()
 
