@@ -47,3 +47,7 @@ body {
 body > .container-fluid {
     padding-bottom: 60px;
 }
+
+.form-error {
+    color: #dc3545;
+}
