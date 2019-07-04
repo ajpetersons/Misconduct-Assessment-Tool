@@ -1,3 +1,4 @@
+import os
 import shutil
 
 from django.contrib.sessions.backends.db import SessionStore as DBSessionStore
@@ -22,8 +23,10 @@ class SessionStore(DBSessionStore):
         expired_sessions = cls.get_model_class().objects.filter(expire_date__lt=timezone.now())
 
         for sess in expired_sessions:
+            print("Removing session: {}".format(sess.session_key))
             paths_to_clear = get_session_paths(sess)
             for path in paths_to_clear:
-                shutil.rmtree(path)
+                if os.path.exists(path):
+                    shutil.rmtree(path)
 
             sess.delete()
