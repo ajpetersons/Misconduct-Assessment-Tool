@@ -49,6 +49,7 @@
         </form>
         <div class="dropdown-divider"></div>
         <a class="btn btn-secondary btn-block" href="{% url 'signup' %}?next={{ request.path }}">Sign up</a>
+        <a class="btn btn-secondary btn-block" id="sessionLogout">End session</a>
     {% endif %}
 </div>
 

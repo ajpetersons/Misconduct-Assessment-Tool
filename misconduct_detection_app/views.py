@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib.auth import logout
 
 from .env_settings import *
 from . import context_processors
@@ -548,6 +549,24 @@ def clean(request):
     if os.path.exists(configs_path):
         shutil.rmtree(configs_path)
 
+    return HttpResponse("Clean Succeeded")
+
+
+def clean_session(request):
+    """Clean the user session - remove all files and remove session cookie
+    
+    :param request: request
+    :type request: HttpRequest
+    :return: operation state
+    :rtype: HttpResponse
+    """
+
+    paths_to_clear = get_session_paths(request.session)
+    for path in paths_to_clear:
+        if os.path.exists(path):
+            shutil.rmtree(path)
+    logout(request)
+    
     return HttpResponse("Clean Succeeded")
 
 

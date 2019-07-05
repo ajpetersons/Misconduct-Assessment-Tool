@@ -283,7 +283,27 @@ function loadDetectionPackageSettings(){
         $("#thresholdSlider").val(parseInt(detectionThreshold));
         $("#detectionThreshold").text(detectionThreshold);
     }
+}
 
+function getCookie(name) {
+    /**
+     * Function returns the value of a cookie with a given name
+     * @param name (string) - the name of the cookie
+     * @returns cookie value
+     */
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
 $(document).ready(function (){
@@ -296,7 +316,7 @@ $(document).ready(function (){
     loadDetectionPackageSettings();
 
     $("#cancelButtonFinal").click(function () {
-        csrfToken = new FormData($('#cancelButtonFrom')[0]);
+        var csrfToken = getCookie('csrftoken');
         $.ajax({
             url: "/clean/",
             type: 'POST',
@@ -305,7 +325,8 @@ $(document).ready(function (){
             processData: false,
             contentType: false,
             dataType:"json",
-            beforeSend: function() {
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
                 uploading = true;
             },
             success : function(data) {
@@ -314,6 +335,26 @@ $(document).ready(function (){
         });
         $(document).ajaxStop(function() {
             window.location.replace('/');
+        });
+    });
+
+    $("#sessionLogout").click(function() {
+        var csrfToken = getCookie('csrftoken');
+        $.ajax({
+            url: "/clean/session/",
+            type: 'POST',
+            cache: false,
+            data: csrfToken,
+            processData: false,
+            contentType: false,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+                uploading = true;
+            },
+            success : function(data) {
+                uploading = false;
+                window.location.replace('/');
+            }
         });
     });
 });

@@ -52,6 +52,14 @@
         </li>
     </ul>
 
+    {% if not user.is_authenticated %}
+    <p>
+        If you want to end your session, and delete all your files, choose "End session" option from the dropdown menu at 
+        the top right corner of the screen. Otherwise your session will be closed and files deleted after 24 hours of 
+        inactivity.
+    </p>
+    {% endif %}
+
     <p>
         Select <i>Next</i> to begin.
     </p>

@@ -40,6 +40,7 @@ urlpatterns = [
     path('results/details/<path:name>', views.examine_file_in_result_page, name='examine_file_in_result'),
 
     path('clean/', views.clean, name='clean'),
+    path('clean/session/', views.clean_session, name='clean_session'),
     path('configs/savingConfigs/', views.saving_configs, name='saving_configs'),
 
     path('errors/errorNoResults/', views.error_no_results_error, name='error_no_results_error'),

@@ -8,3 +8,7 @@ p, ul {
     padding: 14px;
     overflow: hidden;
 }
+
+#sessionLogout {
+    color: #ffffff;
+}

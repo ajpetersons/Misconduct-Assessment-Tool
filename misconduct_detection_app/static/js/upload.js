@@ -180,7 +180,6 @@ function uploadFolder() {
     for (let value of $('#uploadFolderInput')[0].files) {
         folderFile.append("file", value, value.webkitRelativePath);
     }
-    let csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     folderFile.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
 
     $.ajax({
