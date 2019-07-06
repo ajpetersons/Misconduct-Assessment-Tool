@@ -17,3 +17,16 @@ ul.workspaces-list {
     margin: 0;
     padding: 0;
 }
+
+.right-panel button.dropdown-toggle {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 30px
+}
+
+.right-panel button.dropdown-toggle::after {
+    position: absolute;
+    top: 16px;
+    right: 12px;
+}
