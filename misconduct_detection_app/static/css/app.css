@@ -1,4 +1,4 @@
-p, ul {
+.contents p, .contents ul {
     font-size: 22px;
     line-height: 50px;
 }
@@ -11,4 +11,9 @@ p, ul {
 
 #sessionLogout {
     color: #ffffff;
+}
+
+ul.workspaces-list {
+    margin: 0;
+    padding: 0;
 }

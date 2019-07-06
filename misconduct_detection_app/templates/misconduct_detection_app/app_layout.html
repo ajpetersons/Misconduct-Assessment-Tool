@@ -21,36 +21,57 @@
 </script>
 {% endblock %}
 
-{% block navLoginForm %}
-<button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    {% if user.is_authenticated %}
-        User: <i>{{ user.get_username }}</i>
-    {% else %}
-        User: <i>guest</i>
-        <!--li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li-->
-    {% endif %}
-</button>
-<div id="login-dp" class="dropdown-menu pull-right dropdown-menu-right px-4 py-3">
-    {% if user.is_authenticated %}
-        <!-- Commented lines: Go to previous page next -->
-        <!--a class="btn btn-secondary btn-block" href="{% url 'logout' %}?next={{ request.path }}">Logout</a-->
-        <!-- Go to home page -->
-        <a class="btn btn-secondary btn-block" href="{% url 'logout' %}?next={{ views.index }}">Logout</a>
-    {% else %}
-        <form class="" method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            <label for="id_username">Username:</label> 
-            <input class="form-control" id="id_username" type="text" name="username" maxlength="30"/>
-            <label for="id_password">Password:</label> 
-            <input class="form-control" type="password" name="password" id="id_password"/>
-            <br/>
-            <input type="submit" class="btn btn-primary btn-block" value="Log in"/>
-            <input type="hidden" name="next" value="{{ request.get_full_path }}"/>
-        </form>
-        <div class="dropdown-divider"></div>
-        <a class="btn btn-secondary btn-block" href="{% url 'signup' %}?next={{ request.path }}">Sign up</a>
-        <a class="btn btn-secondary btn-block" id="sessionLogout">End session</a>
-    {% endif %}
+
+{% block headerRight %}
+{% if user.is_authenticated %}
+    <div class="btn-group" id="WorkspacesSelection">
+        <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="workspacesDropdown">
+            Workspaces
+        </button>
+
+        <div class="dropdown-menu" aria-labelledby="workspacesDropdown">
+            <ul class="workspaces-list">
+            {% for ws in user_workspaces %}
+                <li class="dropdown-item" href=#>{{ ws.name }}</li>
+            {% empty %}
+                <li class="dropdown-item">No saved workspaces</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endif %}
+
+<div class="btn-group" id="login-form-group">
+    <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="userSettings">
+        {% if user.is_authenticated %}
+            User: <i>{{ user.get_username }}</i>
+        {% else %}
+            User: <i>guest</i>
+            <!--li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li-->
+        {% endif %}
+    </button>
+    <div id="login-dp" class="dropdown-menu pull-right dropdown-menu-right px-4 py-3" aria-labelledby="userSettings">
+        {% if user.is_authenticated %}
+            <!-- Commented lines: Go to previous page next -->
+            <!--a class="btn btn-secondary btn-block" href="{% url 'logout' %}?next={{ request.path }}">Logout</a-->
+            <!-- Go to home page -->
+            <a class="btn btn-secondary btn-block" href="{% url 'logout' %}?next={{ views.index }}">Logout</a>
+        {% else %}
+            <form class="" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <label for="id_username">Username:</label> 
+                <input class="form-control" id="id_username" type="text" name="username" maxlength="30"/>
+                <label for="id_password">Password:</label> 
+                <input class="form-control" type="password" name="password" id="id_password"/>
+                <br/>
+                <input type="submit" class="btn btn-primary btn-block" value="Log in"/>
+                <input type="hidden" name="next" value="{{ request.get_full_path }}"/>
+            </form>
+            <div class="dropdown-divider"></div>
+            <a class="btn btn-secondary btn-block" href="{% url 'signup' %}?next={{ request.path }}">Sign up</a>
+            <a class="btn btn-secondary btn-block" id="sessionLogout">End session</a>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock %}
@@ -64,7 +85,6 @@
         <div class="col-12 col-xl-auto bd-sidebar sidebar border-right align-middle">
             {% block sideButton %}
             {% endblock %}
-
         </div>
 
         <!-- Right side contents area-->

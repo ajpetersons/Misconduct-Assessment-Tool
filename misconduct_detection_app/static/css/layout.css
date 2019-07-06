@@ -1,6 +1,13 @@
 #layoutHeader {
+    position: absolute;
+    left: 50%;
     font-size: 35px;
     font-family:'Segoe UI',Arial,sans-serif;
+    transform: translateX(-50%);
+}
+
+.navbar .right-panel > div {
+    display: inline-block;
 }
 
 .btn-custom-size {
