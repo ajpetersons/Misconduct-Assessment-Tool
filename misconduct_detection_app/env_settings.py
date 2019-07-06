@@ -1,5 +1,7 @@
 import shutil
 
+from django.conf import settings
+
 from .detection_libs import Jplag, SID
 import os
 from filecmp import cmp
@@ -22,7 +24,7 @@ DEFAULT_CONFIGS_PATH = os.path.join(APP_PATH, "uploads", "Default", "configs")
 
 def get_folder_from_session(sess):
     """Function computes user folder name based on the Django session instance 
-        provided
+        provided.
     
     :param sess: User session
     :type sess: Session
@@ -30,6 +32,17 @@ def get_folder_from_session(sess):
     :rtype: str
     """
     return "guest_{}".format(sess.session_key)
+
+
+def get_folder_from_user(user):
+    """Function computes user folder name based on logged in user instance.
+    
+    :param user: Logged in user
+    :type user: User
+    :return: Subdirectory name for user specific files
+    :rtype: str
+    """
+    return "authenticated_{}".format(user.id)
 
 
 def get_user_id(request):
@@ -42,7 +55,8 @@ def get_user_id(request):
     :rtype: str
     """
     if request.user.is_authenticated:
-        return "authenticated_{}".format(request.user.id)
+        request.session.set_expiry(settings.SESSION_COOKIE_AGE)
+        return get_folder_from_user(request.user)
 
     request.session.set_expiry(86400)
 
@@ -63,6 +77,24 @@ def get_session_paths(sess):
     """
     uploads_dir = os.path.join(APP_PATH, "uploads", get_folder_from_session(sess))
     results_dir = os.path.join(APP_PATH, "results", get_folder_from_session(sess))
+
+    return [uploads_dir, results_dir]
+
+
+def get_user_paths(user):
+    """Function retrieves all paths used to store data for user account. This 
+        function is intended for use with logged in user sessions, thus takes 
+        User as a parameter, instead of HttpRequest as majority of other 
+        functions
+    
+    :param user: Logged in user instance
+    :type user: User
+    :return: List of directories used to store data for logged in user session -
+        uploaded files and result files
+    :rtype: list of str
+    """
+    uploads_dir = os.path.join(APP_PATH, "uploads", get_folder_from_user(user))
+    results_dir = os.path.join(APP_PATH, "results", get_folder_from_user(user))
 
     return [uploads_dir, results_dir]
 
