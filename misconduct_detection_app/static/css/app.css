@@ -30,3 +30,9 @@ ul.workspaces-list {
     top: 16px;
     right: 12px;
 }
+
+.sidebar br {
+    content: " ";
+    display: block;
+    margin: 12px;
+}
