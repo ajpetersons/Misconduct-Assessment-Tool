@@ -493,7 +493,7 @@ class SID(DetectionLib):
         if len(small_files) > 0:
             # First check the smaller segments
             with open(os.path.join(self.results_path, "small", "result.json"), 'w') as f:
-                cmd = ['sid compare', '-s', '3', '-w', '3', '-l', 'python3', 
+                cmd = ['sid compare', '-s', '4', '-w', '4', '-l', 'python3', 
                     '-vv', '--output', os.path.join(self.results_path, "small")]
                 for file in all_submission_files + small_files: 
                     cmd += ['-f', "'{}'".format(file)]
@@ -555,6 +555,10 @@ class SID(DetectionLib):
         """
         sources = {}
 
+        for segment in segment_names:
+            segment_name = self.get_segment_name(segment)
+            sources[segment_name] = {}
+
         files = os.listdir(os.path.join(self.results_path, subdir))
         for file in files:
             with open(os.path.join(self.results_path, subdir, file)) as fp:
@@ -565,15 +569,11 @@ class SID(DetectionLib):
             if filename.contents[0] not in segment_names:
                 continue
 
-            segment_name = self.get_segment_name(filename.contents[0])
-
-            if segment_name not in sources:
-                sources[segment_name] = {}
-
             remote_file = soup.find(id='sourceFile')
             remote_filename = remote_file.find(class_='name').contents[0]
             similarity = file_results.find(class_='similarity').contents[0]
 
+            segment_name = self.get_segment_name(filename.contents[0])
             sources[segment_name][remote_filename] = [
                 similarity.strip(), 
                 os.path.join(subdir, file)
