@@ -31,8 +31,11 @@
 
         <div class="dropdown-menu" aria-labelledby="workspacesDropdown">
             <ul class="workspaces-list">
+                <li class="dropdown-item" href="#">Save current workspace</li>
+                <div class="dropdown-divider"></div>
             {% for ws in user_workspaces %}
                 <li class="dropdown-item" href=#>{{ ws.name }}</li>
+                <!-- TODO: add delete button -->
             {% empty %}
                 <li class="dropdown-item">No saved workspaces</li>
             {% endfor %}
