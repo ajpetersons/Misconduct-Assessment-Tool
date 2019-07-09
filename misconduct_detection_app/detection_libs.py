@@ -618,7 +618,7 @@ class SID(DetectionLib):
     @file_language.setter
     def file_language(self, file_language):
         if file_language not in self.file_language_supported:
-            raise TypeError("Following language type is not supported by Jplag: " + file_language)
+            raise TypeError("Following language type is not supported by SID: " + file_language)
         self.__file_language = file_language
 
 
@@ -629,5 +629,7 @@ class SID(DetectionLib):
 
     @lib_path.setter
     def lib_path(self, lib_path):
+        # There is no file for SID, lib_path variable is not used in this class
+        # but required by parent class hence the empty setter
         self.__lib_path = lib_path
 

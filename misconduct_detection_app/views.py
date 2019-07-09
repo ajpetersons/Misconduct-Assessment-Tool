@@ -464,7 +464,7 @@ def select_load_html(request):
     except FileNotFoundError:
         return HttpResponse(json.dumps("FILE_NOT_FOUND", cls=DjangoJSONEncoder))
 
-    # ------------------------------------Run the Jplag jar------------------------------------
+    # ------------------------------------Run detection------------------------------------
 def run_detection(request):
     """Perform detection preparation
     
