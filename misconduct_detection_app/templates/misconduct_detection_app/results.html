@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="{% static 'css/results.css' %}">
     <!-- Receive Django templates results here-->
     <script>
-        const jPlagResults = JSON.parse("{{ jPlagResultsJsonString|escapejs }}");
+        const detectionResults = JSON.parse("{{ ResultsJsonString|escapejs }}");
         const segmentFiles = JSON.parse("{{ segmentFilesJsonString|escapejs }}");
-        let jPlagSubmissionNumber = "{{ jPlagSubmissionNumber }}";
+        let submissionCount = "{{ SubmissionNumber }}";
         let isFileIncluded = "{{ isFileIncluded }}";
     </script>
     <script src="{% static 'js/results.js' %}" defer></script>

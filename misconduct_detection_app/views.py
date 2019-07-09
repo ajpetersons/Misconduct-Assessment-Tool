@@ -149,19 +149,18 @@ def results_index(request):
         except FileNotFoundError:
             return redirect("error_results_keys_not_exists")
 
-    jplag_results, jplag_submission_number = DETECTION_LIBS[configs_path_list["detectionLibSelection"]].results_interpretation()
+    detection_results, submission_count = DETECTION_LIBS[configs_path_list["detectionLibSelection"]].results_interpretation()
 
     segment_files_json_string = json.dumps(segment_files, cls=DjangoJSONEncoder)
-    jplag_results_json_string = json.dumps(jplag_results, cls=DjangoJSONEncoder)
+    detection_results_json_string = json.dumps(detection_results, cls=DjangoJSONEncoder)
     # Check if uploaded file is in uploaded folder
     is_file_included = "No"
     if is_file_included_in_folder(request):
         is_file_included = "Yes"
 
     context = {
-        "jPlagResultsJsonString": jplag_results_json_string,
-        # "jPlagSubmissionNumber": jplag_submission_number, # Deprecated
-        "jPlagSubmissionNumber": number_of_submissions(request),
+        "ResultsJsonString": detection_results_json_string,
+        "SubmissionNumber": number_of_submissions(request),
         "segmentFilesJsonString": segment_files_json_string,
         "isFileIncluded": is_file_included
     }

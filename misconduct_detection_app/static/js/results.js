@@ -15,9 +15,9 @@ let filesWithAllSegments;
 isFileIncludedBool = isFileIncluded === "Yes";
 
 if (isFileIncludedBool) {
-    correctedSubmissionNumber = jPlagSubmissionNumber - 1;
+    correctedSubmissionNumber = submissionCount - 1;
 } else {
-    correctedSubmissionNumber = jPlagSubmissionNumber;
+    correctedSubmissionNumber = submissionCount;
 }
 
 /**
@@ -30,8 +30,8 @@ if (isFileIncludedBool) {
 let getMatchedSubmissionCount = segmentName => {
     let submissions = {};
 
-    Object.keys(jPlagResults[segmentName]).forEach(resultPath => {
-        if (!jPlagResults[segmentName].hasOwnProperty(resultPath)) return;
+    Object.keys(detectionResults[segmentName]).forEach(resultPath => {
+        if (!detectionResults[segmentName].hasOwnProperty(resultPath)) return;
 
         let pathBase = resultPath.substr(0, resultPath.lastIndexOf("/"));
 
@@ -42,7 +42,7 @@ let getMatchedSubmissionCount = segmentName => {
 };
 
 // Compute details
-var matchedSegmentNames = Object.keys(jPlagResults).filter(key => jPlagResults.hasOwnProperty(key) === true);
+var matchedSegmentNames = Object.keys(detectionResults).filter(key => detectionResults.hasOwnProperty(key) === true);
 matchedSegmentNames.forEach(segmentName => {
     let temp_probability = 0;
 
@@ -236,7 +236,7 @@ $("#report-form").submit(function (e) {
     change_font_size(section_size);
     print_text("General Evaluation");
     change_font_size(subsection_size+1);
-    print_text(`Number of total submissions:   ${jPlagSubmissionNumber}`);
+    print_text(`Number of total submissions:   ${submissionCount}`);
     change_font_size(text_size);
 
     y -= 2;
@@ -287,7 +287,7 @@ $("#report-form").submit(function (e) {
         change_font_size(subsection_size);
         print_text(`Individual probability:               ${individual_probabilities[segmentName].toFixed(decimalPrecision)}`);
         change_font_size(subsection_size-1);
-        let suspectFilesKeys = Object.keys(jPlagResults[segmentName]).filter(key => jPlagResults[segmentName].hasOwnProperty(key) === true);
+        let suspectFilesKeys = Object.keys(detectionResults[segmentName]).filter(key => detectionResults[segmentName].hasOwnProperty(key) === true);
         let similarSubmissionNumber = suspectFilesKeys.length - 1;
         if (similarSubmissionNumber < 0) similarSubmissionNumber = 0;
         print_text(`Number of similar submissions:   ${similarSubmissionNumber}`);
@@ -322,7 +322,7 @@ $(document).ready(function (){
     // General stats
     $("#segmentsContainer").before(
         "<div id='results-summary'>" +
-        `<h4>Number of total submissions: <i>${jPlagSubmissionNumber}</i></h4>Including the suspect submission: ${isFileIncluded}` +
+        `<h4>Number of total submissions: <i>${submissionCount}</i></h4>Including the suspect submission: ${isFileIncluded}` +
         `<p>Joint Probability: <i>${joint_probability.toFixed(decimalPrecision)}</i><br/>Joint Expectation: <i>${expectation.toFixed(decimalPrecision)}</i></p>` +
         "</div>"
     );
@@ -368,7 +368,7 @@ $(document).ready(function (){
         $segmentDetails.append(segmentDetailsStructure);
 
         // Link to original suspect code, if there is any.
-        let suspectFilesKeys = Object.keys(jPlagResults[segmentName]).filter(key => jPlagResults[segmentName].hasOwnProperty(key) === true);
+        let suspectFilesKeys = Object.keys(detectionResults[segmentName]).filter(key => detectionResults[segmentName].hasOwnProperty(key) === true);
 
         if (suspectFilesKeys.length !== 0) {
             $segmentDetails.append($("<button></button>").attr({
@@ -394,14 +394,14 @@ $(document).ready(function (){
 
             suspectFilesKeys.forEach(suspectFilesKey => {
                 const filePath = suspectFilesKey.substring(suspectFilesKey.indexOf("folder") + 8);
-                const fileLink = jPlagResults[segmentName][suspectFilesKey][1];
-                let linkToJPlagResult = document.createElement("a");
-                linkToJPlagResult.setAttribute("href", "details\\" + fileLink);
-                linkToJPlagResult.setAttribute("target", "_blank");
-                linkToJPlagResult.innerHTML = filePath;
-                linkToJPlagResult.appendChild(document.createElement("br"));
+                const fileLink = detectionResults[segmentName][suspectFilesKey][1];
+                let linkToResultDetails = document.createElement("a");
+                linkToResultDetails.setAttribute("href", "details\\" + fileLink);
+                linkToResultDetails.setAttribute("target", "_blank");
+                linkToResultDetails.innerHTML = filePath;
+                linkToResultDetails.appendChild(document.createElement("br"));
 
-                document.getElementById("codeDetails" + segmentName).appendChild(linkToJPlagResult);
+                document.getElementById("codeDetails" + segmentName).appendChild(linkToResultDetails);
 
 
 
