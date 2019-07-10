@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 's1509375.inf.ed.ac.uk']
 
 INSTALLED_APPS = [
     'misconduct_detection_app',
+    'workspaces',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

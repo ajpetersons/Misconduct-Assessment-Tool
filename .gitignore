@@ -5,6 +5,7 @@
 .idea/
 misconduct_detection_app/uploads
 misconduct_detection_app/results
+misconduct_detection_app/workspaces
 scratchpad/
 .vs/
 .vscode/
