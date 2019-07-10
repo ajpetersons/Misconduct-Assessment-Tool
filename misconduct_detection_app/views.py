@@ -384,8 +384,10 @@ def select_code(request):
     if request.method == 'POST':
         if os.path.exists(get_segments_path(request)):
             shutil.rmtree(get_segments_path(request))
-        if not os.path.exists(get_segments_path(request)):
+        try:
             os.makedirs(get_segments_path(request))
+        except FileExistsError:
+            pass
         if len(request.POST) > 1:
             for code_segment in request.POST.keys():
                 if code_segment != "csrfmiddlewaretoken":  # we don't want csrf token here

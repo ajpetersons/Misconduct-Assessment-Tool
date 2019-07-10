@@ -47,11 +47,9 @@ function setFileDetectionPackage() {
             });
             let $detectionLibSelection = $("#detectionLibSelection");
             $detectionLibSelection.empty();
-            $detectionLibSelection.append($("<div></div>").attr({
-                "class": "btn btn-outline-primary",
-                "role": "button",
-            }).text(autoDetectionLibSelection + " : " + autoDetectionLanguage));
-
+            let button = createButtonWithIcon("settings", autoDetectionLibSelection + " : " + autoDetectionLanguage, false);
+            button.addClass("text-primary"); // Add the link colour to match the other buttons
+            $detectionLibSelection.append(button);
         }
     });
 }
