@@ -21,24 +21,24 @@ if (isFileIncludedBool) {
 }
 
 /**
- * Function iterates all found matches and returns the number of unique submissions.
+ * Function iterates all found matches and returns the number of unique files.
  *
  * @function
  * @param segmentName {String} Name of the segment currently considered
- * @returns {Integer} Number of unique submissions that include a match with given segment
+ * @returns {Integer} Number of unique files that include a match with given segment
  */
 let getMatchedSubmissionCount = segmentName => {
-    let submissions = {};
+    let submissions = 0;
 
     Object.keys(detectionResults[segmentName]).forEach(resultPath => {
         if (!detectionResults[segmentName].hasOwnProperty(resultPath)) return;
 
-        let pathBase = resultPath.substr(0, resultPath.lastIndexOf("/"));
+        if (submissionPathPrefix && resultPath.startsWith(submissionPathPrefix)) return;
 
-        submissions[pathBase] = true;
+        submissions++;
     });
 
-    return Object.keys(submissions).length;
+    return submissions;
 };
 
 // Compute details
@@ -48,20 +48,15 @@ matchedSegmentNames.forEach(segmentName => {
 
     let numMatches = getMatchedSubmissionCount(segmentName);
 
-    if (numMatches !== 0 && correctedSubmissionNumber > 0) {
-        let number_of_similar;
-        if (isFileIncludedBool) {
-            number_of_similar = numMatches - 1;
-        } else {
-            number_of_similar = numMatches;
-        }
-        temp_probability = number_of_similar / correctedSubmissionNumber;
+    if (totalFileCount > 0) {
+        temp_probability = numMatches / totalFileCount;
     }
+    
     individual_probabilities[segmentName] = temp_probability;
     joint_probability *= temp_probability;
 });
 
-expectation = joint_probability * correctedSubmissionNumber;
+expectation = joint_probability * totalFileCount;
 
 
 var segmentFilesKeys = Object.keys(segmentFiles).filter(key => segmentFiles.hasOwnProperty(key) === true);
@@ -236,6 +231,7 @@ $("#report-form").submit(function (e) {
     change_font_size(section_size);
     print_text("General Evaluation");
     change_font_size(subsection_size+1);
+    print_text(`Number of total files in other submissions:   ${totalFileCount}`);
     print_text(`Number of total submissions:   ${submissionCount}`);
     change_font_size(text_size);
 
@@ -288,9 +284,10 @@ $("#report-form").submit(function (e) {
         print_text(`Individual probability:               ${individual_probabilities[segmentName].toFixed(decimalPrecision)}`);
         change_font_size(subsection_size-1);
         let suspectFilesKeys = Object.keys(detectionResults[segmentName]).filter(key => detectionResults[segmentName].hasOwnProperty(key) === true);
-        let similarSubmissionNumber = suspectFilesKeys.length - 1;
+        let similarSubmissionNumber = suspectFilesKeys.length;
+        if (isFileIncludedBool) similarSubmissionNumber--;
         if (similarSubmissionNumber < 0) similarSubmissionNumber = 0;
-        print_text(`Number of similar submissions:   ${similarSubmissionNumber}`);
+        print_text(`Number of similar submission files:   ${similarSubmissionNumber}`);
         y += 1;
         change_font_size(text_size);
         if(detailed) {
@@ -321,10 +318,16 @@ $(document).ready(function (){
 
     // General stats
     $("#segmentsContainer").before(
-        "<div id='results-summary'>" +
-        `<h4>Number of total submissions: <i>${submissionCount}</i></h4>Including the suspect submission: ${isFileIncluded}` +
-        `<p>Joint Probability: <i>${joint_probability.toFixed(decimalPrecision)}</i><br/>Joint Expectation: <i>${expectation.toFixed(decimalPrecision)}</i></p>` +
-        "</div>"
+        `<div id='results-summary'>
+            <h4>Number of total files in other submissions: <i>${totalFileCount}</i></h4>
+            <h4>Number of total submissions: <i>${submissionCount}</i></h4>
+            Including the suspect submission: ${isFileIncluded}
+            <p>
+                Joint Probability: <i>${joint_probability.toFixed(decimalPrecision)}</i>
+                <br/>
+                Joint Expectation: <i>${expectation.toFixed(decimalPrecision)}</i>
+            </p>
+        </div>`
     );
 
     // Each segment

@@ -146,26 +146,33 @@ def get_list_of_files(dirName):
     return allFiles
 
 
-def is_file_included_in_folder(request):
+def uploaded_file_dir_in_folder(request):
     """
-    Check if the uploaded file is included in the uploaded folder
+    Check if the uploaded file is included in the uploaded folder and return the 
+        path for the submission folder
 
     :param request:
-    :return:
+    :return: The submission directory for the uploaded file or None if file is 
+        not included
     """
     file_path = get_file_to_compare_path(request)
     single_file_dir = get_list_of_files(file_path)
     if len(single_file_dir) == 0:
-        return False
+        return None
     file = single_file_dir[0]
     folder_path = get_folder_path(request)
     folder_files = get_list_of_files(folder_path)
 
     for folder_file in folder_files:
         if cmp(file, folder_file):
-            return True
+            reduced_path = folder_file
+            path_end = []
+            while reduced_path != folder_path:
+                reduced_path, last = os.path.split(reduced_path)
+                path_end.append(last)
+            return os.path.join(folder_path, path_end[-1], path_end[-2])
 
-    return False
+    return None
 
 
 def number_of_submissions(request):
@@ -337,3 +344,24 @@ def auto_detect_programming_language(request):
         print("Uploaded file not supported")
         return "FILE_TYPE_NOT_SUPPORTED"
 
+
+def num_external_files(request):
+    """Function calculates the number of files that are in the uploaded folder. 
+        If the uploaded file is included in the submissions, then all files from 
+        that specific submission are excluded from the count.
+    
+    :param request: Request that has been made and contains user credentials
+    :type request: HttpRequest
+    :return: The number of files uploaded (excluding the submission)
+    :rtype: int
+    """
+    # calculate the number of files from other submissions
+    folder_path = get_folder_path(request)
+    folder_files = get_list_of_files(folder_path)
+
+    submission_folder = uploaded_file_dir_in_folder(request)
+    submission_files = []
+    if submission_folder is not None:
+        submission_files = get_list_of_files(submission_folder)
+
+    return len(folder_files) - len(submission_files)

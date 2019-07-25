@@ -11,6 +11,11 @@
         const segmentFiles = JSON.parse("{{ segmentFilesJsonString|escapejs }}");
         let submissionCount = "{{ SubmissionNumber }}";
         let isFileIncluded = "{{ isFileIncluded }}";
+        const totalFileCount = {{ totalFileCount }};
+        let submissionPathPrefix;
+        {% if submissionPathPrefix is not none %}
+            submissionPathPrefix = "{{ submissionPathPrefix }}";
+        {% endif %}
     </script>
     <script src="{% static 'js/results.js' %}" defer></script>
     <!-- Report generation script source: https://rawgit.com/MrRio/jsPDF/master/docs/ -->

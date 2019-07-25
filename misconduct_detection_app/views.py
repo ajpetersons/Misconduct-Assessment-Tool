@@ -70,7 +70,7 @@ def uploaded_folder_index(request):
     """
     # Check if uploaded file is in uploaded folder
     is_file_included = "No"
-    if is_file_included_in_folder(request):
+    if uploaded_file_dir_in_folder(request) is not None:
         is_file_included = "Yes"
     context = {
         "numberOfSubmissions": number_of_submissions(request),
@@ -155,14 +155,17 @@ def results_index(request):
     detection_results_json_string = json.dumps(detection_results, cls=DjangoJSONEncoder)
     # Check if uploaded file is in uploaded folder
     is_file_included = "No"
-    if is_file_included_in_folder(request):
+    submission_path_prefix = uploaded_file_dir_in_folder(request)
+    if submission_path_prefix is not None:
         is_file_included = "Yes"
 
     context = {
         "ResultsJsonString": detection_results_json_string,
         "SubmissionNumber": number_of_submissions(request),
         "segmentFilesJsonString": segment_files_json_string,
-        "isFileIncluded": is_file_included
+        "isFileIncluded": is_file_included,
+        "totalFileCount": num_external_files(request),
+        "submissionPathPrefix": submission_path_prefix
     }
 
     return render(request, 'misconduct_detection_app/results.html', context)
@@ -288,7 +291,7 @@ def upload_check_included(request):
     :return: Yes/No/NA
     """
     if os.path.exists(get_folder_path(request)) and os.path.exists(get_file_to_compare_path(request)):
-        if is_file_included_in_folder(request):
+        if uploaded_file_dir_in_folder(request) is not None:
             return HttpResponse("Yes")
         else:
             return HttpResponse("No")
