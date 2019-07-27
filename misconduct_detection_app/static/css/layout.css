@@ -58,3 +58,15 @@ body > .container-fluid {
 .form-error {
     color: #dc3545;
 }
+
+.alert-container .alert {
+    width: 100%;
+    margin-left: 30px;
+}
+
+.modal-footer.note {
+    border: none;
+    padding-top: 0;
+    font-size: 14px;
+    color: #6e6e6e;
+}

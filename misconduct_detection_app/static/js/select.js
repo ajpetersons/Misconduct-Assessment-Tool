@@ -56,18 +56,6 @@ function shadeColor(color, percent) {
 }
 
 /**
- * Check whether the segments section is empty
- */
-function areSegmentsEmpty() {
-    let i;
-    for (i = 1; i <= maxSegmentNumber; i++) {
-        if ($("#rowSegment" + i).length)
-            return false;
-    }
-    return true;
-}
-
-/**
  * Disables next button if there are no segments
  */
 function updateNextButtonStatus() {
@@ -220,68 +208,6 @@ function drawOneSegment(selectText, segmentNumber) {
     });
 }
 
-function sendCurrentSegmentsAndSelection() {
-    let selectedCode = new FormData($('#selectCode_Form')[0]);
-    $.ajax({
-        url: "selectCode/",
-        type: 'POST',
-        cache: false,
-        data: selectedCode,
-        processData: false,
-        contentType: false,
-        dataType:"json",
-        beforeSend: function() {
-            uploading = true;
-        },
-        success : function(data) {
-            uploading = false;
-        }
-    });
-
-    let checkedBoxesArray = $('input[type="checkbox"]:checked').map(function(){
-		return $(this).val();
-    }).get();
-    let checkedBoxes = new FormData();
-    checkedBoxes.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
-    checkedBoxes.append("checkedBox", checkedBoxesArray);
-    $.ajax({
-        url: "checkBoxStatus/",
-        type: 'POST',
-        cache: false,
-        data: checkedBoxes,
-        processData: false,
-        contentType: false,
-        dataType:"json",
-        beforeSend: function() {
-            uploading = true;
-        },
-        success : function(data) {
-            uploading = false;
-        }
-    });
-
-    let codeDisplayHtml = $("#codeDisplayText").html()
-    console.log('codeDisplayHtml '+codeDisplayHtml)
-    let codeDisplayFrom = new FormData();
-    codeDisplayFrom.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
-    codeDisplayFrom.append("codeDisplayHtml", codeDisplayHtml);
-    $.ajax({
-        url: "saveHtml/",
-        type: 'POST',
-        cache: false,
-        data: codeDisplayFrom,
-        processData: false,
-        contentType: false,
-        dataType:"json",
-        beforeSend: function() {
-            uploading = true;
-        },
-        success : function(data) {
-            uploading = false;
-        }
-    });
-}
-
 function highlightNode(node, colour) {
     node.find("span").css("color", "black");
     node.find("span").css("background", colour);
@@ -308,45 +234,6 @@ function highlightCode(selectedTextRange, startNode, endNode, segmentNumber) {
     highlightNode(endNode, getHighlightColour(segmentNumber));
 }
 
-function getAutoDetectionResults() {
-    $.ajax({
-        url: '/select/autoDetect/',
-        type: "GET",
-        dataType: "json",
-        success: function (autoDetectResults) {
-            autoDetectionLibSelection = autoDetectResults[0]
-            autoDetectionLanguage = autoDetectResults[1]
-            if ((detectionLibSelection === undefined) || (detectionLanguage === undefined)) {
-                $("#autoDetectionConfirmationModalBody").empty()
-                $("#autoDetectionConfirmationModalConfirm").addClass("disabled")
-                $("#autoDetectionConfirmationModalBody").append(
-                    "You have not set the detection package and programming language!"
-                )
-                $('#autoDetectionConfirmationModal').modal('show');
-            } else if ((!autoDetectionLibSelection.includes(detectionLibSelection)) || detectionLanguage != autoDetectionLanguage) {
-                $("#autoDetectionConfirmationModalBody").empty()
-                $("#autoDetectionConfirmationModalConfirm").removeClass("disabled")
-                $("#autoDetectionConfirmationModalBody").append(
-                    `The selected programming language used for detection is not the one 
-                    usually associated with the file extension of the uploaded file.
-                    Recommended setting: <br> <br>`
-                )
-                $("#autoDetectionConfirmationModalBody").append($("<div></div>").attr({
-                    "style": "text-align: center",
-                }).text(autoDetectionLibSelection + " : " + autoDetectionLanguage));
-                $("#autoDetectionConfirmationModalConfirm").on("click", function(){
-                    window.location.replace('/select/runningWaitingPage/');
-                });
-                $('#autoDetectionConfirmationModal').modal('show');
-            } else {
-                $(document).ajaxStop(function() {
-                    window.location.replace('/select/runningWaitingPage/');
-                });
-            }
-        }
-    });
-}
-
 function setCodeText(code) {
     $("#codeDisplayText").empty()
         .append("<pre id='codeDisplayTextPre' class='prettyprint linenums lang-c lang-cpp lang-java' style='white-space:pre-wrap'></pre>");
@@ -371,21 +258,19 @@ function setCodeDisplayText() {
     });
 }
 
-$("#nextButton").click(function(evt) {
-    evt.preventDefault();
-
-    if (!areSegmentsEmpty()) {
-        sendCurrentSegmentsAndSelection();
-        getAutoDetectionResults();
-    }
-
-});
+$("#nextButton").click(runDetection);
 
 function saveChanges() {
     // Save segment changes
     sendCurrentSegmentsAndSelection();
     $(document).ajaxStop(function () {
+        if (maxSegmentNumber > 0) {
+            segmentsPathList = "SEGMENTSEXISTS";
+        } else {
+            segmentsPathList = "NOFOLDEREXISTS";
+        }
         redrawBottomBar();
+        updateNextButtonStatus();
     });
 }
 
@@ -481,7 +366,6 @@ function addSelectedSegment() {
         highlightCode(selectedTextRange, startNode, endNode, maxSegmentNumber);
         drawOneSegment(selectedText, maxSegmentNumber);
         saveChanges();
-        updateNextButtonStatus();
     } else {
         displayTooltip();
     }
@@ -541,4 +425,6 @@ $(document).ready(function () {
     $(function () {
         $('[data-toggle="popover"]').popover()
     });
+
+    updateNextButtonStatus()
 });

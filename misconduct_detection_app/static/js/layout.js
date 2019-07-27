@@ -224,54 +224,189 @@ function loadDetectionLib() {
         });
     });
 
-    $("#programmingLanguageChoosingModalSave").on("click", function(){
-        // Please notice here. Although we made all input radio button in a form,
-        // we don't want to send it to the back-end directly. We will let something
-        // else send the variables set here later.
-        detectionLanguage = $("input[type='radio']:checked", ".programmingLanguageChoosingLanguageFormDivs").val()
-        detectionLibSelection = $("input[name=detectionLib]:checked").val();
-        detectionThreshold = $("#detectionThreshold").text();
-        if (detectionLanguage === undefined || detectionLibSelection === undefined) {
-            console.error("Detection Library not properly selected")
-            return;
-        }
-
-        $("#detectionLibSelection").empty();
-        let button = createButtonWithIcon(icon, detectionLibSelection + " : " + detectionLanguage, false);
-        button.addClass("text-primary"); // Add the link colour to match the other buttons
-        $("#detectionLibSelection").append(button);
-
-        let programmingConfigs = new FormData();
-        programmingConfigs.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
-        programmingConfigs.append("detectionLibSelection", detectionLibSelection);
-        programmingConfigs.append("detectionLanguage", detectionLanguage);
-        programmingConfigs.append("detectionThreshold", detectionThreshold);
-        $.ajax({
-            url: "/configs/savingConfigs/",
-            type: 'POST',
-            cache: false,
-            data: programmingConfigs,
-            processData: false,
-            contentType: false,
-            dataType:"json",
-            beforeSend: function() {
-                uploading = true;
-            },
-            success : function(data) {
-                uploading = false;
-            }
-        });
-
-        $(document).ajaxStop(function() {
-            $("#programmingLanguageChoosingModal").modal('hide');
-        });
-        
+    $("#programmingLanguageChoosingModalSave").on("click", uploadDetectionLibConfig);
+    $("#programmingLanguageChoosingModalSaveAndRun").on("click", function(event) {
+        uploadDetectionLibConfig(event, runDetection);
     });
 
     // Let the button listen click event
     $("#detectionLibSelection").on("click", function() {
         $("#programmingLanguageChoosingModal").modal();
     });
+}
+
+function sendCurrentSegmentsAndSelection() {
+    let selectedCode = new FormData($('#selectCode_Form')[0]);
+    $.ajax({
+        url: "selectCode/",
+        type: 'POST',
+        cache: false,
+        data: selectedCode,
+        processData: false,
+        contentType: false,
+        dataType:"json",
+        beforeSend: function() {
+            uploading = true;
+        },
+        success : function(data) {
+            uploading = false;
+        }
+    });
+
+    let checkedBoxesArray = $('input[type="checkbox"]:checked').map(function(){
+		return $(this).val();
+    }).get();
+    let checkedBoxes = new FormData();
+    checkedBoxes.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
+    checkedBoxes.append("checkedBox", checkedBoxesArray);
+    $.ajax({
+        url: "checkBoxStatus/",
+        type: 'POST',
+        cache: false,
+        data: checkedBoxes,
+        processData: false,
+        contentType: false,
+        dataType:"json",
+        beforeSend: function() {
+            uploading = true;
+        },
+        success : function(data) {
+            uploading = false;
+        }
+    });
+
+    let codeDisplayHtml = $("#codeDisplayText").html()
+    console.log('codeDisplayHtml '+codeDisplayHtml)
+    let codeDisplayFrom = new FormData();
+    codeDisplayFrom.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
+    codeDisplayFrom.append("codeDisplayHtml", codeDisplayHtml);
+    $.ajax({
+        url: "saveHtml/",
+        type: 'POST',
+        cache: false,
+        data: codeDisplayFrom,
+        processData: false,
+        contentType: false,
+        dataType:"json",
+        beforeSend: function() {
+            uploading = true;
+        },
+        success : function(data) {
+            uploading = false;
+        }
+    });
+}
+
+function getAutoDetectionResults() {
+    $.ajax({
+        url: '/select/autoDetect/',
+        type: "GET",
+        dataType: "json",
+        success: function (autoDetectResults) {
+            let autoDetectionLibSelection = autoDetectResults[0]
+            let autoDetectionLanguage = autoDetectResults[1]
+            if ((detectionLibSelection === undefined) || (detectionLanguage === undefined)) {
+                $("#autoDetectionConfirmationModalBody").empty()
+                $("#autoDetectionConfirmationModalConfirm").addClass("disabled")
+                $("#autoDetectionConfirmationModalBody").append(
+                    "You have not set the detection package and programming language!"
+                )
+                $('#autoDetectionConfirmationModal').modal('show');
+            } else if ((!autoDetectionLibSelection.includes(detectionLibSelection)) || detectionLanguage != autoDetectionLanguage) {
+                $("#autoDetectionConfirmationModalBody").empty()
+                $("#autoDetectionConfirmationModalConfirm").removeClass("disabled")
+                $("#autoDetectionConfirmationModalBody").append(
+                    `The selected programming language used for detection is not the one 
+                    usually associated with the file extension of the uploaded file.
+                    Recommended setting: <br> <br>`
+                )
+                $("#autoDetectionConfirmationModalBody").append($("<div></div>").attr({
+                    "style": "text-align: center",
+                }).text(autoDetectionLibSelection + " : " + autoDetectionLanguage));
+                $("#autoDetectionConfirmationModalConfirm").on("click", function(){
+                    window.location.replace('/select/runningWaitingPage/');
+                });
+                $('#autoDetectionConfirmationModal').modal('show');
+            } else {
+                $(document).ajaxStop(function() {
+                    window.location.replace('/select/runningWaitingPage/');
+                });
+            }
+        }
+    });
+}
+
+/**
+ * Check whether the segments section is empty
+ */
+function areSegmentsEmpty() {
+    return segmentsPathList === "NOFOLDEREXISTS";
+}
+
+function runDetection(evt) {
+    if (evt) evt.preventDefault();
+
+    if (areSegmentsEmpty()) {
+        $(".alert-container").append(
+            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Could not start detection! You must select at least one segment
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>`
+        );
+        return;
+    }
+
+    sendCurrentSegmentsAndSelection();
+    getAutoDetectionResults();
+}
+
+function uploadDetectionLibConfig(event, callback){
+    event.preventDefault();
+
+    // Please notice here. Although we made all input radio button in a form,
+    // we don't want to send it to the back-end directly. We will let something
+    // else send the variables set here later.
+    detectionLanguage = $("input[type='radio']:checked", ".programmingLanguageChoosingLanguageFormDivs").val()
+    detectionLibSelection = $("input[name=detectionLib]:checked").val();
+    detectionThreshold = $("#detectionThreshold").text();
+    if (detectionLanguage === undefined || detectionLibSelection === undefined) {
+        console.error("Detection Library not properly selected")
+        return;
+    }
+
+    $("#detectionLibSelection").empty();
+    let button = createButtonWithIcon("settings", detectionLibSelection + " : " + detectionLanguage, false);
+    button.addClass("text-primary"); // Add the link colour to match the other buttons
+    $("#detectionLibSelection").append(button);
+
+    let programmingConfigs = new FormData();
+    programmingConfigs.append("csrfmiddlewaretoken", document.getElementsByName('csrfmiddlewaretoken')[0].value);
+    programmingConfigs.append("detectionLibSelection", detectionLibSelection);
+    programmingConfigs.append("detectionLanguage", detectionLanguage);
+    programmingConfigs.append("detectionThreshold", detectionThreshold);
+    $.ajax({
+        url: "/configs/savingConfigs/",
+        type: 'POST',
+        cache: false,
+        data: programmingConfigs,
+        processData: false,
+        contentType: false,
+        dataType:"json",
+        beforeSend: function() {
+            uploading = true;
+        },
+        success : function(data) {
+            uploading = false;
+            if (callback) callback();
+        }
+    });
+
+    $(document).ajaxStop(function() {
+        $("#programmingLanguageChoosingModal").modal('hide');
+    });
+    
 }
 
 function loadDetectionPackageSettings(){

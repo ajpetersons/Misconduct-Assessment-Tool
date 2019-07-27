@@ -436,8 +436,10 @@ def select_save_html(request):
     """
     
     if request.method == 'POST':
-        if not os.path.exists(get_segments_path(request)):
+        try:
             os.makedirs(get_segments_path(request))
+        except FileExistsError:
+            pass
         if len(request.POST) > 1:
             try:
                 with open(os.path.join(get_configs_path(request), "code_select_html.html"), 'w', newline='') as f:
@@ -595,9 +597,9 @@ def saving_configs(request):
                 else:
                     with open(os.path.join(get_configs_path(request), "configs.txt"), 'a') as f:
                         f.write("\n"+parameter+"," + request.POST[parameter])
-        return HttpResponse('Selection Succeeded')
+        return JsonResponse({"status": "success"})
     else:
-        return HttpResponse('Selection Failed')
+        return JsonResponse({"status": "failure"})
 
 
 def auto_detect(request):

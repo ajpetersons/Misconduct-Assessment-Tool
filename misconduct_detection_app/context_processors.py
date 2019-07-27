@@ -22,6 +22,33 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def segments_exist(segments_path):
+    """Function determines if there are segments in the given path. This 
+        function does not check if any segment is selected.
+    
+    :param segments_path: The path to segments directory
+    :type segments_path: str
+    :return: Indicator if there exist at least one valid segment
+    :rtype: bool
+    """
+    if not os.path.exists(segments_path):
+        # Segments directory does not exist for user
+        return False
+
+    files = os.listdir(segments_path)
+    
+    if not files:
+        # Segments directory empty for user
+        return False
+
+    if len(files) == 1 and os.path.exists(os.path.join(segments_path, "include_segments_path")):
+        # There are no segment files, only copy from last detection
+        return False
+
+    # There is at least one valid segment file
+    return True
+
+
 def generate_uploaded_file_list(request):
     """Read and fetch user files on the server and return to front end.
 
@@ -43,11 +70,11 @@ def generate_uploaded_file_list(request):
         file_to_compare_path_list = os.listdir(file_to_compare_path)
     else:
         file_to_compare_path_list = ["NOFOLDEREXISTS"]
-    if os.path.exists(segments_path):
+    if segments_exist(segments_path) :
         segments_path_list = ["SEGMENTSEXISTS"]
     else:
         segments_path_list = ["NOFOLDEREXISTS"]
-    if os.path.exists(os.path.join(get_segments_path(request), "include_segments_path")):
+    if os.path.exists(results_path):
         results_path_list = ["RESULTSEXISTS"]
     else:
         results_path_list = ["NOFOLDEREXISTS"]
