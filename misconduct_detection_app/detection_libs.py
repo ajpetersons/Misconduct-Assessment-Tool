@@ -411,7 +411,8 @@ class Jplag(DetectionLib):
 class SID(DetectionLib):
     """SID detection library."""
 
-    def __init__(self, results_path, segments_path, folder_to_compare_path, file_language, lib_path=None, name="SID"):
+    def __init__(self, results_path, segments_path, folder_to_compare_path, file_language, 
+                 lib_path=None, name="SID", threshold=80):
         """Create a new SID detection package wrapper object.
         
         :param name: the name of this library
@@ -430,6 +431,8 @@ class SID(DetectionLib):
         ----------------------Only for SID----------------------
         :param file_language: which languages are supported by this detection package
         :type file_language: str
+        :param threshold: Minimum similarity percent to be reported
+        :type threshold: int
         """
 
         super().__init__(name, lib_path, results_path, segments_path, folder_to_compare_path)
@@ -437,6 +440,7 @@ class SID(DetectionLib):
         assert (file_language in self.file_language_supported), "Language parameter {0} not supported by SID".format(
             file_language)
         self.file_language = file_language
+        self.threshold = threshold
         self.NORMAL_SIZE_SEGMENT = 12
         logger.debug('New instance of %s', self.name)
 
@@ -575,6 +579,11 @@ class SID(DetectionLib):
 
             if os.path.dirname(remote_filename) == self.segments_path:
                 # Exclude cross-segment matches
+                continue
+
+            similarity_parsed = float(similarity.strip().strip("%"))
+            if similarity_parsed < self.threshold:
+                # Exclude mathces with too little similarity
                 continue
 
             segment_name = self.get_segment_name(filename.contents[0])

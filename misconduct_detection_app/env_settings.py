@@ -290,10 +290,12 @@ def sid_default_creator(request, extra_settings):
 
     # Decompress the extra parameters
     detection_language = extra_settings["detectionLanguage"]
+    threshold = int(extra_settings["detectionThreshold"])
 
     # Return the JPlag object dynamically
     return SID(results_path=get_results_path(request), segments_path=include_segments_path,
-                 folder_to_compare_path=get_folder_path(request), file_language=detection_language)
+               folder_to_compare_path=get_folder_path(request), file_language=detection_language,
+               threshold=threshold)
 
 
 # Register detection packages
