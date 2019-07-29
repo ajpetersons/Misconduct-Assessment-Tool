@@ -26,6 +26,7 @@
             <input type="hidden" name="next" value="{{ next }}"/>
         </form>
         <div class="dropdown-divider"></div>
+        <span class="login-redirect">Don't have an account?</span>
         <a class="btn btn-secondary btn-block" href="{% url 'signup' %}?next={{ request.path }}">Sign up</a>
     </div>
 

@@ -4,7 +4,6 @@
     {# load previous script declarations #}
     {{ block.super }}
     {% load staticfiles %}
-    <!-- <link rel="stylesheet" href="{% static 'css/guest.css' %}"> -->
     <script>
         pageName = "Welcome"
     </script>
@@ -28,9 +27,11 @@
                 <input type="submit" class="btn btn-primary btn-block" value="Log in"/>
                 <input type="hidden" name="next" value="{{ request.get_full_path }}"/>
             </form>
-            <div class="dropdown-divider"></div>
-            <a class="btn btn-secondary btn-block" href="{% url 'signup' %}?next={{ request.path }}">Sign up</a>
         </div>
+        
+        <div class="dropdown-divider"></div>
+        <span class="login-redirect">Don't have an account?</span>
+        <a class="btn btn-secondary btn-block" href="{% url 'signup' %}?next={{ request.path }}">Sign up</a>
 
         <div class="dropdown-divider"></div>
         <a href="/guestLogin/" class="btn btn-secondary btn-block">Continue as a guest</a>

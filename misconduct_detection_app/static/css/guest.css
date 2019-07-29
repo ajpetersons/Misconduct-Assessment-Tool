@@ -22,6 +22,12 @@
   line-height: 22px;
 }
 
+span.login-redirect {
+  margin: 15px 0 10px;
+  display: block;
+  font-size: 14px;
+}
+
 .form-text.text-muted {
   padding-bottom: 16px;
 }
