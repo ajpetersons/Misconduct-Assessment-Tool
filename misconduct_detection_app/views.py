@@ -53,6 +53,8 @@ def upload_index(request):
     :return: render
     :rtype: render
     """
+    if not request.user.is_authenticated or 'guest' not in request.session:
+        return redirect('index')
 
     context = {
         "numberOfSubmissions": number_of_submissions(request),
@@ -68,6 +70,9 @@ def uploaded_folder_index(request):
         :return: render
         :rtype: render
     """
+    if not request.user.is_authenticated or 'guest' not in request.session:
+        return redirect('index')
+
     # Check if uploaded file is in uploaded folder
     is_file_included = "No"
     if uploaded_file_dir_in_folder(request) is not None:
@@ -86,6 +91,9 @@ def select_index(request):
     :return: render
     :rtype: render
     """
+    if not request.user.is_authenticated or 'guest' not in request.session:
+        return redirect('index')
+
     try:
         file_to_be_compared_path = get_file_to_compare_path(request)
         file_to_be_compared = os.listdir(file_to_be_compared_path)
@@ -120,6 +128,9 @@ def results_index(request):
     :return: render
     :rtype: render
     """
+    if not request.user.is_authenticated or 'guest' not in request.session:
+        return redirect('index')
+
     # If the detection failed and there is no result, return the "no results" error page
     if not os.path.exists(get_results_path(request)):
         return redirect('error_no_results_error')
